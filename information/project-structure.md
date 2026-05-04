@@ -15,15 +15,13 @@ leafnote/
 ├── ROADMAP.md                 # Lộ trình theo milestone
 ├── CHANGELOG.md               # Lịch sử release (tạo sau release đầu)
 ├── CONTRIBUTING.md            # Quy ước commit, PR (tạo khi cần)
-├── .env.example               # Mẫu biến môi trường toàn monorepo
+├── .env.example               # Mẫu biến môi trường
 ├── .gitignore
 │
 ├── .claude/                   # Bộ nhớ làm việc của Claude
 ├── information/               # Tài liệu dự án
 ├── backend/                   # FastAPI + Celery (Python)
-├── frontend/
-│   ├── web/                   # React + Vite (web app)
-│   └── mobile/                # React Native + Expo (mobile app)
+├── frontend/                  # React + Vite (web app duy nhất)
 ├── tests/                     # Test tổng hợp (tạo từ M1)
 └── experiments/               # Thử nghiệm nhanh (tạo khi cần)
 ```
@@ -55,17 +53,7 @@ information/
 ├── api-spec.md                # API endpoints (high-level)
 ├── database-schema.md         # Schema DB (high-level)
 ├── user-stories.md            # Stories P0/P1/P2 theo persona
-├── runbooks/                  # Xử lý sự cố vận hành (tạo khi deploy)
-└── plan/
-    ├── mvp-scope.md           # Phạm vi MVP chốt
-    ├── milestones.md          # Mốc có deliverable & gate
-    ├── backlog.md             # Tính năng chưa làm (tạo từ M1)
-    ├── drafts/                # Spec chi tiết tham chiếu khi code
-    │   ├── database-schema.draft.md
-    │   └── api-spec.draft.md
-    └── sprints/               # Kế hoạch sprint (tạo từng sprint khi bắt đầu)
-        ├── sprint-01.md
-        └── sprint-02.md
+└── runbooks/                  # Xử lý sự cố vận hành (tạo khi deploy)
 ```
 
 ---
@@ -133,10 +121,10 @@ backend/
 
 ---
 
-## `frontend/web/` — React + Vite (web app)
+## `frontend/` — React + Vite (web app)
 
 ```
-frontend/web/
+frontend/
 ├── package.json
 ├── vite.config.ts
 ├── tailwind.config.js
@@ -153,7 +141,8 @@ frontend/web/
     │   └── ui/                # shadcn/ui overrides + custom primitives
     ├── pages/
     │   ├── AuthPage.tsx
-    │   ├── WorkspacePage.tsx  # editor + atom panel + surfacing
+    │   ├── WorkspacePage.tsx  # editor + atom panel + surfacing + voice/image capture
+    │   ├── RecallPage.tsx     # recall feed hằng ngày
     │   ├── AtomDetailPage.tsx
     │   ├── ProfilePage.tsx    # /me/cognitive-profile
     │   └── SettingsPage.tsx
@@ -179,42 +168,6 @@ frontend/web/
 - API call → `services/`, không fetch trực tiếp trong component hay hook.
 - Types trong `types/` được codegen tự động — không viết tay lại.
 
----
-
-## `frontend/mobile/` — React Native + Expo
-
-```
-frontend/mobile/
-├── package.json
-├── app.json                   # Expo config
-├── tsconfig.json
-└── src/
-    ├── App.tsx                # Navigation root (React Navigation)
-    ├── screens/
-    │   ├── AuthScreen.tsx
-    │   ├── OnboardingScreen.tsx
-    │   ├── CaptureScreen.tsx  # text + voice + ảnh
-    │   ├── RecallFeedScreen.tsx
-    │   └── ProfileScreen.tsx
-    ├── components/            # UI component mobile-specific
-    │   ├── RecallCard.tsx
-    │   ├── VoiceRecorder.tsx
-    │   └── ImageCapture.tsx
-    ├── hooks/
-    │   ├── useCapture.ts      # Gộp logic text / voice / image
-    │   ├── useRecallFeed.ts
-    │   └── useNotification.ts
-    ├── services/              # Gọi API — share types với web qua shared/
-    │   └── (mirror web/services nhưng dùng expo fetch)
-    └── shared/                # Types & utils share được với web
-        └── types/             # Symlink hoặc copy từ web/src/types/
-```
-
-**Lý do tách `web/` và `mobile/`** thay vì monorepo Expo Router:
-
-- Editor web dùng Tiptap + DOM API — không chạy được trên RN.
-- Graph view dùng Cytoscape — không chạy được trên RN.
-- Share logic qua `services/` và `types/` là đủ; không cần Universal App phức tạp hơn.
 
 ---
 
@@ -248,8 +201,8 @@ Không commit code experiments vào nhánh `main` trừ khi chuyển thành feat
 |---|---|
 | Domain mới (ví dụ: `notification`) | Thêm file vào `routes/`, `models/`, `schemas/`, `services/` — không tạo folder riêng |
 | Trang mới web | Thêm vào `frontend/web/src/pages/` |
-| Màn hình mới mobile | Thêm vào `frontend/mobile/src/screens/` |
+| Trang mới web | Thêm vào `frontend/src/pages/` |
 | Celery task mới | Thêm vào `backend/app/workers/pipeline.py` hoặc `nightly.py` |
-| Sprint mới | Tạo `information/plan/sprints/sprint-NN.md` |
+| Sprint mới | Tạo file tạm trong `.claude/memory/` hoặc root |
 | Thử nghiệm ý tưởng | Tạo trong `experiments/prototypes/<tên>/` |
 | Migration DB mới | `alembic revision --autogenerate -m "M00N_<tên>"` |

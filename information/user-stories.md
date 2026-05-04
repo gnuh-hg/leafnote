@@ -76,19 +76,15 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 - **AC2**: Skip được; nếu skip, mọi note vào "Inbox".
 - **Ưu tiên**: P0.
 
-### S-1.4 Cài app mobile từ link đăng nhập web
+### S-1.4 ~~Cài app mobile từ link đăng nhập web~~
 
-**Là** Quân, **tôi muốn** quét QR trên web để đăng nhập mobile sẵn, **để** không phải gõ lại mật khẩu.
-
-- **AC1**: Settings → "Liên kết mobile" hiện QR chứa one-time token (TTL 5 phút).
-- **AC2**: App mobile quét QR → đăng nhập đồng bộ.
-- **Ưu tiên**: P1.
+> **Out of scope** — chỉ có web app, không có mobile app.
 
 ---
 
 # E2 — Capture (đa kênh, đa nền tảng)
 
-### S-2.1 Gõ note nhanh trên mobile
+### S-2.1 Gõ note nhanh trên web
 
 **Là** Minh, **tôi muốn** mở app, gõ note ngay trong dưới 2 giây, **để** không quên ý trong giờ học.
 
@@ -167,12 +163,12 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 - **AC4**: Quyết định ghi vào `events` để personalization học ngưỡng nhạy của user.
 - **Ưu tiên**: P0.
 
-### S-3.3 Active recall hằng ngày trên mobile
+### S-3.3 Active recall hằng ngày trên web
 
-**Là** Minh, **tôi muốn** mở app sáng có sẵn 10–20 câu hỏi, **để** ôn nhanh trên xe bus.
+**Là** Minh, **tôi muốn** vào trang recall sáng có sẵn 10–20 câu hỏi, **để** ôn nhanh trước giờ học.
 
-- **AC1**: Notification 8:00 (theo timezone) "Hôm nay có N hạt cần ôn".
-- **AC2**: Mở vào màn hình swipe — mỗi câu hiển thị prompt; chạm để xem đáp án; chọn 1 trong 4 mức Again/Hard/Good/Easy.
+- **AC1**: Badge trên nav "Hôm nay có N hạt cần ôn".
+- **AC2**: Trang recall feed — mỗi câu hiển thị prompt; click để xem đáp án; chọn 1 trong 4 mức Again/Hard/Good/Easy.
 - **AC3**: Sau khi trả lời, FSRS update + animation feedback (đúng/sai/streak).
 - **AC4**: Có thể skip cả batch ("Hôm nay bận") — không phạt FSRS, chỉ trừ relevance ưu tiên.
 - **Ưu tiên**: P0.
@@ -333,20 +329,16 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 - **AC2**: Note local-only vẫn full-text searchable.
 - **Ưu tiên**: P1.
 
-### S-X.3 Đồng bộ giữa web và mobile
+### S-X.3 ~~Đồng bộ giữa web và mobile~~
 
-**Là** Minh, **tôi muốn** atom tôi vừa "Good" trên mobile cập nhật ngay trên web đang mở, **để** dữ liệu không lệch.
-
-- **AC1**: Web subscribe SSE/WebSocket; thay đổi hiển thị trong < 3s.
-- **AC2**: Conflict (sửa cùng note 2 nơi) giải quyết bằng "last-write-wins" cấp block, không cấp toàn note.
-- **Ưu tiên**: P1.
+> **Out of scope** — chỉ có web app, không có mobile app.
 
 ### S-X.4 Hiệu năng tối thiểu
 
 **Là** mọi user, **tôi muốn** thao tác chính (mở app, save, recall) phản hồi nhanh, **để** không nản.
 
 - **AC1**: P95 latency: capture text < 300ms (chưa kể AI), recall answer ack < 200ms, surfacing contextual < 800ms.
-- **AC2**: Cold start mobile < 2s; web first contentful paint < 1.5s.
+- **AC2**: Web first contentful paint < 1.5s.
 - **Ưu tiên**: P0.
 
 ### S-X.5 Khả năng truy cập (accessibility)
