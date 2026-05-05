@@ -37,7 +37,7 @@ Leafnote là kiến trúc client-server với một web frontend React, một ba
 
 ### 1. Presentation
 
-- **Web**: React + Tiptap editor, capture (text/voice/image), recall feed, knowledge graph view, project workspace.
+- **Web**: React + Tiptap editor thống nhất (text/voice/image trong cùng editor, không có modal capture riêng), recall feed, knowledge graph view, tag-based filter.
 - Gọi REST API qua `frontend/src/services/`; TypeScript types codegen từ OpenAPI schema.
 
 ### 2. API Layer (`backend/app/api/v1/routes/`)
@@ -61,7 +61,7 @@ Khi note được tạo/cập nhật:
 2. **Task `embed_atoms`**: gọi embedding API → ghi vào pgvector.
 3. **Task `link_atoms`**: tìm k-NN trong graph người dùng, đánh dấu trùng/mâu thuẫn.
 4. **Task `generate_recall`**: sinh câu hỏi cloze/định nghĩa ngược cho mỗi atom.
-5. **Task `update_relevance`** (cron): cập nhật relevance score dựa trên project đang hoạt động.
+5. **Task `update_relevance`** (cron): cập nhật relevance score dựa trên tag được mở gần đây và draft hiện tại.
 
 ### 5. Personalization Loop
 
@@ -89,7 +89,7 @@ Mỗi tương tác (review answer, mở atom, copy atom, dismiss surfacing) ghi 
 
 ### Surfacing trong editor
 
-1. User mở project hoặc gõ trong editor.
+1. User mở danh sách filter theo tag hoặc gõ trong editor.
 2. Web gửi context embedding (debounced) tới `POST /v1/surfacing/contextual`.
 3. Service truy vấn pgvector + bảng review-state → chọn top-K atoms phù hợp (retention sắp quên + relevance cao + chưa surface gần đây).
 4. Trả về list atom đính kèm lý do surface ("sắp quên", "mâu thuẫn", "liên quan").
@@ -124,7 +124,7 @@ Mỗi tương tác (review answer, mở atom, copy atom, dismiss surfacing) ghi 
 
 | Layer | Công nghệ | Lý do |
 |---|---|---|
-| Relational | PostgreSQL 15+ (Supabase) | Bảng chính: notes, atoms, reviews, projects |
+| Relational | PostgreSQL 15+ (Supabase) | Bảng chính: notes, atoms, reviews, tags, note_tags |
 | Vector | pgvector (HNSW) | Tránh vận hành thêm Pinecone/Weaviate riêng |
 | Auth | Supabase Auth | Email / OAuth, JWT tích hợp sẵn |
 | Blob | Supabase Storage | Audio voice note, ảnh OCR |

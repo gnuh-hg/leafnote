@@ -40,7 +40,7 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
    E1          E2           E3                    E4                       E5
 ```
 
-- **E1 Onboarding** — đăng ký, giới thiệu khái niệm "atom", tạo project đầu, capture note đầu.
+- **E1 Onboarding** — đăng ký, giới thiệu khái niệm "atom", thử capture note đầu, gắn tag đầu.
 - **E2 Capture** — đa kênh, đa nền tảng, không ma sát.
 - **E3 Decompose & Review** — atomic engine + active recall + surfacing trong editor.
 - **E4 Personalization mature** — sau 2–4 tuần, hệ thống thể hiện rõ là "đã hiểu user".
@@ -55,8 +55,8 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 **Là** Minh, **tôi muốn** đăng ký bằng email/Google trong dưới 30 giây, **để** bắt đầu ghi chú ngay không bị chặn.
 
 - **AC1**: Given trang landing, When chọn "Đăng ký bằng Google", Then sau OAuth quay về app đã có user mirror, locale=`vi`, timezone=device.
-- **AC2**: Given user mới, When vào lần đầu, Then thấy tối đa 3 màn onboarding (atom là gì → demo capture → tạo project đầu) — có thể skip.
-- **AC3**: Given đã skip onboarding, When về home, Then có 1 project mặc định "Inbox" và 1 note mẫu giải thích cách hoạt động.
+- **AC2**: Given user mới, When vào lần đầu, Then thấy tối đa 2 màn onboarding (atom là gì → demo capture) — có thể skip.
+- **AC3**: Given đã skip onboarding, When về home, Then thấy editor trống ở `/note/new` (không có khái niệm Inbox) và 1 note mẫu trong danh sách giải thích cách hoạt động.
 - **Ưu tiên**: P0.
 
 ### S-1.2 Hiểu khái niệm "atom" qua ví dụ trực quan
@@ -68,12 +68,13 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 - **AC3**: Không buộc xem hết — luôn có "Bỏ qua".
 - **Ưu tiên**: P0.
 
-### S-1.3 Tạo project đầu tiên
+### S-1.3 Gắn tag đầu tiên
 
-**Là** Hà, **tôi muốn** tạo project "Đồ án tốt nghiệp" ngay khi onboarding, **để** atom đầu tiên đã có ngữ cảnh.
+**Là** Hà, **tôi muốn** gắn tag "đồ-án" cho note demo trong onboarding, **để** hiểu cách tổ chức ghi chú không cần workspace cứng.
 
-- **AC1**: Onboarding screen 3 có form 1 trường `name` + chọn màu.
-- **AC2**: Skip được; nếu skip, mọi note vào "Inbox".
+- **AC1**: Sau màn capture demo, gợi ý "Thử thêm tag cho note này" với chip "+ Thêm tag" highlight.
+- **AC2**: Form tạo tag inline: 1 trường `name` (auto-slug) + chọn màu.
+- **AC3**: Skip được; note vẫn lưu bình thường, không có tag.
 - **Ưu tiên**: P0.
 
 ### S-1.4 ~~Cài app mobile từ link đăng nhập web~~
@@ -125,19 +126,34 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 
 **Là** Lan, **tôi muốn** đổ kho ghi chú cũ vào Leafnote, **để** không bắt đầu từ con số 0.
 
-- **AC1**: Upload `.zip` Markdown, mỗi folder thành project, mỗi file thành note.
+- **AC1**: Upload `.zip` Markdown, mỗi folder name → 1 tag tự động, mỗi file thành note có tag tương ứng.
 - **AC2**: Pipeline decompose chạy theo batch, có thanh tiến độ; có thể tắt để xử lý dần (background).
 - **AC3**: Sau import, surfacing tạm tắt 24h để tránh "spam" atom mới.
 - **Ưu tiên**: P1.
 
-### S-2.6 Tự chuyển project khi capture từ ngữ cảnh
+### S-2.6 Editor thống nhất cho tạo & sửa note
 
-**Là** Hà, **tôi muốn** capture trong khi đang mở project "Đồ án", **để** note tự thuộc project đó.
+**Là** Hà, **tôi muốn** dùng cùng một UI khi tạo note mới và khi sửa note cũ, **để** không phải học hai workflow khác nhau.
 
-- **AC1**: Active session có `active_project_id`; mọi capture từ session đó mặc định gán project ấy.
-- **AC2**: User có thể thay đổi 1 chạm trước khi save.
-- **AC3**: Nếu không có session active, vào Inbox.
+- **AC1**: Nút "Ghi chú mới" → navigate `/note/new` mở thẳng editor đầy đủ (không phải modal/wizard).
+- **AC2**: Editor `/note/new` và `/note/:id` dùng cùng component; chỉ khác initial state (body trống vs có sẵn).
+- **AC3**: Voice & image là **input methods** trong toolbar editor (`Mic`, `Image`), không phải mode/flow tách biệt — đều ghi vào cùng note đang mở.
+- **AC4**: Khi navigate `/note/new?input=voice` (từ nút Mic ở TopBar), editor mở sẵn voice panel ở chế độ recording.
+- **AC5**: Sau khi lưu note mới, AI phân rã chạy ngầm; user có thể đóng editor hoặc tiếp tục viết.
 - **Ưu tiên**: P0.
+
+### S-2.7 Filter danh sách ghi chú theo tag
+
+**Là** Hà, **tôi muốn** lọc danh sách note theo nhiều tag cùng lúc, **để** thu hẹp tìm kiếm khi kho ghi chú lớn.
+
+- **AC1**: Trang `/notes` có thanh chips tag ở đầu; click toggle on/off.
+- **AC2**: Multi-select dùng **AND** — note phải có tất cả tag được chọn mới hiện.
+- **AC3**: URL sync: `/notes?tag=t1,t2` để chia sẻ link filter.
+- **AC4**: Click tag trong sidebar → navigate `/notes?tag=<id>` với filter set sẵn.
+- **AC5**: Empty state khi filter không match — gợi ý "Xoá filter" hoặc bỏ bớt tag.
+- **Ưu tiên**: P0.
+
+> **Out of scope MVP**: OR-filter (toggle "Khớp tất cả / Khớp bất kỳ"). Search bar đã đủ cho use case "mở rộng". Sẽ thêm ở P1 nếu user feedback yêu cầu.
 
 ---
 
@@ -186,7 +202,7 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 
 **Là** Hà, **tôi muốn** trong lúc viết note đồ án, hệ thống đẩy lên các atom liên quan tôi đã viết tháng trước, **để** không lặp lại hoặc bỏ sót.
 
-- **AC1**: Editor có panel phụ; sau mỗi 5–10s gõ (debounced), gửi `draft_text` + project context → trả về 3–5 atom.
+- **AC1**: Editor có panel phụ; sau mỗi 5–10s gõ (debounced), gửi `draft_text` + tag context (các tag đã gắn cho note hiện tại) → trả về 3–5 atom.
 - **AC2**: Mỗi gợi ý có "lý do": `due_soon`, `contradicts`, `related`, `dormant_revival`.
 - **AC3**: User có thể: chèn vào draft / mở chi tiết / bỏ qua. Mỗi action ghi event.
 - **AC4**: Atom đã `dismissed` trong session không lặp lại.
@@ -205,7 +221,7 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 
 **Là** Hà, **tôi muốn** xem một atom đầy đủ: nguồn gốc, lịch sử ôn, các atom liên quan, **để** tin tưởng và chỉnh sửa.
 
-- **AC1**: Trang detail hiện: text, kind, origin (note + đoạn highlight), review history (≤ 30 lần gần nhất), link list, project relevances.
+- **AC1**: Trang detail hiện: text, kind, origin (note + đoạn highlight), review history (≤ 30 lần gần nhất), link list, tag relevances.
 - **AC2**: Có nút "Sinh lại câu hỏi", "Chia atom", "Merge với…", "Edit text".
 - **Ưu tiên**: P0.
 
@@ -244,8 +260,8 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 
 **Là** Hà, **tôi muốn** trong giai đoạn viết đồ án, surfacing ưu tiên relevance hơn retention, **để** không bị làm phiền bởi atom môn khác sắp quên.
 
-- **AC1**: Khi user mở 1 project liên tục ≥ 3 ngày → tăng tự động `surfacing_weights.relevance` lên 0.05 (giới hạn 0.7).
-- **AC2**: Khi gần kỳ thi (user đánh dấu deadline trong project) → tăng `retention`.
+- **AC1**: Khi user mở filter cùng 1 tag liên tục ≥ 3 ngày → tăng tự động `surfacing_weights.relevance` lên 0.05 (giới hạn 0.7).
+- **AC2**: Khi gần kỳ thi (user đánh dấu deadline gắn với 1 tag) → tăng `retention`.
 - **AC3**: User thấy được weights hiện tại và có thể override.
 - **Ưu tiên**: P1.
 
