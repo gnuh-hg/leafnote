@@ -20,8 +20,8 @@ leafnote/
 │
 ├── .claude/                   # Bộ nhớ làm việc của Claude
 ├── information/               # Tài liệu dự án
-├── backend/                   # FastAPI + Celery (Python)
-├── frontend/                  # React + Vite (web app duy nhất)
+├── .backend/                   # FastAPI + Celery (Python)
+├── .frontend/                  # React + Vite (web app duy nhất)
 ├── tests/                     # Test tổng hợp (tạo từ M1)
 └── experiments/               # Thử nghiệm nhanh (tạo khi cần)
 ```
@@ -61,7 +61,7 @@ information/
 ## `backend/` — FastAPI (Python)
 
 ```
-backend/
+.backend/
 ├── requirements.txt
 ├── requirements-dev.txt       # pytest, ruff, black, ...
 ├── .env.example
@@ -124,7 +124,7 @@ backend/
 ## `frontend/` — React + Vite (web app)
 
 ```
-frontend/
+.frontend/
 ├── package.json
 ├── vite.config.ts
 ├── tailwind.config.js
