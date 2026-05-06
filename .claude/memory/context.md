@@ -9,7 +9,7 @@ Tất cả tài liệu nền đã hoàn thành. Quyết định lớn được c
 
 Các quyết định còn lại được hoãn có chủ ý:
 
-- LLM provider (OpenAI vs Anthropic) → chốt khi bắt tay M3 (Atomic Engine).
+- LLM provider (OpenAI vs Anthropic) → chốt khi bắt tay M3 (Leaf Engine).
 - pgvector HNSW test → làm spike trong M1.
 
 Next milestone: **M1 — Scaffolding**. Gate: `/health` 200, web Vercel mở được + đăng nhập Supabase Auth, CI xanh.

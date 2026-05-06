@@ -1,6 +1,6 @@
-# my-app
+# Leafnote
 
-Mô tả ngắn về project ở đây.
+> Hướng dẫn cài đặt và chạy Leafnote — ghi chú tự tách thành lá tri thức, tự quay lại đúng lúc bạn cần.
 
 ---
 
@@ -45,4 +45,4 @@ Chi tiết đầy đủ: [`information/project-structure.md`](information/projec
 - [API spec](information/api-spec.md)
 - [Database schema](information/database-schema.md)
 - [Lộ trình](ROADMAP.md)
-- [Contributing](CONTRIBUTING.md)
+- [Lịch sử plan](HISTORY.md)

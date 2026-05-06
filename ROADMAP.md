@@ -33,7 +33,7 @@
 
 ## Tầm nhìn
 
-Biến ghi chú từ "nghĩa địa tri thức" thành **hạt tri thức sống** — tự liên kết, tự ôn, tự nổi lên đúng lúc cần. Người dùng càng dùng lâu, hệ thống càng "hiểu" và phục vụ cá nhân tốt hơn — đo được, không phải khẩu hiệu.
+Biến ghi chú từ "nghĩa địa tri thức" thành **lá tri thức sống** — tự liên kết, tự ôn, tự nổi lên đúng lúc cần. Người dùng càng dùng lâu, hệ thống càng "hiểu" và phục vụ cá nhân tốt hơn — đo được, không phải khẩu hiệu.
 
 ---
 
@@ -67,17 +67,17 @@ Năng lực mới:
 
 ---
 
-## M3 — Atomic Engine (core feature)
+## M3 — Leaf Engine (core feature)
 
-**Mục tiêu**: Note → atoms tự động. Đây là milestone định nghĩa Leafnote là Leafnote.
+**Mục tiêu**: Note → leaves tự động. Đây là milestone định nghĩa Leafnote là Leafnote.
 **Estimate**: ~3 tuần.
 
 Năng lực mới:
 
-- Pipeline decompose (Celery): note → block → atoms.
+- Pipeline decompose (Celery): note → block → leaves.
 - Embedding pgvector + HNSW.
 - Streaming kết quả về client (SSE) — story S-3.1.
-- UI panel atoms cạnh editor: highlight ngược về đoạn gốc, edit, gộp/tách.
+- UI panel leaves cạnh editor: highlight ngược về đoạn gốc, edit, gộp/tách.
 - Đề xuất duplicate / contradicts / related (S-3.2).
 - Idempotency + ai_jobs.
 
@@ -90,9 +90,9 @@ Năng lực mới:
 
 Năng lực mới:
 
-- Sinh câu hỏi tự động cho mỗi atom (cloze / reverse_def / application) — S-3.4.
+- Sinh câu hỏi tự động cho mỗi leaf (cloze / reverse_def / application) — S-3.4.
 - Recall feed web hằng ngày (S-3.3).
-- FSRS scheduler per-atom; chưa fit per-user.
+- FSRS scheduler per-leaf; chưa fit per-user.
 - `recall_answers` + cập nhật stability/difficulty.
 - Stats (`/recall/stats`) — accuracy, streak.
 
@@ -164,4 +164,4 @@ Năng lực mới:
 
 - ⬜ LLM provider chính: OpenAI vs Anthropic? (Cost vs chất lượng tiếng Việt) — chốt khi bắt đầu M3.
 - ⬜ pgvector HNSW trên Supabase free tier có đủ không? — test spike trong M1.
-- ⬜ i18n: chỉ VI cho thi, hay kiến trúc sẵn EN? (Đề xuất: VI trước).
+- ✅ i18n: kiến trúc sẵn EN+VI từ M1, giao diện mặc định VI. Chi tiết trong `information/product-principles.md`.

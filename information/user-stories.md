@@ -40,9 +40,9 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
    E1          E2           E3                    E4                       E5
 ```
 
-- **E1 Onboarding** — đăng ký, giới thiệu khái niệm "atom", thử capture note đầu, gắn tag đầu.
+- **E1 Onboarding** — đăng ký, giới thiệu khái niệm "leaf", thử capture note đầu, gắn tag đầu.
 - **E2 Capture** — đa kênh, đa nền tảng, không ma sát.
-- **E3 Decompose & Review** — atomic engine + active recall + surfacing trong editor.
+- **E3 Decompose & Review** — leaf engine + active recall + surfacing trong editor.
 - **E4 Personalization mature** — sau 2–4 tuần, hệ thống thể hiện rõ là "đã hiểu user".
 - **E5 Long-term knowledge** — sau tháng thứ 3, graph có giá trị retrospective: phát hiện gap, chủ đề lạnh, mâu thuẫn.
 
@@ -55,15 +55,15 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 **Là** Minh, **tôi muốn** đăng ký bằng email/Google trong dưới 30 giây, **để** bắt đầu ghi chú ngay không bị chặn.
 
 - **AC1**: Given trang landing, When chọn "Đăng ký bằng Google", Then sau OAuth quay về app đã có user mirror, locale=`vi`, timezone=device.
-- **AC2**: Given user mới, When vào lần đầu, Then thấy tối đa 2 màn onboarding (atom là gì → demo capture) — có thể skip.
+- **AC2**: Given user mới, When vào lần đầu, Then thấy tối đa 2 màn onboarding (leaf là gì → demo capture) — có thể skip.
 - **AC3**: Given đã skip onboarding, When về home, Then thấy editor trống ở `/note/new` (không có khái niệm Inbox) và 1 note mẫu trong danh sách giải thích cách hoạt động.
 - **Ưu tiên**: P0.
 
-### S-1.2 Hiểu khái niệm "atom" qua ví dụ trực quan
+### S-1.2 Hiểu khái niệm "leaf" qua ví dụ trực quan
 
-**Là** Hà, **tôi muốn** xem một ví dụ note → atoms thật, **để** hiểu vì sao Leafnote khác Notion.
+**Là** Hà, **tôi muốn** xem một ví dụ note → leaves thật, **để** hiểu vì sao Leafnote khác Notion.
 
-- **AC1**: Onboarding screen 2 hiển thị note mẫu 4 dòng + side panel hiện 5 atoms được tách ra, kèm highlight ngược về dòng gốc.
+- **AC1**: Onboarding screen 2 hiển thị note mẫu 4 dòng + side panel hiện 5 leaves được tách ra, kèm highlight ngược về dòng gốc.
 - **AC2**: Có nút "Thử với note của bạn" → mở capture trực tiếp.
 - **AC3**: Không buộc xem hết — luôn có "Bỏ qua".
 - **Ưu tiên**: P0.
@@ -119,7 +119,7 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 **Là** Quân, **tôi muốn** clip một đoạn từ blog đang đọc, **để** giữ kèm nguồn.
 
 - **AC1**: Extension Chrome gửi `selection_html` + `url` → API.
-- **AC2**: Note tự gắn `source_ref` là URL; atom decompose vẫn chạy.
+- **AC2**: Note tự gắn `source_ref` là URL; leaf decompose vẫn chạy.
 - **Ưu tiên**: P1.
 
 ### S-2.5 Import file Markdown / Notion / Obsidian
@@ -128,7 +128,7 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 
 - **AC1**: Upload `.zip` Markdown, mỗi folder name → 1 tag tự động, mỗi file thành note có tag tương ứng.
 - **AC2**: Pipeline decompose chạy theo batch, có thanh tiến độ; có thể tắt để xử lý dần (background).
-- **AC3**: Sau import, surfacing tạm tắt 24h để tránh "spam" atom mới.
+- **AC3**: Sau import, surfacing tạm tắt 24h để tránh "spam" leaf mới.
 - **Ưu tiên**: P1.
 
 ### S-2.6 Editor thống nhất cho tạo & sửa note
@@ -139,7 +139,7 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 - **AC2**: Editor `/note/new` và `/note/:id` dùng cùng component; chỉ khác initial state (body trống vs có sẵn).
 - **AC3**: Voice & image là **input methods** trong toolbar editor (`Mic`, `Image`), không phải mode/flow tách biệt — đều ghi vào cùng note đang mở.
 - **AC4**: Khi navigate `/note/new?input=voice` (từ nút Mic ở TopBar), editor mở sẵn voice panel ở chế độ recording.
-- **AC5**: Sau khi lưu note mới, AI phân rã chạy ngầm; user có thể đóng editor hoặc tiếp tục viết.
+- **AC5**: Sau khi lưu note mới, AI tách lá chạy ngầm; user có thể đóng editor hoặc tiếp tục viết.
 - **Ưu tiên**: P0.
 
 ### S-2.7 Filter danh sách ghi chú theo tag
@@ -159,21 +159,21 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 
 # E3 — Decompose & Review (Core Loop)
 
-### S-3.1 Xem atoms được tách ra từ note
+### S-3.1 Xem leaves được tách ra từ note
 
-**Là** Minh, **tôi muốn** thấy ngay note vừa viết được tách thành những hạt gì, **để** tin rằng hệ thống "hiểu" nội dung.
+**Là** Minh, **tôi muốn** thấy ngay note vừa viết được tách thành những lá gì, **để** tin rằng hệ thống "hiểu" nội dung.
 
-- **AC1**: Trong vòng 10s sau khi save (note ≤ 500 từ), atoms hiện ra dần dần (streaming) trong panel cạnh editor.
-- **AC2**: Mỗi atom có badge `kind` (định nghĩa / mệnh đề / quan hệ / dữ kiện).
-- **AC3**: Click atom → highlight đoạn gốc trong note.
-- **AC4**: User có thể "Gộp lại" / "Tách thêm" / "Sửa text" / "Bỏ qua" mỗi atom.
+- **AC1**: Trong vòng 10s sau khi save (note ≤ 500 từ), leaves hiện ra dần dần (streaming) trong panel cạnh editor.
+- **AC2**: Mỗi leaf có badge `kind` (định nghĩa / mệnh đề / quan hệ / dữ kiện).
+- **AC3**: Click leaf → highlight đoạn gốc trong note.
+- **AC4**: User có thể "Gộp lại" / "Tách thêm" / "Sửa text" / "Bỏ qua" mỗi leaf.
 - **Ưu tiên**: P0.
 
-### S-3.2 Hệ thống đề xuất atom trùng / mâu thuẫn
+### S-3.2 Hệ thống đề xuất leaf trùng / mâu thuẫn
 
 **Là** Hà, **tôi muốn** được cảnh báo khi viết câu mâu thuẫn với ghi chú cũ, **để** không tự lừa mình bằng kiến thức sai.
 
-- **AC1**: Khi atom mới được tạo và similarity ≥ ngưỡng `T_dup` với atom cũ → đề xuất `duplicate`.
+- **AC1**: Khi leaf mới được tạo và similarity ≥ ngưỡng `T_dup` với leaf cũ → đề xuất `duplicate`.
 - **AC2**: Khi LLM phát hiện mâu thuẫn ngữ nghĩa → đề xuất `contradicts`, kèm trích dẫn cả hai.
 - **AC3**: User chọn: giữ cả hai / merge / chọn phiên bản đúng / để sau.
 - **AC4**: Quyết định ghi vào `events` để personalization học ngưỡng nhạy của user.
@@ -183,7 +183,7 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 
 **Là** Minh, **tôi muốn** vào trang recall sáng có sẵn 10–20 câu hỏi, **để** ôn nhanh trước giờ học.
 
-- **AC1**: Badge trên nav "Hôm nay có N hạt cần ôn".
+- **AC1**: Badge trên nav "Hôm nay có N lá cần ôn".
 - **AC2**: Trang recall feed — mỗi câu hiển thị prompt; click để xem đáp án; chọn 1 trong 4 mức Again/Hard/Good/Easy.
 - **AC3**: Sau khi trả lời, FSRS update + animation feedback (đúng/sai/streak).
 - **AC4**: Có thể skip cả batch ("Hôm nay bận") — không phạt FSRS, chỉ trừ relevance ưu tiên.
@@ -193,36 +193,36 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 
 **Là** Quân, **tôi muốn** câu hỏi mỗi ngày khác kiểu (cloze / định nghĩa ngược / ứng dụng), **để** không học vẹt.
 
-- **AC1**: Mỗi atom có ≥ 2 câu hỏi khác `qtype` được sinh sẵn.
-- **AC2**: Nếu user trả lời đúng dạng `cloze` 3 lần liên tiếp cho cùng atom → ưu tiên dạng khác.
+- **AC1**: Mỗi leaf có ≥ 2 câu hỏi khác `qtype` được sinh sẵn.
+- **AC2**: Nếu user trả lời đúng dạng `cloze` 3 lần liên tiếp cho cùng leaf → ưu tiên dạng khác.
 - **AC3**: User có thể "Câu này tệ — sinh lại" (rate-limited).
 - **Ưu tiên**: P0.
 
 ### S-3.5 Surfacing chủ động khi đang viết
 
-**Là** Hà, **tôi muốn** trong lúc viết note đồ án, hệ thống đẩy lên các atom liên quan tôi đã viết tháng trước, **để** không lặp lại hoặc bỏ sót.
+**Là** Hà, **tôi muốn** trong lúc viết note đồ án, hệ thống đẩy lên các leaf liên quan tôi đã viết tháng trước, **để** không lặp lại hoặc bỏ sót.
 
-- **AC1**: Editor có panel phụ; sau mỗi 5–10s gõ (debounced), gửi `draft_text` + tag context (các tag đã gắn cho note hiện tại) → trả về 3–5 atom.
+- **AC1**: Editor có panel phụ; sau mỗi 5–10s gõ (debounced), gửi `draft_text` + tag context (các tag đã gắn cho note hiện tại) → trả về 3–5 leaf.
 - **AC2**: Mỗi gợi ý có "lý do": `due_soon`, `contradicts`, `related`, `dormant_revival`.
 - **AC3**: User có thể: chèn vào draft / mở chi tiết / bỏ qua. Mỗi action ghi event.
-- **AC4**: Atom đã `dismissed` trong session không lặp lại.
+- **AC4**: Leaf đã `dismissed` trong session không lặp lại.
 - **Ưu tiên**: P0.
 
-### S-3.6 Đánh dấu atom thành dormant thay vì xoá
+### S-3.6 Đánh dấu leaf thành dormant thay vì xoá
 
 **Là** Quân, **tôi muốn** "ngủ đông" một chủ đề không còn hot (Rust async runtime), **để** không bị làm phiền nhưng không mất dữ liệu.
 
-- **AC1**: Một chạm "Để sau" trong feed recall → atom `status='dormant'`.
-- **AC2**: Atom dormant không vào recall hằng ngày, nhưng vẫn có thể nổi lên khi search hoặc `dormant_revival`.
+- **AC1**: Một chạm "Để sau" trong feed recall → leaf `status='dormant'`.
+- **AC2**: Leaf dormant không vào recall hằng ngày, nhưng vẫn có thể nổi lên khi search hoặc `dormant_revival`.
 - **AC3**: Sau ≥ 60 ngày dormant + một note mới có chủ đề liên quan → đề xuất "hồi sinh".
 - **Ưu tiên**: P0.
 
-### S-3.7 Xem chi tiết atom — lịch sử, gốc, link
+### S-3.7 Xem chi tiết leaf — lịch sử, gốc, link
 
-**Là** Hà, **tôi muốn** xem một atom đầy đủ: nguồn gốc, lịch sử ôn, các atom liên quan, **để** tin tưởng và chỉnh sửa.
+**Là** Hà, **tôi muốn** xem một leaf đầy đủ: nguồn gốc, lịch sử ôn, các leaf liên quan, **để** tin tưởng và chỉnh sửa.
 
 - **AC1**: Trang detail hiện: text, kind, origin (note + đoạn highlight), review history (≤ 30 lần gần nhất), link list, tag relevances.
-- **AC2**: Có nút "Sinh lại câu hỏi", "Chia atom", "Merge với…", "Edit text".
+- **AC2**: Có nút "Sinh lại câu hỏi", "Chia leaf", "Merge với…", "Edit text".
 - **Ưu tiên**: P0.
 
 ---
@@ -249,16 +249,16 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 
 ### S-4.3 Granularity decompose tự điều chỉnh
 
-**Là** Lan, **tôi muốn** ghi chú nghiên cứu được tách ở mức tinh hơn so với ghi chú họp, **để** atom phù hợp ngữ cảnh.
+**Là** Lan, **tôi muốn** ghi chú nghiên cứu được tách ở mức tinh hơn so với ghi chú họp, **để** leaf phù hợp ngữ cảnh.
 
 - **AC1**: User profile có `granularity_pref: coarse|medium|fine`, mặc định `medium`.
-- **AC2**: Nếu user thường xuyên (≥ 5 lần) "Gộp lại" atoms → đề xuất chuyển `coarse`; ngược lại "Tách thêm" → `fine`.
+- **AC2**: Nếu user thường xuyên (≥ 5 lần) "Gộp lại" leaves → đề xuất chuyển `coarse`; ngược lại "Tách thêm" → `fine`.
 - **AC3**: User có thể override thủ công trong settings.
 - **Ưu tiên**: P1.
 
 ### S-4.4 Surfacing weights điều chỉnh theo hành vi
 
-**Là** Hà, **tôi muốn** trong giai đoạn viết đồ án, surfacing ưu tiên relevance hơn retention, **để** không bị làm phiền bởi atom môn khác sắp quên.
+**Là** Hà, **tôi muốn** trong giai đoạn viết đồ án, surfacing ưu tiên relevance hơn retention, **để** không bị làm phiền bởi leaf môn khác sắp quên.
 
 - **AC1**: Khi user mở filter cùng 1 tag liên tục ≥ 3 ngày → tăng tự động `surfacing_weights.relevance` lên 0.05 (giới hạn 0.7).
 - **AC2**: Khi gần kỳ thi (user đánh dấu deadline gắn với 1 tag) → tăng `retention`.
@@ -275,7 +275,7 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 
 ### S-4.6 Personalization minh bạch (explainability)
 
-**Là** Quân, **tôi muốn** biết tại sao một atom được đẩy lên, **để** tin hệ thống không tuỳ tiện.
+**Là** Quân, **tôi muốn** biết tại sao một leaf được đẩy lên, **để** tin hệ thống không tuỳ tiện.
 
 - **AC1**: Mỗi gợi ý surfacing có dòng "Vì: sắp quên (due trong 6h) + liên quan tới bản nháp đang viết (sim 0.78)".
 - **AC2**: Trang `/me/cognitive-profile` hiển thị đầy đủ feature vector + thời điểm fit gần nhất.
@@ -297,32 +297,32 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 
 **Là** Hà, **tôi muốn** thấy danh sách khái niệm tôi nhắc nhiều nhưng chưa định nghĩa, **để** lấp gap.
 
-- **AC1**: Job nightly chạy entity extraction trên atoms của user → so với atoms `kind='definition'` → list khái niệm chưa có atom.
-- **AC2**: Trang "Gaps" hiển thị + nút "Tạo atom định nghĩa" (mở editor pre-fill).
+- **AC1**: Job nightly chạy entity extraction trên leaves của user → so với leaves `kind='definition'` → list khái niệm chưa có leaf.
+- **AC2**: Trang "Gaps" hiển thị + nút "Tạo leaf định nghĩa" (mở editor pre-fill).
 - **Ưu tiên**: P1.
 
-### S-5.3 Hồi sinh atom dormant đúng lúc
+### S-5.3 Hồi sinh leaf dormant đúng lúc
 
-**Là** Quân, **tôi muốn** khi viết note mới về Rust async, các atom Rust cũ tự nổi lên dù tôi đã "ngủ đông", **để** không phải tự nhớ là đã ghi rồi.
+**Là** Quân, **tôi muốn** khi viết note mới về Rust async, các leaf Rust cũ tự nổi lên dù tôi đã "ngủ đông", **để** không phải tự nhớ là đã ghi rồi.
 
-- **AC1**: Khi atom mới có embedding ≥ ngưỡng `T_revive` với atom dormant → đề xuất hồi sinh trong panel surfacing.
+- **AC1**: Khi leaf mới có embedding ≥ ngưỡng `T_revive` với leaf dormant → đề xuất hồi sinh trong panel surfacing.
 - **AC2**: User có thể "Hồi sinh" (status active, lịch FSRS reset như learning) hoặc "Để dormant".
 - **Ưu tiên**: P1.
 
 ### S-5.4 Xuất "tri thức tinh" (curated export)
 
-**Là** Lan, **tôi muốn** xuất các atom kind=definition của 1 cluster ra Markdown, **để** dùng làm tài liệu giảng dạy.
+**Là** Lan, **tôi muốn** xuất các leaf kind=definition của 1 cluster ra Markdown, **để** dùng làm tài liệu giảng dạy.
 
-- **AC1**: Trên cluster view, nút "Xuất Markdown" → file có heading theo subcluster + atoms.
-- **AC2**: Có toggle "Chỉ atom đã review ≥ 3 lần" để lọc atom còn nháp.
+- **AC1**: Trên cluster view, nút "Xuất Markdown" → file có heading theo subcluster + leaves.
+- **AC2**: Có toggle "Chỉ leaf đã review ≥ 3 lần" để lọc leaf còn nháp.
 - **Ưu tiên**: P2.
 
 ### S-5.5 Báo cáo retrospective hằng quý
 
-**Là** Quân, **tôi muốn** mỗi 90 ngày nhận một bản tổng kết: bao nhiêu atom, retention thật, cluster tăng/giảm, **để** nhìn lại bản thân học gì.
+**Là** Quân, **tôi muốn** mỗi 90 ngày nhận một bản tổng kết: bao nhiêu leaf, retention thật, cluster tăng/giảm, **để** nhìn lại bản thân học gì.
 
 - **AC1**: Email + in-app notification ngày thứ 90 từ signup, sau đó mỗi 90 ngày.
-- **AC2**: Báo cáo gồm chart + 3 atom "thay đổi cuộc đời" (tương tác cao nhất).
+- **AC2**: Báo cáo gồm chart + 3 leaf "thay đổi cuộc đời" (tương tác cao nhất).
 - **Ưu tiên**: P2.
 
 ---
@@ -341,7 +341,7 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 
 **Là** Lan (làm việc với tài liệu nội bộ trường), **tôi muốn** chọn note nào không được gửi qua LLM, **để** không vi phạm quy định.
 
-- **AC1**: Mỗi note có toggle "Local-only" (skip decompose AI). Atom không được tạo cho note đó.
+- **AC1**: Mỗi note có toggle "Local-only" (skip decompose AI). Leaf không được tạo cho note đó.
 - **AC2**: Note local-only vẫn full-text searchable.
 - **Ưu tiên**: P1.
 
@@ -383,4 +383,4 @@ Onboarding → Capture → Decompose & Review → Personalization mature → Lon
 | X | X.1, X.4 | P0 |
 | X | X.2, X.3, X.5 | P1 |
 
-**MVP scope** = tất cả P0. Đây là phạm vi tối thiểu để personalization loop có thể hình thành: capture → atom → review → surfacing → fit profile.
+**MVP scope** = tất cả P0. Đây là phạm vi tối thiểu để personalization loop có thể hình thành: capture → leaf → review → surfacing → fit profile.

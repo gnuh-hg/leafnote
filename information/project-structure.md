@@ -14,7 +14,7 @@ leafnote/
 ├── README.md                  # Giới thiệu, cách chạy (viết khi có cách chạy thật)
 ├── ROADMAP.md                 # Lộ trình theo milestone
 ├── CHANGELOG.md               # Lịch sử release (tạo sau release đầu)
-├── CONTRIBUTING.md            # Quy ước commit, PR (tạo khi cần)
+├── HISTORY.md                 # Lịch sử plan đã thực hiện
 ├── .env.example               # Mẫu biến môi trường
 ├── .gitignore
 │
@@ -48,6 +48,7 @@ leafnote/
 information/
 ├── project-overview.md        # Concept, MVP scope, success criteria
 ├── project-structure.md       # File này
+├── design-system.md           # Màu sắc, typography, component pattern — nguồn chân lý UI
 ├── tech-stack.md              # Công nghệ & lý do chọn
 ├── architecture.md            # Kiến trúc hệ thống (high-level)
 ├── api-spec.md                # API endpoints (high-level)
@@ -81,7 +82,7 @@ information/
     │           ├── auth.py
     │           ├── projects.py
     │           ├── notes.py
-    │           ├── atoms.py
+    │           ├── leaves.py
     │           ├── recall.py
     │           ├── surfacing.py
     │           └── me.py
@@ -89,7 +90,7 @@ information/
     │   ├── user.py
     │   ├── project.py
     │   ├── note.py
-    │   ├── atom.py
+    │   ├── leaf.py
     │   ├── review.py
     │   └── event.py
     ├── schemas/               # Pydantic request/response schemas
@@ -97,18 +98,18 @@ information/
     ├── services/              # Business logic — LUÔN ĐỂ LOGIC Ở ĐÂY
     │   ├── ai/
     │   │   ├── client.py      # Abstraction LLMClient, Embedder, STT, OCR
-    │   │   ├── decompose.py   # Prompt + parse atoms từ note
+    │   │   ├── decompose.py   # Prompt + parse leaves từ note
     │   │   ├── embed.py       # Gọi embedding API, ghi pgvector
     │   │   ├── link.py        # k-NN + phát hiện duplicate/contradicts
     │   │   └── recall_gen.py  # Sinh câu hỏi active recall
     │   ├── notes.py
-    │   ├── atoms.py
-    │   ├── scheduler.py       # FSRS per-atom + fit per-user
+    │   ├── leaves.py
+    │   ├── scheduler.py       # FSRS per-leaf + fit per-user
     │   ├── surfacing.py       # Context-aware ranking
     │   └── personalization.py # Fit cognitive profile
     └── workers/               # Celery tasks
         ├── celery_app.py      # Config Celery + Redis broker
-        ├── pipeline.py        # decompose_note, embed_atoms, link_atoms, generate_recall
+        ├── pipeline.py        # decompose_note, embed_leaves, link_leaves, generate_recall
         └── nightly.py         # fit_fsrs, fit_profile, update_relevance
 ```
 
@@ -134,27 +135,27 @@ information/
     ├── main.tsx
     ├── App.tsx                # Router (React Router v6), layout root
     ├── components/            # UI primitive tái sử dụng — không có business logic
-    │   ├── atoms/             # AtomCard, AtomPanel, AtomBadge
-    │   ├── editor/            # TiptapEditor, SurfacingPanel, AtomHighlight
+    │   ├── leaves/            # LeafCard, LeafPanel, LeafBadge
+    │   ├── editor/            # TiptapEditor, SurfacingPanel, LeafHighlight
     │   ├── recall/            # RecallCard, RatingBar
     │   ├── graph/             # KnowledgeGraph (Cytoscape/react-force-graph)
     │   └── ui/                # shadcn/ui overrides + custom primitives
     ├── pages/
     │   ├── AuthPage.tsx
-    │   ├── WorkspacePage.tsx  # editor + atom panel + surfacing + voice/image capture
+    │   ├── WorkspacePage.tsx  # editor + leaf panel + surfacing + voice/image capture
     │   ├── RecallPage.tsx     # recall feed hằng ngày
-    │   ├── AtomDetailPage.tsx
+    │   ├── LeafDetailPage.tsx
     │   ├── ProfilePage.tsx    # /me/cognitive-profile
     │   └── SettingsPage.tsx
     ├── hooks/                 # Custom hooks — bắt đầu bằng `use`
-    │   ├── useAtoms.ts
+    │   ├── useLeaves.ts
     │   ├── useSurfacing.ts
     │   ├── useRecall.ts
     │   └── useSSE.ts          # Subscribe SSE pipeline events
     ├── services/              # Gọi API — KHÔNG fetch trực tiếp trong component
     │   ├── api.ts             # Axios/fetch instance + auth header
     │   ├── notes.ts
-    │   ├── atoms.ts
+    │   ├── leaves.ts
     │   ├── recall.ts
     │   ├── surfacing.ts
     │   └── me.ts
@@ -200,7 +201,6 @@ Không commit code experiments vào nhánh `main` trừ khi chuyển thành feat
 | Tình huống | Hành động |
 |---|---|
 | Domain mới (ví dụ: `notification`) | Thêm file vào `routes/`, `models/`, `schemas/`, `services/` — không tạo folder riêng |
-| Trang mới web | Thêm vào `frontend/web/src/pages/` |
 | Trang mới web | Thêm vào `frontend/src/pages/` |
 | Celery task mới | Thêm vào `backend/app/workers/pipeline.py` hoặc `nightly.py` |
 | Sprint mới | Tạo file tạm trong `.claude/memory/` hoặc root |

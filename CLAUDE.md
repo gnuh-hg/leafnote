@@ -6,8 +6,7 @@ File này là bản đồ chính để Claude hiểu project. Đọc file này *
 
 ## Project là gì?
 
-**Leafnote** — Hệ thống ghi chú thích ứng dựa trên phân rã tri thức nguyên tử (knowledge atom).
-Web app. Mỗi note được AI tự động chia thành các hạt độc lập, mỗi hạt có vòng đời riêng (retention + relevance), được surfacing lại đúng lúc người dùng cần.
+**Leafnote** — Ứng dụng ghi chú thông minh. Tri thức của người dùng là một cái cây: mỗi note là một cành, AI tự tách ra thành những chiếc lá (leaf) nhỏ — mỗi lá có vòng đời riêng (retention + relevance), được surfacing lại đúng lúc người dùng cần.
 
 Chi tiết: [`information/project-overview.md`](information/project-overview.md).
 
@@ -22,7 +21,7 @@ Xem chi tiết: [`ROADMAP.md`](ROADMAP.md).
 > Hệ quả cho Claude:
 >
 > - Được tạo `backend/`, `frontend/` theo cấu trúc trong `information/project-structure.md`.
-> - Không tạo feature code (notes, atoms, recall) — chỉ scaffold + `/health` + auth.
+> - Không tạo feature code (notes, leaves, recall) — chỉ scaffold + `/health` + auth.
 > - Quy ước code (trong mục dưới) áp dụng ngay từ bây giờ.
 
 ---
@@ -35,7 +34,7 @@ Xem chi tiết: [`ROADMAP.md`](ROADMAP.md).
 | `ROADMAP.md` | `ready` | Phase hiện tại + lộ trình |
 | `README.md` | `chưa tạo` | Viết khi có cách chạy thật |
 | `CHANGELOG.md` | `chưa tạo` | Sau release đầu |
-| `CONTRIBUTING.md` | `chưa tạo` | Khi có người contribute |
+| `HISTORY.md` | `ready` | Lịch sử plan đã thực hiện |
 | `information/project-overview.md` | `ready` | Concept & MVP scope |
 | `information/project-structure.md` | `ready` | Cấu trúc đích |
 | `information/architecture.md` | `ready` | Kiến trúc + tech stack |
@@ -43,6 +42,8 @@ Xem chi tiết: [`ROADMAP.md`](ROADMAP.md).
 | `information/user-stories.md` | `ready` | Pre-project đã chốt |
 | `information/database-schema.md` | `draft` | High-level |
 | `information/api-spec.md` | `draft` | High-level |
+| `information/product-principles.md` | `ready` | 7 định hướng sản phẩm cross-cutting |
+| `information/design-system.md` | `ready` | Màu sắc, typography, component pattern — nguồn chân lý UI |
 | `information/runbooks/` | `chưa cần` | Sau khi deploy |
 | `.claude/memory/context.md` | `ready` | Quyết định đã chốt + lý do |
 | `.claude/memory/mistakes.md` | `chưa cần` | Sau khi gặp lỗi |
@@ -76,7 +77,7 @@ leafnote/
 
 - Business logic **luôn** nằm trong `services/`, không viết trong `routes/`.
 - Biến môi trường chỉ đọc qua `core/config.py`.
-- Mỗi domain (user, note, atom, project, …) có file riêng trong `routes/`, `models/`, `schemas/`, `services/`.
+- Mỗi domain (user, note, leaf, project, …) có file riêng trong `routes/`, `models/`, `schemas/`, `services/`.
 
 ### Frontend (React web)
 
@@ -86,7 +87,6 @@ leafnote/
 
 ### Chung
 
-- Xem `CONTRIBUTING.md` trước khi commit (khi đã có file).
 - Prototype mới → `experiments/prototypes/` (khi đã có folder).
 - Lỗi đã gặp → ghi vào `.claude/memory/mistakes.md`.
 
@@ -95,9 +95,11 @@ leafnote/
 ## Hành vi Claude trong phase này
 
 1. **Đọc đầu phiên**: `CLAUDE.md` → `ROADMAP.md` → `information/project-overview.md` → user-stories nếu cần ngữ cảnh tính năng.
+   **Khi tạo bất kỳ component UI nào**: đọc `information/design-system.md` trước — không tự định nghĩa màu, font, hay pattern.
 2. **Khi user yêu cầu code**: phase `scaffolding` — được tạo `backend/` và `frontend/` theo cấu trúc đã chốt. Hỏi xác nhận trước khi cài thư viện lớn (>10MB), mở port public, hay chạy migration thật.
 3. **Khi tạo / chỉnh tài liệu**: cập nhật bảng "Trạng thái file" ở trên.
 4. **Khi chốt một quyết định lớn** (tech stack, schema, API contract): chuyển nhãn từ `draft` → `ready` và ghi short note vào `.claude/memory/context.md`.
+5. **Quy ước file `.md`**: Mọi file `.md` tạo mới phải có dòng `> [mô tả ngắn]` làm **dòng đầu tiên sau tiêu đề `#`** — giải thích tác dụng của file trong một câu. Ràng buộc này áp dụng vĩnh viễn, không cần nhắc lại mỗi phiên.
 
 ---
 
@@ -105,6 +107,7 @@ leafnote/
 
 | Cần biết gì | Đọc file nào |
 |---|---|
+| Design system (màu, font, pattern) | `information/design-system.md` |
 | Concept & MVP scope | `information/project-overview.md` |
 | User stories & ưu tiên P0/P1 | `information/user-stories.md` |
 | Phase hiện tại & lộ trình | `ROADMAP.md` |
@@ -116,3 +119,5 @@ leafnote/
 | Đang làm đến đâu | `.claude/memory/context.md` |
 | Lỗi cần tránh | `.claude/memory/mistakes.md` |
 | Pattern hay dùng | `.claude/memory/patterns.md` |
+| Định hướng UX/product/security | `information/product-principles.md` |
+| Lịch sử plan đã thực hiện | `HISTORY.md` |

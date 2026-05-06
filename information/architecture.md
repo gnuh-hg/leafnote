@@ -1,5 +1,7 @@
 # Architecture — Leafnote
 
+> Mô tả kiến trúc hệ thống — các tầng, luồng nghiệp vụ trọng yếu, và lý do chọn công nghệ.
+
 ## Tổng quan
 
 Leafnote là kiến trúc client-server với một web frontend React, một backend FastAPI duy nhất, một pipeline AI bất đồng bộ, và một Postgres + pgvector làm nguồn sự thật chung.
@@ -47,63 +49,63 @@ Endpoint mỏng, **không** chứa business logic. Mỗi route validate input (P
 ### 3. Service Layer (`backend/app/services/`) — nơi tập trung logic
 
 - `services/notes/` — CRUD note, lưu ảnh/voice raw.
-- `services/atoms/` — quản lý vòng đời hạt (create, merge, conflict-resolve).
+- `services/leaves/` — quản lý vòng đời lá (create, merge, conflict-resolve).
 - `services/ai/` — abstraction cho LLM, embedding, STT, OCR; có thể swap provider.
-- `services/scheduler/` — FSRS fit per-user, tính lịch ôn hạt.
-- `services/surfacing/` — chấm điểm relevance, chọn hạt để đẩy ra UI.
+- `services/scheduler/` — FSRS fit per-user, tính lịch ôn lá.
+- `services/surfacing/` — chấm điểm relevance, chọn lá để đẩy ra UI.
 - `services/graph/` — query knowledge graph, snapshot tiến hoá.
 
 ### 4. Pipeline AI (Celery workers)
 
 Khi note được tạo/cập nhật:
 
-1. **Task `decompose_note`**: gọi LLM → trả ra danh sách atom proposals (mệnh đề + loại).
-2. **Task `embed_atoms`**: gọi embedding API → ghi vào pgvector.
-3. **Task `link_atoms`**: tìm k-NN trong graph người dùng, đánh dấu trùng/mâu thuẫn.
-4. **Task `generate_recall`**: sinh câu hỏi cloze/định nghĩa ngược cho mỗi atom.
+1. **Task `decompose_note`**: gọi LLM → trả ra danh sách leaf proposals (mệnh đề + loại).
+2. **Task `embed_leaves`**: gọi embedding API → ghi vào pgvector.
+3. **Task `link_leaves`**: tìm k-NN trong graph người dùng, đánh dấu trùng/mâu thuẫn.
+4. **Task `generate_recall`**: sinh câu hỏi cloze/định nghĩa ngược cho mỗi leaf.
 5. **Task `update_relevance`** (cron): cập nhật relevance score dựa trên tag được mở gần đây và draft hiện tại.
 
 ### 5. Personalization Loop
 
-Mỗi tương tác (review answer, mở atom, copy atom, dismiss surfacing) ghi vào bảng `events`. Nightly job:
+Mỗi tương tác (review answer, mở leaf, copy leaf, dismiss surfacing) ghi vào bảng `events`. Nightly job:
 
 - Fit lại tham số FSRS per-user.
-- Cập nhật profile nhận thức (recall accuracy theo loại câu hỏi, theo chủ đề, theo độ dài atom).
+- Cập nhật profile nhận thức (recall accuracy theo loại câu hỏi, theo chủ đề, theo độ dài leaf).
 - Cập nhật weight surfacing (retention vs relevance vs novelty).
 
 ### 6. Storage
 
 - **Postgres** — quan hệ chính.
-- **pgvector** — embedding atoms (HNSW index).
+- **pgvector** — embedding leaves (HNSW index).
 - **Supabase Storage** — voice/image blobs.
 - **Redis** — Celery queue + cache surfacing feed.
 
 ## Luồng nghiệp vụ trọng yếu
 
-### Capture → Atom
+### Capture → Leaf
 
 1. Web gửi `POST /v1/notes` (text/voice/image).
 2. Voice → STT, image → OCR (sync hoặc deferred).
 3. Note lưu raw, trả `note_id` ngay.
-4. Job `decompose_note` enqueue → atoms tạo dần, client subscribe SSE để nhận update.
+4. Job `decompose_note` enqueue → leaves tạo dần, client subscribe SSE để nhận update.
 
 ### Surfacing trong editor
 
 1. User mở danh sách filter theo tag hoặc gõ trong editor.
 2. Web gửi context embedding (debounced) tới `POST /v1/surfacing/contextual`.
-3. Service truy vấn pgvector + bảng review-state → chọn top-K atoms phù hợp (retention sắp quên + relevance cao + chưa surface gần đây).
-4. Trả về list atom đính kèm lý do surface ("sắp quên", "mâu thuẫn", "liên quan").
+3. Service truy vấn pgvector + bảng review-state → chọn top-K leaves phù hợp (retention sắp quên + relevance cao + chưa surface gần đây).
+4. Trả về list leaf đính kèm lý do surface ("sắp quên", "mâu thuẫn", "liên quan").
 
 ### Active Recall
 
 1. Web gọi `GET /v1/recall/today` → list câu hỏi do scheduler chọn.
-2. User trả lời → `POST /v1/recall/{atom_id}/answer` với điểm tự đánh giá (Again/Hard/Good/Easy).
-3. Service cập nhật state FSRS của atom + ghi event để fit lại profile.
+2. User trả lời → `POST /v1/recall/{leaf_id}/answer` với điểm tự đánh giá (Again/Hard/Good/Easy).
+3. Service cập nhật state FSRS của leaf + ghi event để fit lại profile.
 
 ## Nguyên tắc kiến trúc
 
-- **Atom là first-class citizen**, note chỉ là container gốc.
-- **Idempotency** cho mọi job AI (dùng `note_version` + `atom_hash`).
+- **Leaf là first-class citizen**, note chỉ là container gốc.
+- **Idempotency** cho mọi job AI (dùng `note_version` + `leaf_hash`).
 - **Provider-agnostic** ở tầng AI: code chỉ thấy interface `LLMClient`, `Embedder`, `STT`, `OCR`.
 - **Personalization tách khỏi pipeline chính**: sự cố ở job fit profile không được làm hỏng capture / review.
 
@@ -124,7 +126,7 @@ Mỗi tương tác (review answer, mở atom, copy atom, dismiss surfacing) ghi 
 
 | Layer | Công nghệ | Lý do |
 |---|---|---|
-| Relational | PostgreSQL 15+ (Supabase) | Bảng chính: notes, atoms, reviews, tags, note_tags |
+| Relational | PostgreSQL 15+ (Supabase) | Bảng chính: notes, leaves, reviews, tags, note_tags |
 | Vector | pgvector (HNSW) | Tránh vận hành thêm Pinecone/Weaviate riêng |
 | Auth | Supabase Auth | Email / OAuth, JWT tích hợp sẵn |
 | Blob | Supabase Storage | Audio voice note, ảnh OCR |
