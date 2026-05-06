@@ -84,6 +84,33 @@ Mỗi entry tương ứng một phase hoặc một task lớn đã hoàn thành.
 
 ---
 
+## 2026-05-06 — Setup hạ tầng deploy: Vercel + Supabase + Render
+
+**Mục tiêu**: Dựng toàn bộ hạ tầng deploy để frontend và backend có URL thật, sẵn sàng code Phase 1.
+
+**Đã làm**:
+
+- Đổi tên thư mục `.frontend` / `.backend` → `frontend` / `backend` trong docs (dot-prefix bị Vercel ignore)
+- Scaffold skeleton `frontend/` (React + Vite + TypeScript + Tailwind) và `backend/` (FastAPI + `/health`)
+- Deploy **Vercel**: project `leafnote-vn` tại `https://leafnote-vn.vercel.app`
+  - Quirk: Vercel UI không hiện `frontend/` trong directory picker → override build commands thủ công thay vì đổi Root Directory
+- Setup **Supabase**: project ref `thaeibqktfnobjthjzvm`, bật pgvector, cấu hình redirect URL cho Vercel
+  - Lưu ý: Supabase đổi UI mới — dùng Publishable key (`sb_publishable_...`) thay anon key cũ
+- Deploy **Render**: service `leafnote-api`, `/health` endpoint chạy ổn
+  - Fix build: pin Python 3.12.7 (Python 3.14 không có prebuilt wheel cho pydantic-core)
+- Thêm env vars vào Vercel (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`)
+
+**Files đã can thiệp**:
+
+- `frontend/` — tạo mới (scaffold đầy đủ)
+- `backend/` — tạo mới (scaffold đầy đủ)
+- `backend/.python-version` — tạo mới (pin 3.12.7)
+- `backend/requirements.txt` — cập nhật versions
+- `information/project-structure.md` — đổi `.frontend`/`.backend` → `frontend`/`backend`
+- `.claude/memory/context.md` — cập nhật trạng thái
+
+---
+
 ## 2026-05-06 — Tạo design system documentation
 
 **Mục tiêu**: Đưa toàn bộ ngôn ngữ thiết kế từ `leafnote-demo` vào tài liệu chính thức để mọi feature UI sau này đều nhất quán — không tự định nghĩa lại màu hay pattern.

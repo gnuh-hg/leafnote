@@ -13,3 +13,28 @@ Các quyết định còn lại được hoãn có chủ ý:
 - pgvector HNSW test → làm spike trong M1.
 
 Next milestone: **M1 — Scaffolding**. Gate: `/health` 200, web Vercel mở được + đăng nhập Supabase Auth, CI xanh.
+
+---
+
+## 2026-05-06 — Hạ tầng deploy xong
+
+**Vercel (frontend):**
+- Project: `leafnote-vn` → `https://leafnote-vn.vercel.app`
+- Quirk: Vercel UI không hiện `frontend/` trong directory picker (chỉ thấy `information/`). Fix: giữ Root Directory là `./`, override build commands thủ công:
+  - Build: `cd frontend && npm run build`
+  - Output: `frontend/dist`
+  - Install: `cd frontend && npm install`
+
+**Supabase:**
+- Project ref: `thaeibqktfnobjthjzvm`
+- URL: `https://thaeibqktfnobjthjzvm.supabase.co`
+- Dùng **Publishable key** (`sb_publishable_...`) thay anon key cũ — Supabase đã đổi UI
+- pgvector đã bật
+- Redirect URL đã thêm: `https://leafnote-vn.vercel.app/**`
+
+**Render (backend):**
+- Service: `leafnote-api`
+- Python pinned 3.12.7 (file `backend/.python-version`) — Python 3.14 không có prebuilt wheel cho pydantic-core
+- `/health` endpoint đang chạy
+
+**Trạng thái:** Scaffolding infra xong. Bước tiếp: code Phase 1 — Auth.
