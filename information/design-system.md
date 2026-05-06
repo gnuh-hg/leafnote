@@ -20,11 +20,14 @@
 
 | Token | Hex | Dùng cho |
 |---|---|---|
-| `paper-50` | `#f8faf8` | `body` background |
-| `paper-100` | `#f0f4f0` | surface chính (sidebar, card) |
-| `paper-200` | `#e2eae2` | hover background, kbd |
-| `paper-300` | `#c8d8c8` | border, separator, scrollbar |
-| `paper-400` | `#a0bba0` | scrollbar hover |
+| `paper-50` | `#f7f9f7` | `body` background |
+| `paper-100` | `#ecf1ec` | surface chính (sidebar, card) |
+| `paper-150` | `#e3ebe3` | — |
+| `paper-200` | `#d5e2d5` | hover background |
+| `paper-250` | `#c2d4c2` | kbd |
+| `paper-300` | `#a8c0a8` | border, separator, scrollbar |
+| `paper-400` | `#86a886` | scrollbar hover |
+| `paper-500` | `#638f63` | icon muted, secondary text |
 
 ### Ink palette — nền tối (dark mode)
 
@@ -102,7 +105,7 @@ Mỗi loại leaf có màu riêng — áp dụng nhất quán trên badge, highl
 ### Section label pattern
 
 ```jsx
-<div className="text-[10px] uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-medium">
+<div className="text-[10px] uppercase tracking-wider text-zinc-500 dark:text-zinc-500 font-medium">
   Tiêu đề section
 </div>
 ```
@@ -316,8 +319,8 @@ body {
 ```css
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #c8d8c8; border-radius: 4px; } /* paper-300 */
-::-webkit-scrollbar-thumb:hover { background: #a0bba0; } /* paper-400 */
+::-webkit-scrollbar-thumb { background: #a8c0a8; border-radius: 4px; } /* paper-300 */
+::-webkit-scrollbar-thumb:hover { background: #86a886; } /* paper-400 */
 .dark ::-webkit-scrollbar-thumb { background: #2e2e3d; } /* ink-700 */
 .dark ::-webkit-scrollbar-thumb:hover { background: #3d3d4f; } /* ink-600 */
 ```
