@@ -74,6 +74,7 @@ backend/
     ├── core/
     │   ├── config.py          # Settings đọc từ env (pydantic-settings)
     │   ├── database.py        # SQLAlchemy engine + session
+    │   ├── auth.py            # get_current_user dependency (verify Supabase JWT)
     │   └── security.py        # Verify Supabase JWT
     ├── api/
     │   └── v1/
@@ -135,6 +136,7 @@ frontend/
     ├── main.tsx
     ├── App.tsx                # Router (React Router v6), layout root
     ├── components/            # UI primitive tái sử dụng — không có business logic
+    │   ├── auth/              # LoginForm, SignupForm, ProtectedRoute, BrandingPanel, PasswordStrengthMeter
     │   ├── leaves/            # LeafCard, LeafPanel, LeafBadge
     │   ├── editor/            # TiptapEditor, SurfacingPanel, LeafHighlight
     │   ├── recall/            # RecallCard, RatingBar
@@ -148,18 +150,24 @@ frontend/
     │   ├── ProfilePage.tsx    # /me/cognitive-profile
     │   └── SettingsPage.tsx
     ├── hooks/                 # Custom hooks — bắt đầu bằng `use`
+    │   ├── useOnlineStatus.ts # Detect online/offline, reusable
     │   ├── useLeaves.ts
     │   ├── useSurfacing.ts
     │   ├── useRecall.ts
     │   └── useSSE.ts          # Subscribe SSE pipeline events
     ├── services/              # Gọi API — KHÔNG fetch trực tiếp trong component
+    │   ├── auth.ts            # Supabase auth wrapper (signUp, signIn, signOut)
     │   ├── api.ts             # Axios/fetch instance + auth header
     │   ├── notes.ts
     │   ├── leaves.ts
     │   ├── recall.ts
     │   ├── surfacing.ts
     │   └── me.ts
+    ├── lib/
+    │   ├── supabase.ts        # Supabase client instance
+    │   └── i18n.ts            # i18next config
     ├── stores/                # Zustand global state (session, active project)
+    │   └── authStore.ts       # Auth state (user, session, loading)
     └── types/                 # TypeScript types — codegen từ OpenAPI schema
 ```
 

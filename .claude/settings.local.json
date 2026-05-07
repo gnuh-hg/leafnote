@@ -2,7 +2,22 @@
   "permissions": {
     "allow": [
       "Bash(grep \"\\\\.md$\")",
-      "Bash(rtk git *)"
+      "Bash(rtk git *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\admin\\\\all\\\\project\\\\leafnote\" -Force)",
+      "Bash(Select-Object Name, PSIsContainer)",
+      "mcp__Claude_in_Chrome__computer",
+      "mcp__Claude_in_Chrome__browser_batch",
+      "mcp__Claude_in_Chrome__resize_window",
+      "PowerShell(python --version)",
+      "PowerShell(pip show alembic 2>&1)",
+      "PowerShell(Get-Process -Name \"node\" -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -eq \"\" } | Stop-Process -Force)",
+      "mcp__Claude_in_Chrome__navigate",
+      "mcp__Claude_in_Chrome__find",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Bash(git commit -m ' *)",
+      "mcp__Claude_in_Chrome__read_page",
+      "mcp__Claude_in_Chrome__javascript_tool",
+      "Bash(del PLAN.md)"
     ]
   }
 }
