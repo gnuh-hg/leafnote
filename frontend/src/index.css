@@ -1,3 +1,106 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    font-feature-settings: 'cv11', 'ss01', 'ss03';
+  }
+  body {
+    @apply bg-paper-50 text-zinc-900 transition-colors duration-200;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(16, 185, 129, 0.06), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 10%, rgba(52, 211, 153, 0.03), transparent);
+    background-attachment: fixed;
+  }
+  ::selection {
+    @apply bg-emerald-500/30;
+  }
+}
+
+/* Dark mode body — dùng :is() để đảm bảo specificity đúng */
+html.dark body {
+  @apply bg-ink-950 text-zinc-100;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(16, 185, 129, 0.08), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 10%, rgba(52, 211, 153, 0.04), transparent);
+  background-attachment: fixed;
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-paper-100/80 backdrop-blur-xl border border-paper-300/60;
+  }
+  .dark .glass-panel {
+    @apply bg-ink-900/60 border-ink-700/60;
+  }
+  .card-surface {
+    @apply bg-paper-100 border border-paper-300/60 rounded-2xl;
+  }
+  .dark .card-surface {
+    @apply bg-ink-850 border-ink-700/60;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-medium;
+  }
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:ring-offset-2 focus:ring-offset-paper-50;
+  }
+  .dark .focus-ring {
+    @apply focus:ring-offset-ink-950;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #a8c0a8;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #86a886;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #2e2e3d;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3d3d4f;
+}
+
+.leaf-highlight {
+  background: linear-gradient(180deg, transparent 60%, rgba(16, 185, 129, 0.25) 60%);
+  border-radius: 2px;
+  padding: 0 2px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.leaf-highlight:hover,
+.leaf-highlight.active {
+  background: linear-gradient(180deg, transparent 50%, rgba(16, 185, 129, 0.4) 50%);
+}
+.leaf-highlight.type-proposition {
+  background: linear-gradient(180deg, transparent 60%, rgba(251, 191, 36, 0.25) 60%);
+}
+.leaf-highlight.type-proposition.active,
+.leaf-highlight.type-proposition:hover {
+  background: linear-gradient(180deg, transparent 50%, rgba(251, 191, 36, 0.4) 50%);
+}
+.leaf-highlight.type-relation {
+  background: linear-gradient(180deg, transparent 60%, rgba(52, 211, 153, 0.25) 60%);
+}
+.leaf-highlight.type-relation.active,
+.leaf-highlight.type-relation:hover {
+  background: linear-gradient(180deg, transparent 50%, rgba(52, 211, 153, 0.4) 50%);
+}
+.leaf-highlight.type-fact {
+  background: linear-gradient(180deg, transparent 60%, rgba(56, 189, 248, 0.25) 60%);
+}
+.leaf-highlight.type-fact.active,
+.leaf-highlight.type-fact:hover {
+  background: linear-gradient(180deg, transparent 50%, rgba(56, 189, 248, 0.4) 50%);
+}

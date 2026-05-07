@@ -48,7 +48,10 @@ Xem chi tiết: [`ROADMAP.md`](ROADMAP.md).
 | `.claude/memory/context.md` | `ready` | Quyết định đã chốt + lý do |
 | `.claude/memory/mistakes.md` | `chưa cần` | Sau khi gặp lỗi |
 | `.claude/memory/patterns.md` | `chưa cần` | Sau khi rút pattern thực |
-| `backend/`, `frontend/` | `scaffold` | Tạo trong phase scaffolding (hiện tại) |
+| `MIGRATION-PLAN.md` | `done` | Migration hoàn tất — 10/10 phần xong |
+| `.claude/workflows/migrate-demo.md` | `done` | Workflow đã dùng xong |
+| `backend/` | `scaffold` | FastAPI skeleton + `/health` |
+| `frontend/` | `migrated` | UI đầy đủ từ demo — sẵn sàng nối API thật |
 
 > Khi Claude tạo file mới, **cập nhật bảng này**.
 
@@ -121,3 +124,5 @@ leafnote/
 | Pattern hay dùng | `.claude/memory/patterns.md` |
 | Định hướng UX/product/security | `information/product-principles.md` |
 | Lịch sử plan đã thực hiện | `HISTORY.md` |
+| Plan migration demo → production | `MIGRATION-PLAN.md` |
+| Workflow chuyển từng phần demo | `.claude/workflows/migrate-demo.md` |

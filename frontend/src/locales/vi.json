@@ -1,0 +1,364 @@
+{
+  "sidebar": {
+    "tagline": "ghi chú có vòng đời",
+    "nav": {
+      "surfacing": "Đang nổi lên",
+      "notes": "Ghi chú",
+      "graph": "Bản đồ tri thức",
+      "review": "Ôn tập",
+      "insights": "Hồ sơ nhận thức"
+    },
+    "tags": {
+      "title": "Tag",
+      "new": "Mới",
+      "newTitle": "Tạo tag mới",
+      "create": "Tạo tag mới",
+      "empty": "Chưa có tag nào"
+    },
+    "snapshot": {
+      "title": "Hồ sơ nhận thức",
+      "intensity": "Cường độ ôn",
+      "style": "Kiểu học",
+      "streak": "Streak",
+      "streakUnit": "ngày"
+    }
+  },
+  "topbar": {
+    "engineStatus": "Engine đang chạy",
+    "search": {
+      "placeholder": "Tìm trong lá, ghi chú, hoặc khái niệm..."
+    },
+    "theme": {
+      "toDark": "Chuyển sang chế độ tối",
+      "toLight": "Chuyển sang chế độ sáng"
+    },
+    "voice": {
+      "title": "Ghi chú mới bằng giọng nói"
+    },
+    "newNote": "Ghi chú mới"
+  },
+  "leaf": {
+    "type": {
+      "definition": "Định nghĩa",
+      "proposition": "Mệnh đề",
+      "relation": "Quan hệ",
+      "fact": "Dữ kiện"
+    },
+    "surface": {
+      "forgetting": "Sắp quên",
+      "related": "Liên quan ngay",
+      "conflict": "Mâu thuẫn",
+      "new": "Mới sinh"
+    },
+    "dormant": "Ngủ đông",
+    "dormantTooltip": "Lá ngủ đông — không xuất hiện trong recall",
+    "retention": "Ghi nhớ",
+    "relevance": "Liên quan"
+  },
+  "leafDetail": {
+    "whySurfacing": "Vì sao xuất hiện lúc này",
+    "lifecycle": "Vòng đời lá",
+    "forgettingCurve": "Forgetting curve cá nhân",
+    "reviewed": "Đã ôn",
+    "reviewedUnit": "lần",
+    "lastReview": "Lần cuối",
+    "questions": "Câu hỏi truy hồi (AI sinh)",
+    "questionVariants": "biến thể",
+    "questionTypes": {
+      "cloze": "Cloze",
+      "definitionReverse": "Định nghĩa ngược",
+      "application": "Ứng dụng"
+    },
+    "linkedLeaves": "Lá liên kết",
+    "linkedUnit": "lá",
+    "source": "Từ ghi chú",
+    "today": "hôm nay",
+    "actions": {
+      "edit": "Sửa",
+      "merge": "Merge",
+      "revive": "Hồi sinh",
+      "dormant": "Ngủ đông",
+      "review": "Ôn ngay"
+    }
+  },
+  "tagCreate": {
+    "title": "Tag mới",
+    "name": {
+      "label": "Tên tag",
+      "placeholder": "Ví dụ: \"kuhn\", \"đồ-án\", \"reading\"",
+      "help": "Tag là nhãn nhẹ — 1 note có thể gắn nhiều tag, dùng để filter trong danh sách ghi chú."
+    },
+    "color": {
+      "label": "Màu nhận diện"
+    },
+    "preview": {
+      "label": "Xem trước:",
+      "default": "tag-mới"
+    },
+    "actions": {
+      "cancel": "Huỷ",
+      "create": "Tạo tag"
+    }
+  },
+  "dashboard": {
+    "heading": "Đang nổi lên cho bạn",
+    "session": "Phiên làm việc {{minutes}} phút",
+    "subheading": "{{count}} lá được surfacing dựa trên ngữ cảnh phiên làm việc, đường cong quên cá nhân và hành vi 7 ngày gần nhất.",
+    "filter": {
+      "all": "Tất cả"
+    },
+    "emptyFilter": "Không có lá nào trong filter này",
+    "panels": {
+      "today": "Hôm nay",
+      "retentionHealth": "Sức khỏe ghi nhớ",
+      "conflicts": "Cần xử lý",
+      "suggestions": "Gợi ý mở rộng"
+    },
+    "stats": {
+      "needReview": "Cần ôn",
+      "reviewed": "Đã ôn",
+      "newLeaves": "Lá mới sinh",
+      "studyTime": "Thời gian học",
+      "studyTimeValue": "{{minutes}} phút",
+      "streakValue": "{{days}} ngày",
+      "leafUnit": "lá"
+    },
+    "suggestion": {
+      "text": "Bạn có 3 note về Kuhn nhưng chưa có lá nào về",
+      "textSuffix": ". Khái niệm liền kề thường được Kuhn đề cập.",
+      "viewContext": "Xem ngữ cảnh →"
+    }
+  },
+  "notesList": {
+    "count": "{{filtered}}/{{total}} ghi chú",
+    "filterInfo": "lọc theo {{count}} tag (AND)",
+    "heading": "Ghi chú của bạn",
+    "subheading": "Mỗi ghi chú đã được Leaf Engine phân rã. Click để xem lá được tách.",
+    "newNote": "Ghi chú mới",
+    "tagFilter": {
+      "label": "Lọc theo tag · click nhiều tag = AND (note phải có tất cả)",
+      "clear": "Xoá filter"
+    },
+    "emptyFilter": {
+      "title": "Không có ghi chú nào khớp filter",
+      "hint": "Thử bỏ bớt tag hoặc",
+      "clearAll": "xoá toàn bộ filter"
+    },
+    "emptyMain": {
+      "title": "Chưa có ghi chú nào",
+      "description": "Bắt đầu ghi lại kiến thức của bạn — AI sẽ phân rã và giúp bạn nhớ lâu hơn.",
+      "cta": "Tạo ghi chú đầu tiên"
+    },
+    "leafCount": "{{count}} lá",
+    "open": "Mở →"
+  },
+  "editor": {
+    "savedAt": "Đã lưu lúc {{time}}",
+    "leafCount": "{{count}} lá được tách",
+    "newNote": "Note mới · auto-save 2s/lần",
+    "unsaved": "Có thay đổi chưa lưu",
+    "untitled": "Chưa có tiêu đề",
+    "titlePlaceholder": "Tiêu đề",
+    "titlePlaceholderNew": "Tiêu đề (để trống → AI sinh sau khi lưu)",
+    "removeTag": "Bỏ tag",
+    "addTag": "Thêm tag",
+    "editTag": "Sửa tag",
+    "tagPicker": {
+      "title": "Chọn tag (multi-select)"
+    },
+    "mode": {
+      "read": "Đọc",
+      "edit": "Sửa"
+    },
+    "viewGraph": "Xem graph",
+    "save": "Lưu & phân rã",
+    "saveAgain": "Lưu & phân rã lại",
+    "freshBanner": {
+      "title": "AI vừa phân rã {{count}} lá từ note này",
+      "description": "Bạn duyệt phía dưới — giữ, sửa, gộp, tách hoặc bỏ từng lá. Quyết định cuối là của bạn."
+    },
+    "engine": {
+      "title": "Leaf Knowledge Engine",
+      "waiting": "chờ note có nội dung",
+      "willRerun": "sẽ chạy lại khi lưu",
+      "synced": "đồng bộ",
+      "descriptionNew": "Sau khi bạn lưu, AI sẽ phân rã, sinh tiêu đề, gắn embedding",
+      "descriptionDone": "Phân rã xong · {{newCount}} lá mới · {{matchCount}} lá khớp · {{linkedCount}} lá liên kết"
+    },
+    "leaves": {
+      "title": "Lá được tách ({{count}})",
+      "aiReview": "AI tách · bạn duyệt",
+      "showAll": "Tất cả ↓",
+      "addManual": "Thêm lá thủ công",
+      "emptyTitle": "Chưa có lá nào",
+      "emptyDescription": "Cứ gõ tự nhiên — sau khi bạn bấm Lưu & phân rã, AI sẽ tách lá và hiện tại đây để bạn duyệt."
+    },
+    "insights": {
+      "title": "AI phát hiện"
+    },
+    "legend": {
+      "readMode": "Highlight",
+      "editMode": "Bạn sửa, AI sẽ tách lại"
+    },
+    "toolbar": {
+      "record": "Ghi âm",
+      "image": "Ảnh / OCR",
+      "aiTitle": "AI sinh tiêu đề",
+      "autosave": "Auto-save 2s · offline → đồng bộ khi online"
+    },
+    "voice": {
+      "recording": "đang thu — chạm để dừng",
+      "done": "Đã thu xong · transcript sẵn sàng",
+      "insertHint": "Bấm \"Chèn vào note\" để dán transcript vào vị trí con trỏ",
+      "insert": "Chèn vào note"
+    },
+    "image": {
+      "title": "Chèn ảnh — OCR sẽ chạy ngầm sau khi lưu",
+      "dropHint": "Kéo thả ảnh hoặc bấm để chọn",
+      "formats": "Whiteboard · slide · trang sách"
+    },
+    "editHint": {
+      "prefix": "Sau khi lưu",
+      "body": "AI sẽ phân rã lại: lá cũ giữ nguyên ID nếu nội dung không đổi, lá mới được tạo, lá biến mất sẽ chuyển sang trạng thái",
+      "deleteProposal": "đề xuất xoá",
+      "suffix": "để bạn xác nhận."
+    },
+    "placeholder": "Bắt đầu gõ ở đây — không cần đặt tiêu đề trước, không cần chọn thư mục...",
+    "leafRow": {
+      "confidence": "AI tin {{pct}}%",
+      "save": "Lưu",
+      "cancel": "Huỷ",
+      "edit": "Sửa",
+      "split": "Tách",
+      "merge": "Gộp",
+      "discard": "Bỏ"
+    },
+    "status": {
+      "new": "Mới",
+      "existing": "Khớp",
+      "linked": "Liên kết"
+    },
+    "tag": {
+      "ai": "AI",
+      "manual": "Bạn"
+    }
+  },
+  "graph": {
+    "subheading": "Cập nhật theo hành vi · cụm nóng nổi rõ, lá ngủ đông mờ dần",
+    "statsInfo": "{{leaves}} lá · {{edges}} liên kết · {{clusters}} cụm",
+    "colorMode": {
+      "cluster": "Theo cụm",
+      "retention": "Theo retention"
+    },
+    "legend": {
+      "cluster": "Cụm",
+      "retention": "Retention",
+      "crossLink": "Liên kết liên cụm"
+    },
+    "hint": "Hover để xem liên kết · click để pin chi tiết",
+    "hotClusters": "Cụm đang nóng",
+    "dormantClusters": "Cụm ngủ đông",
+    "dormantPct": "{{pct}}% lá mờ dần",
+    "emptyDetail": "Chọn một lá trên bản đồ để xem chi tiết",
+    "nodeDetail": {
+      "deselect": "Bỏ chọn",
+      "retentionLabel": "Retention",
+      "relevanceLabel": "Liên quan",
+      "linkedLabel": "Liên kết",
+      "reviewedLabel": "Đã ôn",
+      "linkedCount": "{{count}} lá",
+      "reviewedCount": "{{count}} lần"
+    }
+  },
+  "review": {
+    "exit": "Thoát phiên",
+    "streak": "{{days}} ngày streak",
+    "question": "Câu hỏi",
+    "answer": "Đáp án",
+    "sourceLeaf": "Lá gốc",
+    "tryFirst": "Hãy thử nhớ trước khi xem đáp án",
+    "reveal": "Hiện đáp án",
+    "memoryLevel": "Mức độ ghi nhớ — phản hồi sẽ cập nhật forgetting curve cá nhân",
+    "retention": "Retention",
+    "relevance": "Liên quan",
+    "reviewCount": "Lần ôn thứ",
+    "defaultQuestion": "Phát biểu lại:",
+    "questionType": {
+      "cloze": "Cloze",
+      "definitionReverse": "Định nghĩa ngược",
+      "application": "Ứng dụng",
+      "recall": "Truy hồi"
+    },
+    "difficulties": {
+      "forgot": "Quên",
+      "hard": "Khó",
+      "good": "Vừa",
+      "easy": "Dễ",
+      "forgotDetail": "< 1 ngày",
+      "hardDetail": "2 ngày",
+      "goodDetail": "6 ngày",
+      "easyDetail": "14 ngày"
+    },
+    "done": {
+      "title": "Xong phiên ôn hôm nay",
+      "description": "Đã ôn {{count}} lá · forgetting curve đã cập nhật",
+      "reviewSession": "Xem lại phiên",
+      "backToDashboard": "Quay về dashboard"
+    }
+  },
+  "insights": {
+    "subheading": "Cập nhật theo từng phiên ôn · {{reviews}} review tính đến nay",
+    "description": "Leafnote xây dựng profile cá nhân từ hành vi ôn tập, mở lại, và viết note. Càng dùng lâu, các điều chỉnh càng chính xác.",
+    "stats": {
+      "totalLeaves": "Tổng số lá",
+      "avgRetention": "Retention TB",
+      "streak": "Streak",
+      "totalReviews": "Tổng review",
+      "leafUnit": "lá",
+      "dayUnit": "ngày"
+    },
+    "forgettingCurve": {
+      "title": "Forgetting curve cá nhân hoá",
+      "description": "Bạn quên nhanh hơn FSRS mặc định khoảng {{pct}}%. Leafnote đã rút ngắn interval review.",
+      "legendYou": "Bạn",
+      "legendFsrs": "FSRS mặc định",
+      "today": "hôm nay",
+      "threshold": "ngưỡng review 70%"
+    },
+    "traits": {
+      "title": "Đặc điểm nhận thức"
+    },
+    "heatmap": {
+      "title": "Bản đồ nhiệt chủ đề · 12 tuần gần nhất",
+      "description": "Cụm nào đang phát triển, cụm nào đang lạnh dần — Leafnote dùng dữ liệu này để chọn lá cần surface.",
+      "weekLabel": "Tuần {{week}}: hoạt động {{pct}}%"
+    },
+    "signals": {
+      "title": "Tín hiệu Leafnote đang theo dõi",
+      "activeRecall": "Lịch sử trả lời active recall",
+      "activeRecallDetail": "Fit tham số FSRS per-user qua MLE",
+      "openRate": "Tần suất mở lại / trích dẫn lá",
+      "openRateDetail": "Phản ánh relevance score real-time",
+      "sessionContext": "Ngữ cảnh phiên làm việc",
+      "sessionContextDetail": "Embedding tổng hợp 7 ngày gần nhất",
+      "pauseTime": "Thời gian dừng ở mỗi câu hỏi",
+      "pauseTimeDetail": "Báo hiệu độ khó cảm nhận khác với điểm tự đánh giá",
+      "questionFormat": "Format câu hỏi hiệu quả nhất",
+      "questionFormatDetail": "Cloze > định nghĩa ngược cho profile của bạn"
+    },
+    "adaptations": {
+      "title": "Leafnote đã điều chỉnh cho bạn",
+      "interval": "Rút ngắn interval review trung bình ×1.2 sau khi phát hiện forgetting curve dốc.",
+      "format": "Ưu tiên format cloze + ứng dụng cho lá mới sinh, giảm sinh \"định nghĩa ngược\".",
+      "granularity": "Phân rã lá mịn hơn (~22 từ/lá) — bạn nhớ tốt hơn ở granularity này.",
+      "surfacing": "Surfacing chủ động khi mở project Triết học khoa học, giảm khi mở Sinh học (cụm ngủ đông)."
+    }
+  },
+  "empty": {
+    "noLeaves": {
+      "title": "Chưa có lá nào nổi lên",
+      "description": "Khi bạn viết ghi chú, AI sẽ tách chúng thành các lá và surfacing lại đúng lúc bạn cần.",
+      "cta": "Tạo ghi chú đầu tiên"
+    }
+  }
+}

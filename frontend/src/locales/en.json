@@ -1,0 +1,364 @@
+{
+  "sidebar": {
+    "tagline": "notes with a lifecycle",
+    "nav": {
+      "surfacing": "Surfacing",
+      "notes": "Notes",
+      "graph": "Knowledge Graph",
+      "review": "Review",
+      "insights": "Cognitive Profile"
+    },
+    "tags": {
+      "title": "Tags",
+      "new": "New",
+      "newTitle": "Create new tag",
+      "create": "Create new tag",
+      "empty": "No tags yet"
+    },
+    "snapshot": {
+      "title": "Cognitive Profile",
+      "intensity": "Review intensity",
+      "style": "Learning style",
+      "streak": "Streak",
+      "streakUnit": "days"
+    }
+  },
+  "topbar": {
+    "engineStatus": "Engine running",
+    "search": {
+      "placeholder": "Search leaves, notes, or concepts..."
+    },
+    "theme": {
+      "toDark": "Switch to dark mode",
+      "toLight": "Switch to light mode"
+    },
+    "voice": {
+      "title": "New note by voice"
+    },
+    "newNote": "New note"
+  },
+  "leaf": {
+    "type": {
+      "definition": "Definition",
+      "proposition": "Proposition",
+      "relation": "Relation",
+      "fact": "Fact"
+    },
+    "surface": {
+      "forgetting": "Forgetting",
+      "related": "Relevant now",
+      "conflict": "Conflict",
+      "new": "New"
+    },
+    "dormant": "Dormant",
+    "dormantTooltip": "Dormant leaf — excluded from recall",
+    "retention": "Retention",
+    "relevance": "Relevance"
+  },
+  "leafDetail": {
+    "whySurfacing": "Why surfacing now",
+    "lifecycle": "Leaf lifecycle",
+    "forgettingCurve": "Personal forgetting curve",
+    "reviewed": "Reviewed",
+    "reviewedUnit": "times",
+    "lastReview": "Last reviewed",
+    "questions": "Recall questions (AI-generated)",
+    "questionVariants": "variants",
+    "questionTypes": {
+      "cloze": "Cloze",
+      "definitionReverse": "Reverse definition",
+      "application": "Application"
+    },
+    "linkedLeaves": "Linked leaves",
+    "linkedUnit": "leaf",
+    "source": "From note",
+    "today": "today",
+    "actions": {
+      "edit": "Edit",
+      "merge": "Merge",
+      "revive": "Revive",
+      "dormant": "Hibernate",
+      "review": "Review now"
+    }
+  },
+  "tagCreate": {
+    "title": "New tag",
+    "name": {
+      "label": "Tag name",
+      "placeholder": "E.g.: \"kuhn\", \"thesis\", \"reading\"",
+      "help": "Tags are lightweight labels — one note can have many tags, used to filter in the notes list."
+    },
+    "color": {
+      "label": "Identifier color"
+    },
+    "preview": {
+      "label": "Preview:",
+      "default": "new-tag"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "create": "Create tag"
+    }
+  },
+  "dashboard": {
+    "heading": "Surfacing for you",
+    "session": "Session {{minutes}} min",
+    "subheading": "{{count}} leaves surfaced based on session context, your personal forgetting curve, and behavior from the last 7 days.",
+    "filter": {
+      "all": "All"
+    },
+    "emptyFilter": "No leaves match this filter",
+    "panels": {
+      "today": "Today",
+      "retentionHealth": "Retention health",
+      "conflicts": "Needs attention",
+      "suggestions": "Expand knowledge"
+    },
+    "stats": {
+      "needReview": "Need review",
+      "reviewed": "Reviewed",
+      "newLeaves": "New leaves",
+      "studyTime": "Study time",
+      "studyTimeValue": "{{minutes}} min",
+      "streakValue": "{{days}} days",
+      "leafUnit": "leaves"
+    },
+    "suggestion": {
+      "text": "You have 3 notes about Kuhn but no leaf yet on",
+      "textSuffix": ". A closely related concept Kuhn often mentions.",
+      "viewContext": "View context →"
+    }
+  },
+  "notesList": {
+    "count": "{{filtered}}/{{total}} notes",
+    "filterInfo": "filtered by {{count}} tags (AND)",
+    "heading": "Your notes",
+    "subheading": "Each note has been decomposed by the Leaf Engine. Click to see extracted leaves.",
+    "newNote": "New note",
+    "tagFilter": {
+      "label": "Filter by tag · click multiple = AND (note must have all)",
+      "clear": "Clear filter"
+    },
+    "emptyFilter": {
+      "title": "No notes match this filter",
+      "hint": "Try removing tags or",
+      "clearAll": "clear all filters"
+    },
+    "emptyMain": {
+      "title": "No notes yet",
+      "description": "Start recording your knowledge — AI will decompose it and help you remember longer.",
+      "cta": "Create your first note"
+    },
+    "leafCount": "{{count}} leaves",
+    "open": "Open →"
+  },
+  "editor": {
+    "savedAt": "Saved at {{time}}",
+    "leafCount": "{{count}} leaves extracted",
+    "newNote": "New note · auto-save every 2s",
+    "unsaved": "Unsaved changes",
+    "untitled": "Untitled",
+    "titlePlaceholder": "Title",
+    "titlePlaceholderNew": "Title (leave blank → AI generates after save)",
+    "removeTag": "Remove tag",
+    "addTag": "Add tag",
+    "editTag": "Edit tags",
+    "tagPicker": {
+      "title": "Select tags (multi-select)"
+    },
+    "mode": {
+      "read": "Read",
+      "edit": "Edit"
+    },
+    "viewGraph": "View graph",
+    "save": "Save & decompose",
+    "saveAgain": "Save & re-decompose",
+    "freshBanner": {
+      "title": "AI just extracted {{count}} leaves from this note",
+      "description": "Review below — keep, edit, merge, split, or discard each leaf. The final call is yours."
+    },
+    "engine": {
+      "title": "Leaf Knowledge Engine",
+      "waiting": "waiting for content",
+      "willRerun": "will re-run on save",
+      "synced": "synced",
+      "descriptionNew": "After saving, AI will decompose, generate title, and attach embeddings",
+      "descriptionDone": "Decomposition done · {{newCount}} new · {{matchCount}} matched · {{linkedCount}} linked"
+    },
+    "leaves": {
+      "title": "Extracted leaves ({{count}})",
+      "aiReview": "AI extracted · you review",
+      "showAll": "All ↓",
+      "addManual": "Add leaf manually",
+      "emptyTitle": "No leaves yet",
+      "emptyDescription": "Just start typing — after you click Save & decompose, AI will extract leaves and show them here for review."
+    },
+    "insights": {
+      "title": "AI insights"
+    },
+    "legend": {
+      "readMode": "Highlights",
+      "editMode": "Edit text, AI will re-extract"
+    },
+    "toolbar": {
+      "record": "Record",
+      "image": "Image / OCR",
+      "aiTitle": "AI title",
+      "autosave": "Auto-save 2s · offline → sync when online"
+    },
+    "voice": {
+      "recording": "recording — tap to stop",
+      "done": "Recording done · transcript ready",
+      "insertHint": "Click \"Insert\" to paste transcript at cursor position",
+      "insert": "Insert into note"
+    },
+    "image": {
+      "title": "Insert image — OCR runs in background after save",
+      "dropHint": "Drag & drop image or click to select",
+      "formats": "Whiteboard · slide · book page"
+    },
+    "editHint": {
+      "prefix": "After saving",
+      "body": "AI will re-decompose: existing leaves keep their ID if unchanged, new leaves are created, missing leaves move to",
+      "deleteProposal": "proposed deletion",
+      "suffix": "for your review."
+    },
+    "placeholder": "Start typing here — no need for a title first, no need to pick a folder...",
+    "leafRow": {
+      "confidence": "AI confidence {{pct}}%",
+      "save": "Save",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "split": "Split",
+      "merge": "Merge",
+      "discard": "Discard"
+    },
+    "status": {
+      "new": "New",
+      "existing": "Matched",
+      "linked": "Linked"
+    },
+    "tag": {
+      "ai": "AI",
+      "manual": "You"
+    }
+  },
+  "graph": {
+    "subheading": "Updated by behavior · hot clusters stand out, dormant leaves fade",
+    "statsInfo": "{{leaves}} leaves · {{edges}} links · {{clusters}} clusters",
+    "colorMode": {
+      "cluster": "By cluster",
+      "retention": "By retention"
+    },
+    "legend": {
+      "cluster": "Cluster",
+      "retention": "Retention",
+      "crossLink": "Cross-cluster link"
+    },
+    "hint": "Hover to see links · click to pin details",
+    "hotClusters": "Hot clusters",
+    "dormantClusters": "Dormant clusters",
+    "dormantPct": "{{pct}}% leaves fading",
+    "emptyDetail": "Select a leaf on the map to view details",
+    "nodeDetail": {
+      "deselect": "Deselect",
+      "retentionLabel": "Retention",
+      "relevanceLabel": "Relevance",
+      "linkedLabel": "Links",
+      "reviewedLabel": "Reviewed",
+      "linkedCount": "{{count}} leaves",
+      "reviewedCount": "{{count}} times"
+    }
+  },
+  "review": {
+    "exit": "Exit session",
+    "streak": "{{days}} day streak",
+    "question": "Question",
+    "answer": "Answer",
+    "sourceLeaf": "Source leaf",
+    "tryFirst": "Try to recall before seeing the answer",
+    "reveal": "Show answer",
+    "memoryLevel": "Memory level — feedback will update your personal forgetting curve",
+    "retention": "Retention",
+    "relevance": "Relevance",
+    "reviewCount": "Review #",
+    "defaultQuestion": "Restate:",
+    "questionType": {
+      "cloze": "Cloze",
+      "definitionReverse": "Reverse definition",
+      "application": "Application",
+      "recall": "Recall"
+    },
+    "difficulties": {
+      "forgot": "Forgot",
+      "hard": "Hard",
+      "good": "Good",
+      "easy": "Easy",
+      "forgotDetail": "< 1 day",
+      "hardDetail": "2 days",
+      "goodDetail": "6 days",
+      "easyDetail": "14 days"
+    },
+    "done": {
+      "title": "Session complete",
+      "description": "Reviewed {{count}} leaves · forgetting curve updated",
+      "reviewSession": "Review session",
+      "backToDashboard": "Back to dashboard"
+    }
+  },
+  "insights": {
+    "subheading": "Updated each session · {{reviews}} reviews to date",
+    "description": "Leafnote builds a personal profile from your review behavior, re-opens, and note writing. The longer you use it, the more accurate the adjustments.",
+    "stats": {
+      "totalLeaves": "Total leaves",
+      "avgRetention": "Avg retention",
+      "streak": "Streak",
+      "totalReviews": "Total reviews",
+      "leafUnit": "leaves",
+      "dayUnit": "days"
+    },
+    "forgettingCurve": {
+      "title": "Personalized forgetting curve",
+      "description": "You forget ~{{pct}}% faster than the default FSRS. Leafnote has shortened your review interval.",
+      "legendYou": "You",
+      "legendFsrs": "Default FSRS",
+      "today": "today",
+      "threshold": "review threshold 70%"
+    },
+    "traits": {
+      "title": "Cognitive traits"
+    },
+    "heatmap": {
+      "title": "Topic heatmap · last 12 weeks",
+      "description": "Which clusters are growing, which are cooling — Leafnote uses this data to choose which leaves to surface.",
+      "weekLabel": "Week {{week}}: {{pct}}% activity"
+    },
+    "signals": {
+      "title": "Signals Leafnote is tracking",
+      "activeRecall": "Active recall response history",
+      "activeRecallDetail": "Fits per-user FSRS parameters via MLE",
+      "openRate": "Re-open / citation rate of leaves",
+      "openRateDetail": "Reflects real-time relevance score",
+      "sessionContext": "Session context",
+      "sessionContextDetail": "Aggregated embeddings from the last 7 days",
+      "pauseTime": "Time paused on each question",
+      "pauseTimeDetail": "Signals perceived difficulty vs self-rated score",
+      "questionFormat": "Most effective question format",
+      "questionFormatDetail": "Cloze > reverse definition for your profile"
+    },
+    "adaptations": {
+      "title": "Leafnote has adjusted for you",
+      "interval": "Shortened review interval by ×1.2 after detecting a steep forgetting curve.",
+      "format": "Prioritizing cloze + application format for new leaves, reducing reverse-definition.",
+      "granularity": "Decomposing leaves more finely (~22 words/leaf) — you retain better at this granularity.",
+      "surfacing": "Actively surfacing when the Philosophy of Science project is open, reducing when Biology is open (dormant cluster)."
+    }
+  },
+  "empty": {
+    "noLeaves": {
+      "title": "No leaves surfacing yet",
+      "description": "As you write notes, AI will extract leaves from them and surface them back at just the right moment.",
+      "cta": "Create your first note"
+    }
+  }
+}
