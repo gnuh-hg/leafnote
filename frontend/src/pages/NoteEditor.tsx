@@ -28,7 +28,7 @@ import {
   Check,
 } from 'lucide-react'
 import { decompositionDemo, notes as allNotes } from '../data/mockData'
-import type { DecompositionDemo, DetectedLeaf, BodyBlock } from '../data/mockData'
+import type { DecompositionDemo, DetectedLeaf } from '../data/mockData'
 import { TYPE_STYLES } from '../components/LeafCard'
 import { useAppState } from '../context/AppState'
 
