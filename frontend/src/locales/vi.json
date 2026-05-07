@@ -354,6 +354,60 @@
       "surfacing": "Surfacing chủ động khi mở project Triết học khoa học, giảm khi mở Sinh học (cụm ngủ đông)."
     }
   },
+  "auth": {
+    "tab": {
+      "login": "Đăng nhập",
+      "signup": "Đăng ký"
+    },
+    "field": {
+      "email": "Email",
+      "password": "Mật khẩu",
+      "confirmPassword": "Nhập lại mật khẩu",
+      "displayName": "Tên hiển thị"
+    },
+    "placeholder": {
+      "email": "you@example.com",
+      "password": "Tối thiểu 8 ký tự",
+      "confirmPassword": "Nhập lại mật khẩu",
+      "displayName": "Tên bạn muốn hiển thị"
+    },
+    "action": {
+      "login": "Đăng nhập",
+      "signup": "Đăng ký",
+      "logout": "Đăng xuất",
+      "loading": "Đang xử lý..."
+    },
+    "error": {
+      "invalidEmail": "Email không hợp lệ",
+      "weakPassword": "Mật khẩu phải có ít nhất 8 ký tự",
+      "mismatch": "Mật khẩu không khớp",
+      "emailTaken": "Email đã được sử dụng",
+      "wrongCredentials": "Email hoặc mật khẩu không đúng",
+      "displayNameLength": "Tên hiển thị phải từ 2–50 ký tự",
+      "generic": "Đã có lỗi xảy ra. Vui lòng thử lại."
+    },
+    "success": {
+      "registered": "Đăng ký thành công! Hãy đăng nhập."
+    },
+    "strength": {
+      "weak": "Yếu",
+      "medium": "Trung bình",
+      "strong": "Mạnh"
+    },
+    "link": {
+      "noAccount": "Chưa có tài khoản?",
+      "hasAccount": "Đã có tài khoản?",
+      "goSignup": "Đăng ký",
+      "goLogin": "Đăng nhập"
+    },
+    "branding": {
+      "tagline": "Ghi chú hôm nay, nhớ mãi ngày mai"
+    },
+    "offline": {
+      "banner": "Bạn đang offline. Cần kết nối mạng để đăng nhập.",
+      "bannerSignup": "Bạn đang offline. Cần kết nối mạng để đăng ký."
+    }
+  },
   "empty": {
     "noLeaves": {
       "title": "Chưa có lá nào nổi lên",

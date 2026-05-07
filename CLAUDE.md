@@ -50,8 +50,21 @@ Xem chi tiết: [`ROADMAP.md`](ROADMAP.md).
 | `.claude/memory/patterns.md` | `chưa cần` | Sau khi rút pattern thực |
 | `MIGRATION-PLAN.md` | `done` | Migration hoàn tất — 10/10 phần xong |
 | `.claude/workflows/migrate-demo.md` | `done` | Workflow đã dùng xong |
-| `backend/` | `scaffold` | FastAPI skeleton + `/health` |
-| `frontend/` | `migrated` | UI đầy đủ từ demo — sẵn sàng nối API thật |
+| `backend/` | `phase1-auth` | FastAPI + auth middleware + User model |
+| `backend/app/models/user.py` | `ready` | User model (SQLAlchemy) |
+| `backend/app/schemas/auth.py` | `ready` | Pydantic schemas (UserOut, UserUpdate) |
+| `backend/app/services/auth.py` | `ready` | Auth business logic |
+| `backend/app/core/auth.py` | `ready` | JWT verify middleware (get_current_user) |
+| `backend/app/core/database.py` | `ready` | AsyncSession + Base |
+| `backend/app/api/v1/routes/auth.py` | `ready` | GET/PATCH /auth/me |
+| `backend/app/api/v1/router.py` | `ready` | API router aggregator |
+| `frontend/` | `phase1-auth` | UI đầy đủ + auth flow |
+| `frontend/src/pages/Auth.tsx` | `ready` | Auth page (login/signup tabs) |
+| `frontend/src/stores/authStore.ts` | `ready` | Zustand auth store |
+| `frontend/src/services/auth.ts` | `ready` | Supabase auth wrapper |
+| `frontend/src/lib/supabase.ts` | `ready` | Supabase client |
+| `frontend/src/hooks/useOnlineStatus.ts` | `ready` | Online/offline detection hook |
+| `frontend/src/components/auth/*` | `ready` | LoginForm, SignupForm, ProtectedRoute, BrandingPanel, PasswordStrengthMeter |
 
 > Khi Claude tạo file mới, **cập nhật bảng này**.
 

@@ -58,3 +58,17 @@ Toàn bộ UI từ `leafnote-demo/` đã được chuyển sang `leafnote/fronte
 - Signals/Adaptations trong Insights: hardcode qua i18n key (không cần mockData)
 
 **Bước tiếp:** Phase 1 — Auth (Supabase login flow, protected routes)
+
+---
+
+## 2026-05-07 — Phase 1 Auth hoàn thành
+
+**Pattern đã chốt:**
+- Zustand store cho global state (auth, session) — không dùng React Context cho state phức tạp
+- Auth middleware: `get_current_user` dependency dùng `python-jose` decode Supabase JWT
+- `get_or_create_user` pattern: first login → sync user từ Supabase vào DB nội bộ
+- `useOnlineStatus` hook: detect online/offline, reusable cho toàn app
+- Auth page layout: split-screen desktop + centered card mobile
+- Supabase client fallback: placeholder values khi env vars chưa set (không crash)
+
+**Bước tiếp:** Phase 1 — Note (CRUD note cơ bản)

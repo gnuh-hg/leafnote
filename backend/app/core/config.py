@@ -16,6 +16,8 @@ class Settings(BaseSettings):
 
     SECRET_KEY: str
 
+    SUPABASE_JWT_SECRET: str
+
     CORS_ORIGINS: list[str] = ["http://localhost:5173"]
 
 

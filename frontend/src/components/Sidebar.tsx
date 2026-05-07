@@ -10,16 +10,30 @@ import {
   Leaf,
   Plus,
   Tag as TagIcon,
+  LogOut,
 } from 'lucide-react'
 import TagCreateModal from './TagCreateModal'
 import { useAppState } from '../context/AppState'
 import { cognitiveProfile } from '../data/mockData'
+import { useAuthStore } from '../stores/authStore'
+import { signOut } from '../services/auth'
 
 export default function Sidebar() {
   const { t } = useTranslation()
   const { tags } = useAppState()
   const navigate = useNavigate()
   const [showCreate, setShowCreate] = useState(false)
+  const clearAuth = useAuthStore((s) => s.clearAuth)
+
+  async function handleLogout() {
+    try {
+      await signOut()
+    } catch {
+      // clear local session even if server call fails (offline)
+    }
+    clearAuth()
+    navigate('/auth')
+  }
 
   const navItems = [
     { to: '/', label: t('sidebar.nav.surfacing'), icon: Sparkles, badge: '12' },
@@ -132,6 +146,17 @@ export default function Sidebar() {
       </nav>
 
       {showCreate && <TagCreateModal onClose={() => setShowCreate(false)} />}
+
+      {/* Logout */}
+      <div className="px-3 pb-2">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-paper-200 dark:hover:bg-ink-850 transition"
+        >
+          <LogOut className="w-4 h-4" />
+          <span>{t('auth.action.logout')}</span>
+        </button>
+      </div>
 
       {/* Cognitive snapshot */}
       <div className="p-4 border-t border-paper-300/40 dark:border-ink-700/40 bg-paper-100/40 dark:bg-ink-900/40">

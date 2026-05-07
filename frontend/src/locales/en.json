@@ -354,6 +354,60 @@
       "surfacing": "Actively surfacing when the Philosophy of Science project is open, reducing when Biology is open (dormant cluster)."
     }
   },
+  "auth": {
+    "tab": {
+      "login": "Sign in",
+      "signup": "Sign up"
+    },
+    "field": {
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "displayName": "Display name"
+    },
+    "placeholder": {
+      "email": "you@example.com",
+      "password": "At least 8 characters",
+      "confirmPassword": "Re-enter password",
+      "displayName": "Your display name"
+    },
+    "action": {
+      "login": "Sign in",
+      "signup": "Sign up",
+      "logout": "Sign out",
+      "loading": "Processing..."
+    },
+    "error": {
+      "invalidEmail": "Invalid email",
+      "weakPassword": "Password must be at least 8 characters",
+      "mismatch": "Passwords do not match",
+      "emailTaken": "Email already in use",
+      "wrongCredentials": "Invalid email or password",
+      "displayNameLength": "Display name must be 2–50 characters",
+      "generic": "Something went wrong. Please try again."
+    },
+    "success": {
+      "registered": "Registration successful! Please sign in."
+    },
+    "strength": {
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong"
+    },
+    "link": {
+      "noAccount": "Don't have an account?",
+      "hasAccount": "Already have an account?",
+      "goSignup": "Sign up",
+      "goLogin": "Sign in"
+    },
+    "branding": {
+      "tagline": "Take notes today, remember forever"
+    },
+    "offline": {
+      "banner": "You're offline. Internet connection required to sign in.",
+      "bannerSignup": "You're offline. Internet connection required to sign up."
+    }
+  },
   "empty": {
     "noLeaves": {
       "title": "No leaves surfacing yet",

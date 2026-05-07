@@ -34,11 +34,11 @@ Không hoàn thiện 1 page rồi mới sang page khác. Thay vào đó, mỗi p
 
 ### Gate
 
-- [ ] Đăng ký → đăng nhập → vào app thành công
+- [x] Đăng ký → đăng nhập → vào app thành công
 - [ ] Tạo note mới → lưu → thấy trong danh sách
 - [ ] Sửa note → lưu → thay đổi được giữ
 - [ ] Xoá note → biến khỏi danh sách
-- [ ] F5 khi chưa đăng nhập → về `/auth`
+- [x] F5 khi chưa đăng nhập → về `/auth`
 
 ---
 

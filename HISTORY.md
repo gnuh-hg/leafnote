@@ -176,6 +176,59 @@ Mỗi entry tương ứng một phase hoặc một task lớn đã hoàn thành.
 
 ---
 
+## 2026-05-07 — Phase 1: Auth — Đăng nhập / Đăng ký
+
+**Mục tiêu**: User đăng ký, đăng nhập, và vào app được. Route guard chặn truy cập khi chưa có session.
+
+**Đã làm**:
+
+- Backend: User model, auth middleware (verify Supabase JWT), `GET /me` + `PATCH /me` endpoints, database.py (AsyncSession + Base)
+- Frontend: Supabase client setup, Zustand auth store, auth service wrapper
+- Auth page: split-screen layout (desktop) + centered card (mobile), 2 tab đăng nhập/đăng ký
+- Validation: inline errors, password strength meter (weak/medium/strong), confirm password real-time
+- Route guard: ProtectedRoute component, redirect logic
+- Sidebar: nút đăng xuất
+- Offline: useOnlineStatus hook, banner offline trên auth page
+- i18n: ~30 auth keys vi+en
+
+**Files đã can thiệp**:
+
+- `backend/app/core/database.py` — tạo mới
+- `backend/app/models/user.py` — tạo mới
+- `backend/app/models/__init__.py` — tạo mới
+- `backend/app/schemas/auth.py` — tạo mới
+- `backend/app/services/auth.py` — tạo mới
+- `backend/app/core/auth.py` — tạo mới
+- `backend/app/api/v1/routes/auth.py` — tạo mới
+- `backend/app/api/v1/router.py` — tạo mới
+- `backend/app/core/config.py` — sửa (thêm SUPABASE_JWT_SECRET)
+- `backend/app/main.py` — sửa (include api_router)
+- `frontend/src/lib/supabase.ts` — tạo mới
+- `frontend/src/stores/authStore.ts` — tạo mới
+- `frontend/src/services/auth.ts` — tạo mới
+- `frontend/src/hooks/useOnlineStatus.ts` — tạo mới
+- `frontend/src/pages/Auth.tsx` — tạo mới
+- `frontend/src/components/auth/LoginForm.tsx` — tạo mới
+- `frontend/src/components/auth/SignupForm.tsx` — tạo mới
+- `frontend/src/components/auth/PasswordStrengthMeter.tsx` — tạo mới
+- `frontend/src/components/auth/BrandingPanel.tsx` — tạo mới
+- `frontend/src/components/auth/ProtectedRoute.tsx` — tạo mới
+- `frontend/src/vite-env.d.ts` — tạo mới
+- `frontend/package.json` — sửa (thêm zustand)
+- `frontend/src/App.tsx` — sửa (routing + auth init + ProtectedRoute)
+- `frontend/src/locales/vi.json` — sửa (thêm auth keys)
+- `frontend/src/locales/en.json` — sửa (thêm auth keys)
+- `frontend/src/components/Sidebar.tsx` — sửa (nút đăng xuất)
+- `CLAUDE.md` — sửa (bảng trạng thái file)
+- `.claude/memory/context.md` — sửa (ghi nhận auth pattern)
+- `information/api-spec.md` — sửa (thêm auth endpoints)
+- `information/database-schema.md` — sửa (thêm bảng users)
+- `information/project-structure.md` — sửa (thêm file mới)
+- `ROADMAP.md` — sửa (tick auth gates)
+- `HISTORY.md` — sửa (thêm entry)
+
+---
+
 ## 2026-05-07 — Lên plan migration: leafnote-demo → leafnote/frontend
 
 **Mục tiêu**: Lập kế hoạch chuyển toàn bộ UI từ bản demo sang repo chính thức, chia thành 10 phần nhỏ có thể thực hiện tuần tự.
