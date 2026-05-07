@@ -173,7 +173,7 @@ export default function SignupForm({ onSwitchToLogin, onSignupSuccess }: Props) 
             {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
-        {touched.confirmPassword && confirmPassword && !confirmValid && (
+        {confirmPassword && !confirmValid && (
           <p className="text-rose-600 dark:text-rose-400 text-xs mt-1">
             {t('auth.error.mismatch')}
           </p>
