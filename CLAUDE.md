@@ -50,6 +50,8 @@ Xem chi tiết: [`ROADMAP.md`](ROADMAP.md).
 | `.claude/memory/patterns.md` | `chưa cần` | Sau khi rút pattern thực |
 | `MIGRATION-PLAN.md` | `done` | Migration hoàn tất — 10/10 phần xong |
 | `.claude/workflows/migrate-demo.md` | `done` | Workflow đã dùng xong |
+| `.claude/workflows/pre-flight.md` | `ready` | Checklist bắt buộc trước/trong/sau mọi task |
+| `.claude/workflows/build-feature.md` | `ready` | Workflow build feature |
 | `backend/` | `phase1-auth` | FastAPI + auth middleware + User model |
 | `backend/app/models/user.py` | `ready` | User model (SQLAlchemy) |
 | `backend/app/schemas/auth.py` | `ready` | Pydantic schemas (UserOut, UserUpdate) |
@@ -110,12 +112,13 @@ leafnote/
 
 ## Hành vi Claude trong phase này
 
-1. **Đọc đầu phiên**: `CLAUDE.md` → `ROADMAP.md` → `information/project-overview.md` → user-stories nếu cần ngữ cảnh tính năng.
+1. **Trước mọi task**: đọc `.claude/workflows/pre-flight.md` — checklist bắt buộc trước/trong/sau khi làm. **Không bỏ qua.**
+2. **Đọc đầu phiên**: `CLAUDE.md` → `ROADMAP.md` → `information/project-overview.md` → user-stories nếu cần ngữ cảnh tính năng.
    **Khi tạo bất kỳ component UI nào**: đọc `information/design-system.md` trước — không tự định nghĩa màu, font, hay pattern.
-2. **Khi user yêu cầu code**: phase `scaffolding` — được tạo `backend/` và `frontend/` theo cấu trúc đã chốt. Hỏi xác nhận trước khi cài thư viện lớn (>10MB), mở port public, hay chạy migration thật.
-3. **Khi tạo / chỉnh tài liệu**: cập nhật bảng "Trạng thái file" ở trên.
-4. **Khi chốt một quyết định lớn** (tech stack, schema, API contract): chuyển nhãn từ `draft` → `ready` và ghi short note vào `.claude/memory/context.md`.
-5. **Quy ước file `.md`**: Mọi file `.md` tạo mới phải có dòng `> [mô tả ngắn]` làm **dòng đầu tiên sau tiêu đề `#`** — giải thích tác dụng của file trong một câu. Ràng buộc này áp dụng vĩnh viễn, không cần nhắc lại mỗi phiên.
+3. **Khi user yêu cầu code**: phase `scaffolding` — được tạo `backend/` và `frontend/` theo cấu trúc đã chốt. Hỏi xác nhận trước khi cài thư viện lớn (>10MB), mở port public, hay chạy migration thật.
+4. **Khi tạo / chỉnh tài liệu**: cập nhật bảng "Trạng thái file" ở trên.
+5. **Khi chốt một quyết định lớn** (tech stack, schema, API contract): chuyển nhãn từ `draft` → `ready` và ghi short note vào `.claude/memory/context.md`.
+6. **Quy ước file `.md`**: Mọi file `.md` tạo mới phải có dòng `> [mô tả ngắn]` làm **dòng đầu tiên sau tiêu đề `#`** — giải thích tác dụng của file trong một câu. Ràng buộc này áp dụng vĩnh viễn, không cần nhắc lại mỗi phiên.
 
 ---
 

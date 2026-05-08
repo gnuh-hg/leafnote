@@ -281,8 +281,12 @@ Empty state phải có: icon + tiêu đề + mô tả. CTA nếu phù hợp.
 - [ ] **i18n**: tất cả string qua `t()`, VI + EN đầy đủ, không string nào trống
 - [ ] **Bảo mật**: validate ở backend, không data nhạy cảm trong URL, endpoint có auth guard
 - [ ] **Mobile**: không vỡ layout ở 375px, touch target ≥ 44×44px
-- [ ] **Không leak jargon**: không có "leaf ID", "embedding", "FSRS", "pgvector" ra UI
-- [ ] **Adaptive UX**: tooltip chỉ hiện khi hover, không auto-show, không "Are you sure?" với action không destructive
+- [ ] **Adaptive UX — Người mới**: onboarding chỉ hiện lần đầu, bỏ qua được bất kỳ lúc nào, không lặp tooltip/walkthrough với user >3 ngày hoặc >5 note
+- [ ] **Adaptive UX — Người có kinh nghiệm**: tooltip chỉ hiện khi hover (không auto-show), không "Are you sure?" với action không destructive
+- [ ] **Adaptive UX — Không leak jargon**: không có "leaf ID", "embedding", "FSRS", "pgvector" ra UI — giải thích khái niệm lạ bằng analogy gần gũi
+- [ ] **Adaptive UX — Backend tracking**: feature có dùng `user_created_at`, `note_count`, `last_active_at` để quyết định UX path (nếu liên quan)
+- [ ] **Offline**: ghi note offline hoạt động, UI hiện trạng thái online/offline/syncing, tính năng phụ thuộc server không crash khi mất mạng
+- [ ] **Guest flow**: flow guest → login mượt, không mất data, không redirect lạ
 
 ### Design System
 

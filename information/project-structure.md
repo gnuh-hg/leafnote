@@ -32,13 +32,19 @@ leafnote/
 
 ```
 .claude/
-└── memory/
-    ├── context.md             # Đang làm đến đâu, quyết định đã chốt
-    ├── mistakes.md            # Lỗi đã gặp, tránh lặp (tạo khi gặp lỗi đầu)
-    └── patterns.md            # Pattern code hay dùng (tạo khi rút ra được)
+├── memory/
+│   ├── context.md             # Đang làm đến đâu, quyết định đã chốt
+│   ├── mistakes.md            # Lỗi đã gặp, tránh lặp (tạo khi gặp lỗi đầu)
+│   └── patterns.md            # Pattern code hay dùng (tạo khi rút ra được)
+└── workflows/
+    ├── pre-flight.md          # Checklist bắt buộc trước/trong/sau mọi task
+    ├── build-feature.md       # Workflow build feature (10 bước)
+    ├── fix-bug.md             # Workflow sửa bug
+    ├── ship-product.md        # Workflow ship product
+    └── migrate-demo.md        # Migration demo → production (done)
 ```
 
-**Không có** `skills/`, `agents/`, `workflows/`, `hooks/` trong phase này — tạo khi thực sự cần, không tạo sẵn rỗng.
+**Không có** `skills/`, `agents/`, `hooks/` trong phase này — tạo khi thực sự cần, không tạo sẵn rỗng.
 
 ---
 
