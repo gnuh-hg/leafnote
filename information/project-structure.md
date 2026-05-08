@@ -172,6 +172,9 @@ frontend/
     ├── lib/
     │   ├── supabase.ts        # Supabase client instance
     │   └── i18n.ts            # i18next config
+    ├── assets/
+    │   └── images/            # Static images (logo, illustrations)
+    │       └── logo-leafnote.png
     ├── stores/                # Zustand global state (session, active project)
     │   └── authStore.ts       # Auth state (user, session, loading)
     └── types/                 # TypeScript types — codegen từ OpenAPI schema

@@ -67,6 +67,7 @@ Xem chi tiết: [`ROADMAP.md`](ROADMAP.md).
 | `frontend/src/lib/supabase.ts` | `ready` | Supabase client |
 | `frontend/src/hooks/useOnlineStatus.ts` | `ready` | Online/offline detection hook |
 | `frontend/src/components/auth/*` | `ready` | LoginForm, SignupForm, ProtectedRoute, BrandingPanel, PasswordStrengthMeter |
+| `frontend/src/assets/images/logo-leafnote.png` | `ready` | Logo chính của app |
 
 > Khi Claude tạo file mới, **cập nhật bảng này**.
 
