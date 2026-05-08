@@ -17,7 +17,25 @@
       "Bash(git commit -m ' *)",
       "mcp__Claude_in_Chrome__read_page",
       "mcp__Claude_in_Chrome__javascript_tool",
-      "Bash(del PLAN.md)"
+      "Bash(del PLAN.md)",
+      "Bash(rtk gh *)",
+      "Bash(npm install *)",
+      "Bash(gitnexus *)",
+      "PowerShell(gitnexus analyze *)",
+      "PowerShell(Get-Content *)",
+      "PowerShell(Get-ChildItem *)",
+      "Bash(node *)",
+      "Bash(GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 node /c/Users/admin/AppData/Roaming/npm/node_modules/gitnexus/dist/cli/index.js analyze . -f)",
+      "Bash(GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 NODE_OPTIONS=\"--abort-on-uncaught-exception\" node /c/Users/admin/AppData/Roaming/npm/node_modules/gitnexus/dist/cli/index.js analyze . -f)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 node /c/Users/admin/AppData/Roaming/npm/node_modules/gitnexus/dist/cli/index.js analyze . -f -v)",
+      "PowerShell(node --stack-size=4096 -e \"console.log\\('stack-size ok'\\)\" 2>&1)",
+      "PowerShell(cd \"C:\\\\Users\\\\admin\\\\all\\\\project\\\\leafnote\"; $env:NODE_OPTIONS = \"--max-old-space-size=8192\"; node --trace-uncaught-exception \"C:\\\\Users\\\\admin\\\\AppData\\\\Roaming\\\\npm\\\\node_modules\\\\gitnexus\\\\dist\\\\cli\\\\index.js\" analyze . -f 2>&1 | Out-String; echo \"EXIT: $LASTEXITCODE\")",
+      "PowerShell(gitnexus list *)",
+      "mcp__gitnexus__list_repos",
+      "mcp__gitnexus__query",
+      "mcp__gitnexus__context",
+      "WebFetch(domain:github.com)"
     ]
   }
 }
