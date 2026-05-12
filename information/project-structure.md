@@ -15,8 +15,10 @@ leafnote/
 ├── ROADMAP.md                 # Lộ trình theo milestone
 ├── CHANGELOG.md               # Lịch sử release (tạo sau release đầu)
 ├── HISTORY.md                 # Lịch sử plan đã thực hiện
+├── AGENTS.md                  # GitNexus agent configuration
 ├── .env.example               # Mẫu biến môi trường
 ├── .gitignore
+├── .gitnexusignore
 │
 ├── .claude/                   # Bộ nhớ làm việc của Claude
 ├── information/               # Tài liệu dự án
@@ -32,19 +34,55 @@ leafnote/
 
 ```
 .claude/
+├── agents/                    # Sub-agents chuyên biệt theo loại task
+│   ├── architect.md           # Kiểm tra layer separation, architecture rules
+│   ├── coder.md               # Feature implementer theo convention Leafnote
+│   ├── optimizer.md           # Performance analysis (React + FastAPI + bundle)
+│   ├── python-reviewer.md     # FastAPI/Python reviewer (service layer, async)
+│   ├── reviewer.md            # General code reviewer (security + conventions)
+│   ├── security-reviewer.md   # Security: Supabase JWT, OWASP, secrets
+│   ├── tdd-guide.md           # TDD workflow: Vitest + pytest
+│   └── typescript-reviewer.md # TypeScript/React reviewer (i18n, hooks, types)
+├── commands/
+│   └── delegate.md            # /delegate slash command
+├── hooks/
+│   ├── post-gen.md            # Hook sau khi generate code
+│   ├── pre-gen.md             # Hook trước khi generate code
+│   └── validation.md          # Hook validation
 ├── memory/
 │   ├── context.md             # Đang làm đến đâu, quyết định đã chốt
-│   ├── mistakes.md            # Lỗi đã gặp, tránh lặp (tạo khi gặp lỗi đầu)
-│   └── patterns.md            # Pattern code hay dùng (tạo khi rút ra được)
+│   ├── global.md              # Global memory cross-session
+│   ├── mistakes.md            # Lỗi đã gặp, tránh lặp
+│   └── patterns.md            # Pattern code hay dùng
+├── skills/
+│   ├── coding/
+│   │   ├── backend-patterns.md  # FastAPI + SQLAlchemy async patterns
+│   │   ├── browser-qa/          # UI/browser testing workflow cho Leafnote
+│   │   ├── debug.md
+│   │   ├── generate-code.md
+│   │   └── optimize.md
+│   ├── content/
+│   │   ├── hooks.md
+│   │   └── writing.md
+│   ├── product/
+│   │   ├── ideation.md
+│   │   └── validation.md
+│   ├── gemini-delegation.md   # Kỹ năng giao việc hiệu quả cho Gemini
+│   ├── task-planner.md        # Phân tích task, chia subtask, chọn worker
+│   └── gitnexus/              # GitNexus skill files (6 skills)
+│       ├── gitnexus-cli/
+│       ├── gitnexus-debugging/
+│       ├── gitnexus-exploring/
+│       ├── gitnexus-guide/
+│       ├── gitnexus-impact-analysis/
+│       └── gitnexus-refactoring/
 └── workflows/
     ├── pre-flight.md          # Checklist bắt buộc trước/trong/sau mọi task
-    ├── build-feature.md       # Workflow build feature (10 bước)
+    ├── build-feature.md       # Workflow build feature
     ├── fix-bug.md             # Workflow sửa bug
     ├── ship-product.md        # Workflow ship product
     └── migrate-demo.md        # Migration demo → production (done)
 ```
-
-**Không có** `skills/`, `agents/`, `hooks/` trong phase này — tạo khi thực sự cần, không tạo sẵn rỗng.
 
 ---
 
@@ -55,8 +93,10 @@ information/
 ├── project-overview.md        # Concept, MVP scope, success criteria
 ├── project-structure.md       # File này
 ├── design-system.md           # Màu sắc, typography, component pattern — nguồn chân lý UI
-├── tech-stack.md              # Công nghệ & lý do chọn
+├── logo-brief.md              # Prompt thiết kế logo cho AI/designer
 ├── architecture.md            # Kiến trúc hệ thống (high-level)
+├── features.md                # Catalog tính năng F-01…F-20
+├── product-principles.md      # 7 định hướng sản phẩm cross-cutting
 ├── api-spec.md                # API endpoints (high-level)
 ├── database-schema.md         # Schema DB (high-level)
 ├── user-stories.md            # Stories P0/P1/P2 theo persona

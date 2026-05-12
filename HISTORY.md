@@ -229,6 +229,33 @@ Mỗi entry tương ứng một phase hoặc một task lớn đã hoàn thành.
 
 ---
 
+## 2026-05-08 — Tích hợp GitNexus code intelligence
+
+**Mục tiêu**: Đưa GitNexus vào workflow để có impact analysis, code navigation, và blast-radius check trước khi sửa code.
+
+**Đã làm**:
+
+- Index repo leafnote với GitNexus: 606 symbols, 715 relationships, 1 execution flow
+- Tạo 6 skill files trong `.claude/skills/gitnexus/`: exploring, debugging, impact-analysis, refactoring, cli, guide
+- Cập nhật `.claude/settings.local.json`: thêm permissions cho MCP GitNexus tools
+- Tạo `AGENTS.md` và `.gitnexusignore`
+- Cập nhật `CLAUDE.md`: thêm section GitNexus với quy tắc bắt buộc (impact trước khi edit, detect_changes trước khi commit)
+
+**Files đã can thiệp**:
+
+- `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` — tạo mới
+- `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` — tạo mới
+- `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` — tạo mới
+- `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` — tạo mới
+- `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` — tạo mới
+- `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` — tạo mới
+- `.claude/settings.local.json` — sửa (thêm MCP permissions)
+- `AGENTS.md` — tạo mới
+- `.gitnexusignore` — tạo mới
+- `CLAUDE.md` — sửa (thêm GitNexus section + status table)
+
+---
+
 ## 2026-05-07 — Lên plan migration: leafnote-demo → leafnote/frontend
 
 **Mục tiêu**: Lập kế hoạch chuyển toàn bộ UI từ bản demo sang repo chính thức, chia thành 10 phần nhỏ có thể thực hiện tuần tự.
@@ -248,3 +275,78 @@ Mỗi entry tương ứng một phase hoặc một task lớn đã hoàn thành.
 - `.claude/workflows/migrate-demo.md` — tạo mới
 - `HISTORY.md` — sửa (thêm entry này)
 - `.claude/memory/context.md` — sửa (cập nhật trạng thái)
+
+---
+
+## 2026-05-11 — Tích hợp everything-claude-code vào .claude/
+
+**Mục tiêu**: Tích hợp project everything-claude-code vào cấu trúc .claude/ hiện có mà không gây xung đột, đảm bảo các tài nguyên AI bổ sung sẵn sàng cho Claude, với cấu trúc tổ chức rõ ràng hơn.
+
+**Đã làm**:
+- Tạo thư mục `ecc_collection/` trong `.claude/` để chứa tất cả tài nguyên từ everything-claude-code, cùng các thư mục con phân loại theo chức năng (`agents/`, `skills/`, `configs/`, v.v.).
+- Chuyển các file từ `temp/everything-claude-code/.claude/` và các thư mục cấp cao của everything-claude-code vào các thư mục `ecc_collection/` tương ứng.
+- Chuyển tất cả các file `.md` và `agent.yaml` từ thư mục gốc của `temp/everything-claude-code/` vào `information/ecc-project-docs/`.
+- Xóa thư mục tạm `temp/everything-claude-code/` và các thư mục `ecc/` và `ecc_top_level/` tạm thời đã tạo trước đó.
+- Cập nhật `CLAUDE.md` và `HISTORY.md` để phản ánh cấu trúc mới.
+
+**Files đã can thiệp**:
+- `CLAUDE.md` — sửa (cập nhật đường dẫn file mới)
+- `HISTORY.md` — sửa (cập nhật entry này)
+- `.claude/ecc_collection/` — tạo mới (và chứa tất cả các file từ everything-claude-code)
+- `information/ecc-project-docs/` — tạo mới (và chứa các file `.md` và `agent.yaml` từ everything-claude-code)
+- Các thư mục cũ: `.claude/commands/ecc/`, `.claude/enterprise/ecc/`, `.claude/homunculus/ecc/`, `.claude/research/ecc/`, `.claude/rules/ecc/`, `.claude/skills/ecc/`, `.claude/team/ecc/`, `.claude/ecc_configs/`, `.claude/agents/ecc_top_level/`, `.claude/hooks/ecc_top_level/`, `.claude/skills/ecc_top_level/`, `.claude/workflows/ecc_top_level/` — đã xóa.
+
+---
+
+## 2026-05-11 — Thay thế ECC bằng bộ agent và skill thiết kế riêng cho Leafnote
+
+**Mục tiêu**: Xóa bỏ tích hợp everything-claude-code chưa hoàn chỉnh (chỉ có file rỗng/placeholder), thay bằng bộ agents và skills được viết đặc biệt theo convention và workflow của Leafnote.
+
+**Đã làm**:
+- Xóa toàn bộ `ecc_collection/`, `information/ecc-project-docs/` và các thư mục ECC cũ
+- Tạo 8 agent files trong `.claude/agents/`: `architect`, `coder`, `optimizer`, `python-reviewer`, `reviewer`, `security-reviewer`, `tdd-guide`, `typescript-reviewer` — mỗi agent có description, context Leafnote, và tool set cụ thể
+- Tạo `skills/coding/backend-patterns.md` (FastAPI + SQLAlchemy async patterns)
+- Tạo `skills/coding/browser-qa/` (UI testing workflow)
+- Tạo `skills/content/`, `skills/product/`, `skills/coding/debug.md`, `skills/coding/generate-code.md`, `skills/coding/optimize.md`
+- Tạo `skills/gemini-delegation.md` và `skills/task-planner.md` (Manager Protocol)
+- Tạo `commands/delegate.md` (/delegate slash command), `hooks/` (pre-gen, post-gen, validation)
+- Tạo `GEMINI.md` và `.gemini/` folder cho Gemini worker workflow
+- Cập nhật `CLAUDE.md`: thêm Manager Protocol, bảng agent, bảng skills
+- Cập nhật `AGENTS.md`: cấu hình GitNexus với danh sách agent mới
+
+**Files đã can thiệp**:
+- `.claude/agents/architect.md` — tạo mới
+- `.claude/agents/coder.md` — tạo mới
+- `.claude/agents/optimizer.md` — tạo mới
+- `.claude/agents/python-reviewer.md` — tạo mới
+- `.claude/agents/reviewer.md` — tạo mới
+- `.claude/agents/security-reviewer.md` — tạo mới
+- `.claude/agents/tdd-guide.md` — tạo mới
+- `.claude/agents/typescript-reviewer.md` — tạo mới
+- `.claude/commands/delegate.md` — tạo mới
+- `.claude/hooks/post-gen.md`, `pre-gen.md`, `validation.md` — tạo mới
+- `.claude/skills/coding/backend-patterns.md` — tạo mới
+- `.claude/skills/coding/browser-qa/` — tạo mới
+- `.claude/skills/gemini-delegation.md` — tạo mới
+- `.claude/skills/task-planner.md` — tạo mới
+- `GEMINI.md` — tạo mới
+- `.gemini/` — tạo mới
+- `CLAUDE.md` — sửa (Manager Protocol, bảng trạng thái file)
+- `AGENTS.md` — sửa (cập nhật danh sách agents)
+- `information/project-structure.md` — sửa (cập nhật .claude/ section)
+
+---
+
+## 2026-05-11 — Thêm logo chính thức và cập nhật UI branding
+
+**Mục tiêu**: Đưa logo chính thức (bản không nền) vào frontend và thay thế icon placeholder trong các component BrandingPanel và Sidebar.
+
+**Đã làm**:
+- Thêm `logo-leafnote-nobackground.png` vào `frontend/src/assets/images/`
+- Cập nhật `BrandingPanel.tsx`: thay icon SVG placeholder bằng `<img>` dùng logo PNG
+- Cập nhật `Sidebar.tsx`: thay icon placeholder bằng logo PNG trong header sidebar
+
+**Files đã can thiệp**:
+- `frontend/src/assets/images/logo-leafnote-nobackground.png` — thêm mới
+- `frontend/src/components/auth/BrandingPanel.tsx` — sửa
+- `frontend/src/components/Sidebar.tsx` — sửa

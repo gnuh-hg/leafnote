@@ -72,3 +72,24 @@ Toàn bộ UI từ `leafnote-demo/` đã được chuyển sang `leafnote/fronte
 - Supabase client fallback: placeholder values khi env vars chưa set (không crash)
 
 **Bước tiếp:** Phase 1 — Note (CRUD note cơ bản)
+
+---
+
+## 2026-05-08 — Tích hợp GitNexus
+
+**Quyết định**: Dùng GitNexus làm code intelligence layer cho toàn bộ quá trình phát triển.
+
+**Workflow bắt buộc**:
+- `gitnexus_impact` trước khi sửa bất kỳ symbol nào
+- `gitnexus_detect_changes` trước khi commit
+- Cảnh báo user nếu risk HIGH hoặc CRITICAL
+
+**Index hiện tại**: 606 symbols, 715 relationships, 1 execution flow (stale → chạy `npx gitnexus analyze`).
+
+---
+
+## 2026-05-11 — Tích hợp everything-claude-code
+
+**Quyết định**: Tích hợp các tài nguyên AI bổ sung (agents, skills, configs) từ project `everything-claude-code` vào cấu trúc `.claude/` của Leafnote.
+**Mục tiêu**: Nâng cao năng lực của Claude trong việc hiểu và tương tác với codebase, cung cấp các công cụ và hướng dẫn chuyên biệt cho các tác vụ phức tạp.
+**Cách thức**: Các file được tổ chức lại một cách ngữ nghĩa trong thư mục `.claude/ecc_collection/`, với các thư mục con như `agents/`, `skills/`, `configs/`, v.v. để phân loại rõ ràng. Tài liệu đi kèm được chuyển vào `information/ecc-project-docs/`.

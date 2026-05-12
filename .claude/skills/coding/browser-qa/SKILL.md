@@ -1,8 +1,6 @@
 ---
 name: browser-qa
-description: UI verification and browser testing skill for Leafnote frontend. Use after making UI changes to verify the feature works in the real browser before reporting done.
-metadata:
-  type: project
+description: "Trigger a browser QA session for Leafnote frontend. Verifies changed features work in Chrome: smoke test, auth flow, golden/error paths, responsive check, dark mode. Use after any frontend change before reporting done."
 ---
 
 # Browser QA — Leafnote Frontend Testing

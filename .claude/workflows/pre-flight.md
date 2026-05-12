@@ -70,14 +70,14 @@ Xác định loại task, rồi đọc **tất cả** file trong cột "Bắt bu
 ### Checklist tóm tắt (copy-paste mental check)
 
 ```
-□ CLAUDE.md      — bảng trạng thái file đã cập nhật?
-□ structure.md   — cây thư mục đã phản ánh file mới?
-□ api-spec.md    — endpoint mới đã ghi?
-□ db-schema.md   — bảng/column mới đã ghi?
-□ context.md     — quyết định lớn đã ghi?
-□ HISTORY.md     — task lớn đã có entry?
-□ ROADMAP.md     — gate đã tick?
-□ vi.json+en.json — i18n đồng bộ?
+□ CLAUDE.md             — bảng trạng thái file đã cập nhật?
+□ project-structure.md  — cây thư mục đã phản ánh file mới?
+□ api-spec.md           — endpoint mới đã ghi?
+□ db-schema.md          — bảng/column mới đã ghi?
+□ context.md            — quyết định lớn đã ghi?
+□ HISTORY.md            — task lớn đã có entry?
+□ ROADMAP.md            — gate đã tick?
+□ vi.json+en.json       — i18n đồng bộ?
 ```
 
 **Không cập nhật tài liệu = task chưa xong.**

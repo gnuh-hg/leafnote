@@ -13,6 +13,10 @@ htmlcov/
 # Env
 .env
 .env.local
+.env.workers
+
+# Gemini scratchpad (temp files, not for commit)
+.gemini/tmp/*.md
 
 # Node
 node_modules/
