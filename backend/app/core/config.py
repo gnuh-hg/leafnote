@@ -1,8 +1,12 @@
 import json
+import sys
+import time
+import traceback
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+print("DEBUG: Starting config.py module loading...", flush=True)
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
@@ -38,5 +42,16 @@ class Settings(BaseSettings):
             return [origin.strip() for origin in v.split(",") if origin.strip()]
         return v
 
+print("DEBUG: Attempting to instantiate Settings class...", flush=True)
 
-settings = Settings()
+try:
+    settings = Settings()
+    print("DEBUG: Settings instantiated successfully.", flush=True)
+except Exception as e:
+    print(f"CRITICAL CONFIG ERROR: Pydantic validation failed!", flush=True)
+    print(f"ERROR DETAILS: {e}", flush=True)
+    traceback.print_exc(file=sys.stdout)
+    sys.stdout.flush()
+    # Wait to ensure Render captures the logs
+    time.sleep(10)
+    sys.exit(3)

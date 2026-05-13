@@ -35,6 +35,9 @@ def _run_migrations() -> None:
         print(f"CRITICAL ERROR: Migration failed: {e}", flush=True)
         traceback.print_exc(file=sys.stdout)
         sys.stdout.flush()
+        # Give Render time to collect logs
+        import time
+        time.sleep(10)
         # Exit with a specific code to indicate migration failure
         sys.exit(3)
 
