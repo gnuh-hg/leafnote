@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 
 from alembic import command
@@ -16,7 +17,8 @@ def _run_migrations() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    _run_migrations()
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, _run_migrations)
     yield
 
 
