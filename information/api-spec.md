@@ -4,6 +4,15 @@
 
 ---
 
+## System
+
+| Method | Path | Auth | Mô tả |
+|---|---|---|---|
+| `HEAD` | `/health` | None | Kiểm tra server còn sống — chỉ trả status code, không có body |
+| `GET` | `/health` | None | Như HEAD nhưng kèm body `{ "status": "ok" }` — dùng khi cần đọc response |
+
+---
+
 ## Auth
 
 | Method | Path | Auth | Mô tả |
@@ -12,10 +21,12 @@
 | `PATCH` | `/api/v1/auth/me` | Required | Cập nhật display_name |
 
 ### `GET /api/v1/auth/me`
+
 - Response: `{ id, email, display_name, created_at }`
 - 401 nếu token invalid
 
 ### `PATCH /api/v1/auth/me`
+
 - Body: `{ display_name?: string }`
 - Response: `UserOut`
 
@@ -32,16 +43,19 @@
 | `POST` | `/api/v1/tags/{tag_id}/access` | Required | Tăng access_count (tag picker) → 204 |
 
 ### `POST /api/v1/tags/`
+
 - Body: `{ name: string, color: string }` — name bị strip/lowercase/dash-separated, color phải thuộc VALID_COLORS
 - Response: `TagOut` (201)
 - 409 nếu user đã có tag cùng tên
 
 ### `PATCH /api/v1/tags/{tag_id}`
+
 - Body: `{ name?: string, color?: string }` — cả hai optional
 - Response: `TagOut`
 - 409 nếu đổi tên trùng với tag khác của cùng user
 
 ### TagOut schema
+
 ```json
 { "id": "uuid", "name": "string", "color": "amber", "note_count": 0, "access_count": 0, "last_accessed": null, "created_at": "iso8601", "updated_at": "iso8601" }
 ```
