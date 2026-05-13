@@ -13,7 +13,11 @@
       "new": "New",
       "newTitle": "Create new tag",
       "create": "Create new tag",
-      "empty": "No tags yet"
+      "empty": "No tags yet",
+      "menu": {
+        "edit": "Rename & recolor",
+        "delete": "Delete tag"
+      }
     },
     "snapshot": {
       "title": "Cognitive Profile",
@@ -407,6 +411,47 @@
       "banner": "You're offline. Internet connection required to sign in.",
       "bannerSignup": "You're offline. Internet connection required to sign up."
     }
+  },
+  "tagEdit": {
+    "title": "Edit tag",
+    "actions": {
+      "save": "Save changes"
+    }
+  },
+  "tagDelete": {
+    "confirm": {
+      "title": "Delete tag",
+      "description": "Notes with this tag won't be deleted."
+    },
+    "actions": {
+      "delete": "Delete",
+      "cancel": "Cancel"
+    }
+  },
+  "tag": {
+    "error": {
+      "duplicate": "This tag already exists",
+      "loadFailed": "Failed to load tags"
+    },
+    "action": {
+      "retry": "Retry"
+    }
+  },
+  "toast": {
+    "error": {
+      "generic": "Something went wrong, please try again",
+      "network": "Network connection lost",
+      "tagDuplicate": "This tag already exists",
+      "tagNotFound": "Tag not found",
+      "unauthorized": "Session expired"
+    },
+    "warning": {
+      "offline": "You are offline"
+    }
+  },
+  "tagPicker": {
+    "empty": "No tags yet",
+    "emptyCreate": "Create a new tag?"
   },
   "empty": {
     "noLeaves": {

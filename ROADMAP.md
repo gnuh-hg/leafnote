@@ -65,9 +65,9 @@ Không hoàn thiện 1 page rồi mới sang page khác. Thay vào đó, mỗi p
 
 ### Gate
 
-- [ ] Tạo tag → hiện trong sidebar
+- [x] Tạo tag → hiện trong sidebar (Tag CRUD fullstack xong — 2026-05-12)
 - [ ] Gắn tag vào note → tag hiện trên note card
-- [ ] Filter 2 tag cùng lúc → chỉ hiện note có cả 2
+- [ ] Filter 2 tag cùng lúc → chỉ hiện note có cả 2 (UI filter đã có, cần kết nối API thật)
 - [ ] Lưu note → sau vài giây thấy banner + leaf panel
 - [ ] Click leaf → đoạn text tương ứng được highlight
 - [ ] Sửa content leaf → lưu được

@@ -1,3 +1,8 @@
+---
+name: task-planner
+description: "Read BEFORE delegating any task. Analyzes scope, applies 100-Token Rule, selects the right Gemini worker, and structures the directive. Use at the start of every delegation flow."
+---
+
 # Skill: Task Planner
 
 > Đọc skill này TRƯỚC KHI delegate bất kỳ task nào. Giúp Claude phân tích scope, chia subtask, và soạn directive cho đúng worker.
@@ -16,10 +21,12 @@ Trả lời 3 câu hỏi:
    - `docs` — markdown, architecture, api-spec
    - `test` — unit/integration/e2e
 
-2. **Có thỏa 100-Token Rule không?**
-   - Ước lượng số dòng code sẽ sinh ra > 100? → delegate
-   - Cần đọc > 5 file cùng lúc? → delegate
-   - Nếu không thỏa: Claude tự làm, không cần delegate
+2. **Task có đủ nặng để delegate không?**
+   - Scope rộng, cần giữ nhiều context cùng lúc? → delegate
+   - Công việc lặp lại/cơ học trên nhiều file? → delegate
+   - Đã có plan chi tiết sẵn, chỉ cần điền vào? → Claude tự làm
+   - Docs/markdown thuần (ít rủi ro)? → Claude tự làm
+   - Mục tiêu: giảm tải cho Claude, không phải gate cứng
 
 3. **Có dependency giữa subtask không?**
    - Backend schema/API phải xong trước frontend có thể call
@@ -90,7 +97,7 @@ Luôn gửi `GEMINI.md` nếu worker cần hiểu conventions của project.
 ## Bước 4 — Sau khi delegate xong
 
 1. Đọc output từ Gemini theo chuẩn `.gemini/response-format.md`
-2. QC theo checklist trong `gemini-delegation.md` mục 5
+2. QC theo checklist trong `gemini-delegation` skill mục 5
 3. Apply code vào file thực tế (dùng Edit/Write tool)
 4. Nếu worker thiếu sót: gọi lại với: *"Bạn đã bỏ sót [X], hãy hoàn thiện với độ chi tiết cao nhất."*
 5. Chạy linter/type-check nếu có

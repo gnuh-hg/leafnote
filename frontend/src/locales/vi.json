@@ -13,7 +13,11 @@
       "new": "Mới",
       "newTitle": "Tạo tag mới",
       "create": "Tạo tag mới",
-      "empty": "Chưa có tag nào"
+      "empty": "Chưa có tag nào",
+      "menu": {
+        "edit": "Đổi tên & màu",
+        "delete": "Xóa tag"
+      }
     },
     "snapshot": {
       "title": "Hồ sơ nhận thức",
@@ -407,6 +411,47 @@
       "banner": "Bạn đang offline. Cần kết nối mạng để đăng nhập.",
       "bannerSignup": "Bạn đang offline. Cần kết nối mạng để đăng ký."
     }
+  },
+  "tagEdit": {
+    "title": "Chỉnh sửa tag",
+    "actions": {
+      "save": "Lưu thay đổi"
+    }
+  },
+  "tagDelete": {
+    "confirm": {
+      "title": "Xóa tag",
+      "description": "Ghi chú gắn tag này sẽ không bị xóa."
+    },
+    "actions": {
+      "delete": "Xóa",
+      "cancel": "Hủy"
+    }
+  },
+  "tag": {
+    "error": {
+      "duplicate": "Tag này đã tồn tại",
+      "loadFailed": "Không tải được tag"
+    },
+    "action": {
+      "retry": "Thử lại"
+    }
+  },
+  "toast": {
+    "error": {
+      "generic": "Có lỗi xảy ra, vui lòng thử lại",
+      "network": "Mất kết nối mạng",
+      "tagDuplicate": "Tag này đã tồn tại",
+      "tagNotFound": "Không tìm thấy tag",
+      "unauthorized": "Phiên đăng nhập hết hạn"
+    },
+    "warning": {
+      "offline": "Bạn đang ngoại tuyến"
+    }
+  },
+  "tagPicker": {
+    "empty": "Chưa có tag",
+    "emptyCreate": "Tạo tag mới?"
   },
   "empty": {
     "noLeaves": {

@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import TopBar from './components/TopBar'
+import ToastContainer from './components/ui/ToastContainer'
 import Dashboard from './pages/Dashboard'
 import NotesList from './pages/NotesList'
 import NoteEditor from './pages/NoteEditor'
@@ -20,6 +21,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
         <TopBar />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
+      <ToastContainer />
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -30,7 +30,8 @@ import {
 import { decompositionDemo, notes as allNotes } from '../data/mockData'
 import type { DecompositionDemo, DetectedLeaf } from '../data/mockData'
 import { TYPE_STYLES } from '../components/LeafCard'
-import { useAppState } from '../context/AppState'
+import { useTags } from '../hooks/useTags'
+import { COLOR_DOT } from '../services/tags'
 
 export default function NoteEditor() {
   const { t } = useTranslation()
@@ -41,7 +42,7 @@ export default function NoteEditor() {
   const initialInput = searchParams.get('input')
   const isFresh = searchParams.get('fresh') === '1'
 
-  const { tags } = useAppState()
+  const { data: tags = [] } = useTags()
 
   const note = decompositionDemo
   const sourceNote = isNew
@@ -63,6 +64,18 @@ export default function NoteEditor() {
     sourceNote?.tagIds ? [...sourceNote.tagIds] : [],
   )
   const [tagPickerOpen, setTagPickerOpen] = useState(false)
+  const pickerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!tagPickerOpen) return
+    const handler = (e: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setTagPickerOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [tagPickerOpen])
   const [voiceState, setVoiceState] = useState<'idle' | 'recording' | 'done'>(
     initialInput === 'voice' ? 'recording' : 'idle',
   )
@@ -186,7 +199,7 @@ export default function NoteEditor() {
                   key={tg.id}
                   className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11.5px] bg-paper-100 dark:bg-ink-850 border border-paper-300/40 dark:border-ink-700/40 text-zinc-700 dark:text-zinc-200"
                 >
-                  <span className={`w-1.5 h-1.5 rounded-full ${tg.dot}`} />
+                  <span className={`w-1.5 h-1.5 rounded-full ${COLOR_DOT[tg.color] ?? 'bg-indigo-400'}`} />
                   <span className="text-zinc-500">#</span>
                   {tg.name}
                   <button
@@ -208,7 +221,7 @@ export default function NoteEditor() {
             </button>
 
             {tagPickerOpen && (
-              <div className="absolute left-0 top-full mt-1 z-30 card-surface bg-paper-50 dark:bg-ink-900 shadow-2xl py-1 w-72 max-h-72 overflow-y-auto animate-fade-in">
+              <div ref={pickerRef} className="absolute left-0 top-full mt-1 z-30 card-surface bg-paper-50 dark:bg-ink-900 shadow-2xl py-1 w-72 max-h-72 overflow-y-auto animate-fade-in">
                 <div className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-zinc-500 font-medium border-b border-paper-300/60 dark:border-ink-700/60 flex items-center justify-between">
                   <span>{t('editor.tagPicker.title')}</span>
                   <button
@@ -218,6 +231,17 @@ export default function NoteEditor() {
                     <X className="w-3 h-3" />
                   </button>
                 </div>
+                {tags.length === 0 && (
+                  <div className="px-3 py-4 text-center">
+                    <p className="text-[12px] text-zinc-500">{t('tagPicker.empty')}</p>
+                    <button
+                      onClick={() => setTagPickerOpen(false)}
+                      className="mt-1 text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline"
+                    >
+                      {t('tagPicker.emptyCreate')}
+                    </button>
+                  </div>
+                )}
                 {tags.map((tg) => {
                   const isSelected = selectedTagIds.includes(tg.id)
                   return (
@@ -231,7 +255,7 @@ export default function NoteEditor() {
                       }`}
                     >
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className={`w-1.5 h-1.5 rounded-full ${tg.dot} shrink-0`} />
+                        <div className={`w-1.5 h-1.5 rounded-full ${COLOR_DOT[tg.color] ?? 'bg-indigo-400'} shrink-0`} />
                         <span className="truncate">
                           <span className="text-zinc-600">#</span>
                           {tg.name}

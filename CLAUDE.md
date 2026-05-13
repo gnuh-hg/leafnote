@@ -88,49 +88,71 @@ Backend đọc từ `backend/.env`. Các key bắt buộc: `DATABASE_URL`, `SUPA
 | `information/design-system.md` | `ready` | Màu sắc, typography, component pattern — nguồn chân lý UI |
 | `information/runbooks/` | `chưa cần` | Sau khi deploy |
 | `.claude/memory/context.md` | `ready` | Quyết định đã chốt + lý do |
-| `.claude/memory/mistakes.md` | `chưa cần` | Sau khi gặp lỗi |
-| `.claude/memory/patterns.md` | `chưa cần` | Sau khi rút pattern thực |
+| `.claude/memory/mistakes.md` | `ready` | Lỗi đã gặp cần tránh lại |
+| `.claude/memory/patterns.md` | `ready` | Pattern đã rút ra để tái dùng |
 | `MIGRATION-PLAN.md` | `done` | Migration hoàn tất — 10/10 phần xong |
 | `.claude/workflows/migrate-demo.md` | `done` | Workflow đã dùng xong |
-| `.claude/workflows/pre-flight.md` | `ready` | Checklist bắt buộc trước/trong/sau mọi task |
-| `.claude/workflows/build-feature.md` | `ready` | Workflow build feature |
-| `backend/` | `phase1-auth` | FastAPI + auth middleware + User model |
+| `.claude/workflows/master.md` | `ready` | Điểm vào duy nhất cho mọi task — routing + post-task checklist |
+| `.claude/workflows/pre-flight.md` | `ready` | Code rules chi tiết (Bước 2) — reference khi cần nhắc lại |
+| `.claude/workflows/fix-bug.md` | `ready` | Workflow debug có hệ thống |
+| `.claude/workflows/ship-product.md` | `ready` | Checklist trước khi deploy lên production |
+| `.claude/workflows/build-feature.md` | `ready` | Workflow build feature fullstack |
+| `backend/` | `phase2-tags` | FastAPI + auth + Tag CRUD |
 | `backend/app/models/user.py` | `ready` | User model (SQLAlchemy) |
+| `backend/app/models/tag.py` | `ready` | Tag model (UniqueConstraint user_id+name) |
 | `backend/app/schemas/auth.py` | `ready` | Pydantic schemas (UserOut, UserUpdate) |
+| `backend/app/schemas/tag.py` | `ready` | TagCreate/Update/Out, VALID_COLORS |
 | `backend/app/services/auth.py` | `ready` | Auth business logic |
+| `backend/app/services/tags.py` | `ready` | Tag CRUD + track_access (sort by access_count) |
 | `backend/app/core/auth.py` | `ready` | JWT verify middleware (get_current_user) |
 | `backend/app/core/database.py` | `ready` | AsyncSession + Base |
 | `backend/app/api/v1/routes/auth.py` | `ready` | GET/PATCH /auth/me |
+| `backend/app/api/v1/routes/tags.py` | `ready` | 5 endpoints: list/create/update/delete/access |
 | `backend/app/api/v1/router.py` | `ready` | API router aggregator |
-| `frontend/` | `phase1-auth` | UI đầy đủ + auth flow |
+| `frontend/` | `phase2-tags` | UI đầy đủ + auth + Tag CRUD |
 | `frontend/src/pages/Auth.tsx` | `ready` | Auth page (login/signup tabs) |
 | `frontend/src/stores/authStore.ts` | `ready` | Zustand auth store |
+| `frontend/src/stores/toastStore.ts` | `ready` | Toast store (auto-dismiss, max 3) |
 | `frontend/src/services/auth.ts` | `ready` | Supabase auth wrapper |
+| `frontend/src/services/api.ts` | `ready` | Axios instance + Supabase JWT interceptor |
+| `frontend/src/services/tags.ts` | `ready` | Tag API calls + COLOR_DOT map |
 | `frontend/src/lib/supabase.ts` | `ready` | Supabase client |
 | `frontend/src/hooks/useOnlineStatus.ts` | `ready` | Online/offline detection hook |
+| `frontend/src/hooks/useTags.ts` | `ready` | TanStack Query hooks cho Tag CRUD |
 | `frontend/src/components/auth/*` | `ready` | LoginForm, SignupForm, ProtectedRoute, BrandingPanel, PasswordStrengthMeter |
-| `frontend/src/components/Sidebar.tsx` | `ready` | Sidebar nav (mock data cho tags/projects) |
+| `frontend/src/components/ui/Toast.tsx` | `ready` | Toast component (slide-in, error/warning/info) |
+| `frontend/src/components/ui/ToastContainer.tsx` | `ready` | createPortal toast container |
+| `frontend/src/components/Sidebar.tsx` | `ready` | Sidebar với useTags(), hover menu, skeleton |
 | `frontend/src/components/TopBar.tsx` | `ready` | Top bar |
 | `frontend/src/components/LeafCard.tsx` | `ready` | Card hiển thị leaf |
 | `frontend/src/components/LeafDetailModal.tsx` | `ready` | Modal chi tiết leaf |
-| `frontend/src/components/TagCreateModal.tsx` | `ready` | Modal tạo tag |
+| `frontend/src/components/TagCreateModal.tsx` | `ready` | Modal tạo tag (real API) |
+| `frontend/src/components/TagEditModal.tsx` | `ready` | Modal sửa tag |
+| `frontend/src/components/TagDeleteConfirm.tsx` | `ready` | Confirm xóa tag |
 | `frontend/src/pages/Dashboard.tsx` | `scaffold` | Mock data |
-| `frontend/src/pages/NotesList.tsx` | `scaffold` | Mock data |
-| `frontend/src/pages/NoteEditor.tsx` | `scaffold` | Mock data |
+| `frontend/src/pages/NotesList.tsx` | `scaffold` | Mock notes, real tags filter UI |
+| `frontend/src/pages/NoteEditor.tsx` | `scaffold` | Mock notes, real tag picker |
 | `frontend/src/pages/KnowledgeGraph.tsx` | `scaffold` | Mock data |
 | `frontend/src/pages/ReviewFeed.tsx` | `scaffold` | Mock data |
 | `frontend/src/pages/Insights.tsx` | `scaffold` | Mock data |
-| `frontend/src/context/AppState.tsx` | `ready` | React context cho tags (mock state) |
+| `frontend/src/context/AppState.tsx` | `deprecated` | Gutted — giữ export rỗng, thay bằng useTags() |
 | `frontend/src/context/ThemeContext.tsx` | `ready` | Dark/light theme context |
 | `frontend/src/data/mockData.ts` | `ready` | Mock data cho tất cả pages — sẽ xóa khi kết nối API thật |
 | `frontend/src/lib/i18n.ts` | `ready` | i18next setup |
 | `frontend/src/assets/images/logo-leafnote.png` | `ready` | Logo chính của app |
 | `information/logo-brief.md` | `ready` | Prompt thiết kế logo cho AI/designer |
 | `AGENTS.md` | `ready` | GitNexus agent configuration cho codebase |
-| `.claude/skills/gitnexus/` | `ready` | 6 skill files: exploring, debugging, impact, refactoring, cli, guide |
-| `.claude/skills/gemini-delegation.md` | `ready` | Kỹ năng giao việc hiệu quả cho Gemini |
-| `.claude/skills/coding/browser-qa.md` | `ready` | UI/browser testing workflow cho Leafnote frontend |
-| `.claude/skills/coding/backend-patterns.md` | `ready` | FastAPI + SQLAlchemy async patterns |
+| `.claude/skills/gemini-delegation/` | `ready` | Kỹ năng giao việc cho Gemini + cách dùng gemini-run.js |
+| `.claude/skills/task-planner/` | `ready` | 100-Token Rule, chọn worker, soạn directive |
+| `.claude/skills/browser-qa/` | `ready` | UI/browser testing workflow cho Leafnote frontend |
+| `.claude/skills/backend-patterns/` | `ready` | FastAPI + SQLAlchemy async patterns |
+| `.claude/skills/debug/` | `ready` | Debug React + FastAPI (console, network, backend logs) |
+| `.claude/skills/generate-code/` | `ready` | Code generation conventions (naming, layer, i18n) |
+| `.claude/skills/optimize/` | `ready` | Performance checklist (React, TanStack Query, SQLAlchemy) |
+| `.claude/skills/react-hooks/` | `ready` | Custom hook patterns cho Leafnote |
+| `.claude/skills/doc-writing/` | `ready` | Conventions viết .md trong project |
+| `.claude/skills/feature-ideation/` | `ready` | Scoping feature vs product principles + phase constraints |
+| `.claude/skills/validation/` | `ready` | Pydantic v2 + form validation patterns |
 | `.claude/agents/architect.md` | `ready` | Kiểm tra layer separation, architecture rules |
 | `.claude/agents/coder.md` | `ready` | Feature implementer theo convention Leafnote |
 | `.claude/agents/reviewer.md` | `ready` | General code reviewer (security + conventions) |
@@ -139,6 +161,7 @@ Backend đọc từ `backend/.env`. Các key bắt buộc: `DATABASE_URL`, `SUPA
 | `.claude/agents/python-reviewer.md` | `ready` | FastAPI/Python reviewer (service layer, async) |
 | `.claude/agents/security-reviewer.md` | `ready` | Security: Supabase JWT, OWASP, secrets |
 | `.claude/agents/tdd-guide.md` | `ready` | TDD workflow: Vitest + pytest |
+| `.claude/agents/tester.md` | `ready` | Browser QA tester — Chrome UI testing, 5-phase smoke/auth/feature/responsive/theme |
 | `GEMINI.md` | `ready` | Project context cho Gemini CLI workers |
 | `.gemini/` | `ready` | Gemini worker agents + response format |
 
@@ -244,23 +267,27 @@ fd config
 
 ---
 
-## Manager Protocol (BẮT BUỘC)
+## Manager Protocol
 
-Trước khi bắt đầu bất kỳ task nào thỏa **100-Token Rule** — sinh ra > 100 dòng code HOẶC cần đọc > 5 file — Claude **PHẢI**:
+`/delegate` là công cụ để **giảm tải cho Claude** khi task thực sự nặng — không phải gate cứng nhắc.
 
-1. **Đọc `.claude/skills/task-planner.md`** — phân tích task, chia subtask, chọn worker
-2. **Delegate cho Gemini worker qua Bash** — không tự viết code
-3. **Review output từ Gemini** — QC theo checklist trong `gemini-delegation.md` rồi mới integrate
+**Dùng `/delegate` khi:**
+- Task sẽ sinh > 100 dòng code mới VÀ Claude cần đọc nhiều file context cùng lúc
+- Scope rộng đến mức khó giữ toàn bộ context trong đầu (fullstack feature, refactor lớn)
+- Công việc lặp lại, cơ học (generate nhiều file tương tự nhau)
 
-> **KHÔNG** tự viết code khi task thỏa 100-Token Rule. Đây là rule không có ngoại lệ.
->
-> Để trigger thủ công: dùng slash command `/delegate <mô tả task>`.
+**Không cần delegate khi:**
+- Đã có plan chi tiết sẵn (chỉ cần "điền vào chỗ trống")
+- Task là docs/markdown thuần — ít rủi ro hơn code
+- Task < 50 dòng dù là code hay docs
+
+**Cách delegate:** đọc `.claude/skills/task-planner/SKILL.md` → soạn directive → `/delegate <mô tả task>`
 
 ---
 
 ## Hành vi Claude trong phase này
 
-1. **Trước mọi task**: đọc `.claude/workflows/pre-flight.md` — checklist bắt buộc trước/trong/sau khi làm. **Không bỏ qua.**
+1. **Trước mọi task**: đọc `.claude/workflows/master.md` — điểm vào duy nhất, route đến đúng workflow/agent/skill cho loại task hiện tại. **Không bỏ qua.**
 2. **Đọc đầu phiên**: `CLAUDE.md` → `ROADMAP.md` → `information/project-overview.md` → user-stories nếu cần ngữ cảnh tính năng.
    **Khi tạo bất kỳ component UI nào**: đọc `information/design-system.md` trước — không tự định nghĩa màu, font, hay pattern.
 3. **Khi user yêu cầu code**: phase `Phase 1 — Shell`. Auth đã xong. Pages đã scaffold với mock data. Việc tiếp theo là kết nối từng page với API thật qua `services/` + TanStack Query. Hỏi xác nhận trước khi cài thư viện lớn (>10MB) hay chạy migration thật.
@@ -274,6 +301,7 @@ Trước khi bắt đầu bất kỳ task nào thỏa **100-Token Rule** — sin
 
 | Cần biết gì | Đọc file nào |
 |---|---|
+| Điểm vào cho mọi task | `.claude/workflows/master.md` |
 | Design system (màu, font, pattern) | `information/design-system.md` |
 | Concept & MVP scope | `information/project-overview.md` |
 | User stories & ưu tiên P0/P1 | `information/user-stories.md` |
@@ -326,11 +354,11 @@ This project is indexed by GitNexus as **leafnote** (604 symbols, 712 relationsh
 
 | Task | Read this skill file |
 |------|---------------------|
-| Understand architecture / "How does X work?" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |
-| Blast radius / "What breaks if I change X?" | `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |
-| Trace bugs / "Why is X failing?" | `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` |
-| Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |
-| Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |
-| Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
+| Understand architecture / "How does X work?" | skill `gitnexus-exploring` (global) |
+| Blast radius / "What breaks if I change X?" | skill `gitnexus-impact-analysis` (global) |
+| Trace bugs / "Why is X failing?" | skill `gitnexus-debugging` (global) |
+| Rename / extract / split / refactor | skill `gitnexus-refactoring` (global) |
+| Tools, resources, schema reference | skill `gitnexus-guide` (global) |
+| Index, status, clean, wiki CLI commands | skill `gitnexus-cli` (global) |
 
 <!-- gitnexus:end -->

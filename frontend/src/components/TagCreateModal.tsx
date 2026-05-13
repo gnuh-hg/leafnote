@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { X, Tag as TagIcon, CheckCircle2 } from 'lucide-react'
-import { useAppState } from '../context/AppState'
+import { useCreateTag, useTags } from '../hooks/useTags'
 
 const COLORS = [
   { name: 'amber', dot: 'bg-amber-400' },
@@ -22,18 +22,33 @@ interface TagCreateModalProps {
 
 export default function TagCreateModal({ onClose, onCreated }: TagCreateModalProps) {
   const { t } = useTranslation()
-  const { addTag } = useAppState()
+  const { data: tags = [] } = useTags()
+  const createTag = useCreateTag()
   const [name, setName] = useState('')
   const [color, setColor] = useState('emerald')
-
-  const submit = () => {
-    if (!name.trim()) return
-    const id = addTag({ name, color })
-    onCreated?.(id)
-    onClose()
-  }
+  const [nameError, setNameError] = useState('')
 
   const slug = name.trim().toLowerCase().replace(/\s+/g, '-')
+
+  const submit = () => {
+    if (!slug) return
+
+    const duplicate = tags.some((tg) => tg.name === slug)
+    if (duplicate) {
+      setNameError(t('tag.error.duplicate'))
+      return
+    }
+
+    createTag.mutate(
+      { name: slug, color },
+      {
+        onSuccess: (tag) => {
+          onCreated?.(tag.id)
+          onClose()
+        },
+      },
+    )
+  }
 
   return createPortal(
     <div
@@ -67,14 +82,25 @@ export default function TagCreateModal({ onClose, onCreated }: TagCreateModalPro
             <input
               autoFocus
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              maxLength={50}
+              onChange={(e) => {
+                setName(e.target.value)
+                setNameError('')
+              }}
               onKeyDown={(e) => e.key === 'Enter' && submit()}
               placeholder={t('tagCreate.name.placeholder')}
               className="w-full bg-paper-100 dark:bg-ink-850 border border-paper-300/40 dark:border-ink-700/40 rounded-lg px-3 py-2 text-[14px] text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/40 transition"
             />
-            <p className="text-[10.5px] text-zinc-500 mt-1.5">
-              {t('tagCreate.name.help')}
-            </p>
+            <div className="flex items-start justify-between mt-1">
+              {nameError ? (
+                <p className="text-[11px] text-rose-500">{nameError}</p>
+              ) : (
+                <p className="text-[10.5px] text-zinc-500">{t('tagCreate.name.help')}</p>
+              )}
+              <span className={`text-[10px] shrink-0 ml-2 ${name.length >= 45 ? 'text-amber-500' : 'text-zinc-400 dark:text-zinc-600'}`}>
+                {name.length}/50
+              </span>
+            </div>
           </div>
 
           <div>
@@ -116,7 +142,7 @@ export default function TagCreateModal({ onClose, onCreated }: TagCreateModalPro
             </button>
             <button
               onClick={submit}
-              disabled={!name.trim()}
+              disabled={!name.trim() || createTag.isPending}
               className="px-3 py-1.5 rounded-lg text-xs bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium transition shadow-lg shadow-emerald-500/20"
             >
               {t('tagCreate.actions.create')}

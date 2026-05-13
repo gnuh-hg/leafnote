@@ -1,5 +1,9 @@
 # Pre-flight Checklist
 
+> **Lưu ý**: Routing và post-task checklist đã chuyển về `.claude/workflows/master.md`. File này giữ vai trò **reference cho code rules** (Bước 2) khi cần xem chi tiết quy tắc trong khi code.
+
+---
+
 > Đọc file này TRƯỚC mọi task. Không bỏ bước, không đoán.
 
 ---

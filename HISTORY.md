@@ -283,6 +283,7 @@ Mỗi entry tương ứng một phase hoặc một task lớn đã hoàn thành.
 **Mục tiêu**: Tích hợp project everything-claude-code vào cấu trúc .claude/ hiện có mà không gây xung đột, đảm bảo các tài nguyên AI bổ sung sẵn sàng cho Claude, với cấu trúc tổ chức rõ ràng hơn.
 
 **Đã làm**:
+
 - Tạo thư mục `ecc_collection/` trong `.claude/` để chứa tất cả tài nguyên từ everything-claude-code, cùng các thư mục con phân loại theo chức năng (`agents/`, `skills/`, `configs/`, v.v.).
 - Chuyển các file từ `temp/everything-claude-code/.claude/` và các thư mục cấp cao của everything-claude-code vào các thư mục `ecc_collection/` tương ứng.
 - Chuyển tất cả các file `.md` và `agent.yaml` từ thư mục gốc của `temp/everything-claude-code/` vào `information/ecc-project-docs/`.
@@ -290,6 +291,7 @@ Mỗi entry tương ứng một phase hoặc một task lớn đã hoàn thành.
 - Cập nhật `CLAUDE.md` và `HISTORY.md` để phản ánh cấu trúc mới.
 
 **Files đã can thiệp**:
+
 - `CLAUDE.md` — sửa (cập nhật đường dẫn file mới)
 - `HISTORY.md` — sửa (cập nhật entry này)
 - `.claude/ecc_collection/` — tạo mới (và chứa tất cả các file từ everything-claude-code)
@@ -303,6 +305,7 @@ Mỗi entry tương ứng một phase hoặc một task lớn đã hoàn thành.
 **Mục tiêu**: Xóa bỏ tích hợp everything-claude-code chưa hoàn chỉnh (chỉ có file rỗng/placeholder), thay bằng bộ agents và skills được viết đặc biệt theo convention và workflow của Leafnote.
 
 **Đã làm**:
+
 - Xóa toàn bộ `ecc_collection/`, `information/ecc-project-docs/` và các thư mục ECC cũ
 - Tạo 8 agent files trong `.claude/agents/`: `architect`, `coder`, `optimizer`, `python-reviewer`, `reviewer`, `security-reviewer`, `tdd-guide`, `typescript-reviewer` — mỗi agent có description, context Leafnote, và tool set cụ thể
 - Tạo `skills/coding/backend-patterns.md` (FastAPI + SQLAlchemy async patterns)
@@ -315,6 +318,7 @@ Mỗi entry tương ứng một phase hoặc một task lớn đã hoàn thành.
 - Cập nhật `AGENTS.md`: cấu hình GitNexus với danh sách agent mới
 
 **Files đã can thiệp**:
+
 - `.claude/agents/architect.md` — tạo mới
 - `.claude/agents/coder.md` — tạo mới
 - `.claude/agents/optimizer.md` — tạo mới
@@ -342,11 +346,88 @@ Mỗi entry tương ứng một phase hoặc một task lớn đã hoàn thành.
 **Mục tiêu**: Đưa logo chính thức (bản không nền) vào frontend và thay thế icon placeholder trong các component BrandingPanel và Sidebar.
 
 **Đã làm**:
+
 - Thêm `logo-leafnote-nobackground.png` vào `frontend/src/assets/images/`
 - Cập nhật `BrandingPanel.tsx`: thay icon SVG placeholder bằng `<img>` dùng logo PNG
 - Cập nhật `Sidebar.tsx`: thay icon placeholder bằng logo PNG trong header sidebar
 
 **Files đã can thiệp**:
+
 - `frontend/src/assets/images/logo-leafnote-nobackground.png` — thêm mới
 - `frontend/src/components/auth/BrandingPanel.tsx` — sửa
 - `frontend/src/components/Sidebar.tsx` — sửa
+
+---
+
+## 2026-05-12 — Tag CRUD Fullstack + Toast System + UX Fixes
+
+**Mục tiêu**: Kết nối Tag từ mock data sang API thật (backend + frontend). Thêm toast notification system. Sửa vite proxy bug + auth bug.
+
+**Đã làm**:
+
+- Backend: `Tag` model (UniqueConstraint user_id+name), schemas (TagCreate/Update/Out, VALID_COLORS, strip/lowercase name), service layer (list sort by access_count, 409 on duplicate, track_access), routes (5 endpoints), Alembic migration `2dd55bfa6698_m002_create_tags_table`
+- Frontend: Zustand `toastStore` (auto-dismiss 4s, max 3, error persistent), `Toast.tsx` + `ToastContainer.tsx` (createPortal), Axios instance với Supabase JWT interceptor, `services/tags.ts`, `hooks/useTags.ts` (TanStack Query v5), `TagEditModal.tsx`, `TagDeleteConfirm.tsx`
+- Sidebar rewrite: dùng `useTags()` thay mock, TagListSkeleton, hover MoreHorizontal menu (edit/delete), error state với retry
+- NotesList + NoteEditor: thay `useAppState` bằng `useTags`, fix `tg.noteCount` → `tg.note_count`, COLOR_DOT mapping
+- TagCreateModal: dùng `useCreateTag` mutation, client-side duplicate check, isPending state
+- Sửa Vite proxy rewrite bug (rewrite strip `/api` prefix → backend nhận sai path)
+- Sửa auth bug: `.env.local` rỗng override `.env` thật → xóa `.env.local`
+- Setup local venv với Python 3.13 (3.14 không có pydantic-core wheel)
+- Thêm ~20 i18n keys (vi.json + en.json): tagEdit, tagDelete, tag.error/action, toast, tagPicker, sidebar.tags.menu
+
+**Files đã can thiệp**:
+
+- `backend/app/models/tag.py` — tạo mới
+- `backend/app/schemas/tag.py` — tạo mới
+- `backend/app/services/tags.py` — tạo mới
+- `backend/app/api/v1/routes/tags.py` — tạo mới
+- `backend/app/api/v1/router.py` — sửa (include tags router)
+- `backend/alembic/env.py` — sửa (import Tag model)
+- `backend/alembic/versions/2dd55bfa6698_m002_create_tags_table.py` — tạo mới
+- `frontend/src/stores/toastStore.ts` — tạo mới
+- `frontend/src/components/ui/Toast.tsx` — tạo mới
+- `frontend/src/components/ui/ToastContainer.tsx` — tạo mới
+- `frontend/src/services/api.ts` — tạo mới
+- `frontend/src/services/tags.ts` — tạo mới
+- `frontend/src/hooks/useTags.ts` — tạo mới
+- `frontend/src/components/TagEditModal.tsx` — tạo mới
+- `frontend/src/components/TagDeleteConfirm.tsx` — tạo mới
+- `frontend/src/main.tsx` — sửa (QueryClientProvider, xóa AppStateProvider)
+- `frontend/src/components/Sidebar.tsx` — viết lại (useTags, hover menu, skeleton)
+- `frontend/src/components/TagCreateModal.tsx` — sửa (useCreateTag, isPending)
+- `frontend/src/pages/NoteEditor.tsx` — sửa (useTags, COLOR_DOT, click-outside)
+- `frontend/src/pages/NotesList.tsx` — sửa (useTags, COLOR_DOT, note_count)
+- `frontend/src/context/AppState.tsx` — gut (giữ export rỗng)
+- `frontend/src/locales/vi.json` — sửa (~20 keys mới)
+- `frontend/src/locales/en.json` — sửa (~20 keys mới)
+- `frontend/vite.config.ts` — sửa (xóa rewrite sai)
+- `.claude/memory/mistakes.md` — sửa (Gemini CLI agent mode + .env.local)
+- `CLAUDE.md` — sửa (bảng trạng thái file)
+- `information/api-spec.md` — sửa (thêm Tags endpoints)
+- `information/database-schema.md` — sửa (thêm bảng tags)
+- `.claude/memory/context.md` — sửa (patterns mới)
+- `ROADMAP.md` — sửa (tick gate Tag system)
+
+---
+
+## 2026-05-12 — Build Master Workflow System
+
+**Mục tiêu**: Thống nhất toàn bộ skills/agents/workflows vào một điểm vào duy nhất, hoàn thiện các workflows còn trống, và tạo bảng trigger→update đầy đủ cho post-task documentation.
+
+**Đã làm**:
+- Tạo `master.md` — điểm vào duy nhất cho mọi task, gồm: phân loại 6 loại task, 100-Token Rule routing, bước 2A–2F chi tiết theo task type, bảng post-task checklist 17 trigger, xử lý công việc dang dở, và bản đồ toàn hệ thống (skills/agents/workers)
+- Viết đầy đủ `fix-bug.md` (trước đó trống) — 7 bước debug: reproduce → isolate → root cause → fix → verify → document → post-task; bảng common root causes Leafnote
+- Viết đầy đủ `ship-product.md` (trước đó trống) — 9 bước deploy: gate check → quality gate → security → QA → gitnexus → deploy (thứ tự migration→backend→frontend) → post-deploy verify → document → rollback protocol
+- Thêm structure cho `mistakes.md` và `patterns.md` (trước đó trống); migrate 5 patterns đã chốt từ `context.md` vào `patterns.md`
+- Cập nhật `CLAUDE.md`: section "Hành vi Claude" trỏ về `master.md`, bảng trạng thái file cập nhật, bảng tham khảo nhanh thêm dòng `master.md`
+- Thêm deprecation note vào `pre-flight.md` — routing chuyển về `master.md`, Bước 2 (code rules) giữ nguyên là reference
+
+**Files đã can thiệp**:
+- `.claude/workflows/master.md` — tạo mới
+- `.claude/workflows/fix-bug.md` — viết nội dung (từ file trống)
+- `.claude/workflows/ship-product.md` — viết nội dung (từ file trống)
+- `.claude/workflows/pre-flight.md` — sửa (thêm deprecation note đầu file)
+- `.claude/memory/mistakes.md` — viết nội dung (từ file trống)
+- `.claude/memory/patterns.md` — viết nội dung (từ file trống)
+- `CLAUDE.md` — sửa (3 chỗ: Hành vi Claude, bảng trạng thái, bảng tham khảo nhanh)
+- `HISTORY.md` — sửa (entry này)

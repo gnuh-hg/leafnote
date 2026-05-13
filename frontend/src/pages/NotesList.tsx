@@ -3,12 +3,13 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { FileText, Leaf, Clock, X, Plus, Tag as TagIcon, Filter } from 'lucide-react'
 import { notes } from '../data/mockData'
-import { useAppState } from '../context/AppState'
+import { useTags } from '../hooks/useTags'
+import { COLOR_DOT } from '../services/tags'
 
 export default function NotesList() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { tags } = useAppState()
+  const { data: tags = [] } = useTags()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const activeTagIds = useMemo(() => {
@@ -103,12 +104,12 @@ export default function NotesList() {
                     : 'bg-paper-100 dark:bg-ink-850 border-paper-300/40 dark:border-ink-700/40 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-paper-400 dark:hover:border-ink-600'
                 }`}
               >
-                <span className={`w-1.5 h-1.5 rounded-full ${tg.dot}`} />
+                <span className={`w-1.5 h-1.5 rounded-full ${COLOR_DOT[tg.color] ?? 'bg-indigo-400'}`} />
                 <span>
                   <span className="text-zinc-600">#</span>
                   {tg.name}
                 </span>
-                <span className="text-[10px] text-zinc-500">{tg.noteCount}</span>
+                <span className="text-[10px] text-zinc-500">{tg.note_count}</span>
               </button>
             )
           })}
@@ -178,7 +179,7 @@ export default function NotesList() {
                       key={tid}
                       className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-paper-100 dark:bg-ink-850 border border-paper-300/40 dark:border-ink-700/40 text-zinc-600 dark:text-zinc-300"
                     >
-                      <span className={`w-1 h-1 rounded-full ${tg.dot}`} />
+                      <span className={`w-1 h-1 rounded-full ${COLOR_DOT[tg.color] ?? 'bg-indigo-400'}`} />
                       <span className="text-zinc-500">#</span>
                       {tg.name}
                     </span>

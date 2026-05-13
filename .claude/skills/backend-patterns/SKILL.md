@@ -1,3 +1,8 @@
+---
+name: backend-patterns
+description: "Reference for FastAPI + SQLAlchemy async patterns in Leafnote backend. Read before writing endpoints, services, or database queries. Covers service layer, Pydantic v2, async SQLAlchemy, error handling, auth dependency."
+---
+
 # Backend Patterns — Leafnote FastAPI
 
 > Tài liệu tham khảo nội bộ cho FastAPI + SQLAlchemy async. Đọc khi viết endpoints, services, hoặc database queries.

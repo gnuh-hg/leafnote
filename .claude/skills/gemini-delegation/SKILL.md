@@ -1,3 +1,8 @@
+---
+name: gemini-delegation
+description: "Use when delegating heavy tasks to Gemini workers — code generation > 100 lines, reading > 5 files at once, bulk refactor, or research across the full codebase. Covers how to write directives, call gemini-run.js, QC output."
+---
+
 # Kỹ năng giao việc cho Gemini (Gemini Delegation Skill)
 
 > Hướng dẫn Claude (Manager) cách điều phối công việc qua Gemini CLI Orchestrator → Gemini Workers để tiết kiệm token cho các task nặng.
@@ -107,58 +112,44 @@ Nếu thiếu sót: *"Bạn đã bỏ sót [X], hãy hoàn thiện với độ c
 
 ---
 
-## 6. Cách gọi Gemini từ Bash
+## 6. Cách gọi Gemini từ PowerShell
 
-**Template chuẩn với retry + auto key rotation** — tự thử tất cả key trước khi từ bỏ:
+**Template chuẩn** — Claude chỉ cần soạn directive, toàn bộ key selection + rotation được xử lý tự động bởi `gemini-run.js`:
 
-```bash
-cd /c/Users/admin/all/project/leafnote
-TOTAL_KEYS=$(grep -c "^GEMINI_KEY_" .env.workers)
-success=false
-for attempt in $(seq 1 $TOTAL_KEYS); do
-  ACTIVE_KEY=$(grep "ACTIVE_WORKER_KEY=" .env.workers | cut -d'=' -f2 | tr -d ' \r')
-  GEMINI_API_KEY=$(grep "GEMINI_KEY_${ACTIVE_KEY}=" .env.workers | cut -d'=' -f2 | awk '{print $1}')
-  OUTPUT=$(GEMINI_API_KEY="$GEMINI_API_KEY" gemini -p "@worker-name <directive>" 2>&1)
-  if echo "$OUTPUT" | grep -qiE "429|Too Many Requests|RESOURCE_EXHAUSTED|quota exceeded"; then
-    echo "⚠️  Key $ACTIVE_KEY rate limited (attempt $attempt/$TOTAL_KEYS). Rotating..."
-    node tools/scripts/rotate-workers.js --next
-    continue
-  fi
-  echo "$OUTPUT"
-  success=true
-  break
-done
-[ "$success" != "true" ] && echo "❌ Tất cả key đều bị rate limit."
-```
-
-Directive dài (fullstack task) → dùng heredoc thay `<directive>` bằng `"$(cat <<'EOF' ... EOF)"`:
-
-```bash
-cd /c/Users/admin/all/project/leafnote
-TOTAL_KEYS=$(grep -c "^GEMINI_KEY_" .env.workers)
-success=false
-for attempt in $(seq 1 $TOTAL_KEYS); do
-  ACTIVE_KEY=$(grep "ACTIVE_WORKER_KEY=" .env.workers | cut -d'=' -f2 | tr -d ' \r')
-  GEMINI_API_KEY=$(grep "GEMINI_KEY_${ACTIVE_KEY}=" .env.workers | cut -d'=' -f2 | awk '{print $1}')
-  OUTPUT=$(GEMINI_API_KEY="$GEMINI_API_KEY" gemini -p "$(cat <<'EOF'
+```powershell
+# Soạn directive (PowerShell here-string)
+$directive = @"
 Act as @frontend-worker.
+
 ## Context
 [full file content]
+
 ## Task
 [mô tả chi tiết]
-EOF
-)" 2>&1)
-  if echo "$OUTPUT" | grep -qiE "429|Too Many Requests|RESOURCE_EXHAUSTED|quota exceeded"; then
-    echo "⚠️  Key $ACTIVE_KEY rate limited (attempt $attempt/$TOTAL_KEYS). Rotating..."
-    node tools/scripts/rotate-workers.js --next
-    continue
-  fi
-  echo "$OUTPUT"
-  success=true
-  break
-done
-[ "$success" != "true" ] && echo "❌ Tất cả key đều bị rate limit."
+"@
+
+# Gửi — script tự chọn key, tự rotate khi bị rate limit
+$directive | node tools/scripts/gemini-run.js
 ```
+
+Hoặc dùng file khi directive quá dài:
+
+```powershell
+# Ghi ra file tạm
+$directive | Out-File -Encoding utf8 directive.tmp
+
+# Gọi với --file
+node tools/scripts/gemini-run.js --file directive.tmp
+
+# Xoá file tạm sau khi xong
+Remove-Item directive.tmp
+```
+
+Script `gemini-run.js` tự động:
+1. Đọc active key từ `.env.workers`
+2. Gọi `gemini -p`
+3. Nếu nhận lỗi `429 / RESOURCE_EXHAUSTED` → rotate sang key tiếp theo và thử lại
+4. Nếu hết tất cả key → báo lỗi rõ ràng, exit 1
 
 ---
 

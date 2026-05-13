@@ -54,28 +54,19 @@ leafnote/
 │   ├── global.md              # Global memory cross-session
 │   ├── mistakes.md            # Lỗi đã gặp, tránh lặp
 │   └── patterns.md            # Pattern code hay dùng
-├── skills/
-│   ├── coding/
-│   │   ├── backend-patterns.md  # FastAPI + SQLAlchemy async patterns
-│   │   ├── browser-qa/          # UI/browser testing workflow cho Leafnote
-│   │   ├── debug.md
-│   │   ├── generate-code.md
-│   │   └── optimize.md
-│   ├── content/
-│   │   ├── hooks.md
-│   │   └── writing.md
-│   ├── product/
-│   │   ├── ideation.md
-│   │   └── validation.md
-│   ├── gemini-delegation.md   # Kỹ năng giao việc hiệu quả cho Gemini
-│   ├── task-planner.md        # Phân tích task, chia subtask, chọn worker
-│   └── gitnexus/              # GitNexus skill files (6 skills)
-│       ├── gitnexus-cli/
-│       ├── gitnexus-debugging/
-│       ├── gitnexus-exploring/
-│       ├── gitnexus-guide/
-│       ├── gitnexus-impact-analysis/
-│       └── gitnexus-refactoring/
+├── skills/                    # Mỗi skill: <tên>/SKILL.md + frontmatter name/description
+│   ├── gemini-delegation/     # Giao việc cho Gemini + gemini-run.js
+│   ├── task-planner/          # 100-Token Rule, chọn worker, soạn directive
+│   ├── browser-qa/            # UI/browser testing workflow
+│   ├── backend-patterns/      # FastAPI + SQLAlchemy async patterns
+│   ├── debug/                 # Debug React + FastAPI
+│   ├── generate-code/         # Code generation conventions
+│   ├── optimize/              # Performance checklist
+│   ├── react-hooks/           # Custom hook patterns
+│   ├── doc-writing/           # Conventions viết .md
+│   ├── feature-ideation/      # Scoping feature vs product principles
+│   └── validation/            # Pydantic v2 + form validation
+│   # GitNexus skills (gitnexus-*) nằm ở global ~/.claude/skills/
 └── workflows/
     ├── pre-flight.md          # Checklist bắt buộc trước/trong/sau mọi task
     ├── build-feature.md       # Workflow build feature

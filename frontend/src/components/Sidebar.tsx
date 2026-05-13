@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -10,19 +10,25 @@ import {
   Plus,
   Tag as TagIcon,
   LogOut,
+  MoreHorizontal,
 } from 'lucide-react'
 import logoLeafnote from '../assets/images/logo-leafnote.png'
 import TagCreateModal from './TagCreateModal'
-import { useAppState } from '../context/AppState'
+import TagEditModal from './TagEditModal'
+import TagDeleteConfirm from './TagDeleteConfirm'
+import { useTags, useTrackTagAccess } from '../hooks/useTags'
+import { COLOR_DOT, type TagOut } from '../services/tags'
 import { cognitiveProfile } from '../data/mockData'
 import { useAuthStore } from '../stores/authStore'
 import { signOut } from '../services/auth'
-
 export default function Sidebar() {
   const { t } = useTranslation()
-  const { tags } = useAppState()
+  const { data: tags = [], isLoading, isError, refetch } = useTags()
+  const trackAccess = useTrackTagAccess()
   const navigate = useNavigate()
   const [showCreate, setShowCreate] = useState(false)
+  const [editTag, setEditTag] = useState<TagOut | null>(null)
+  const [deleteTag, setDeleteTag] = useState<TagOut | null>(null)
   const clearAuth = useAuthStore((s) => s.clearAuth)
 
   async function handleLogout() {
@@ -36,10 +42,10 @@ export default function Sidebar() {
   }
 
   const navItems = [
-    { to: '/', label: t('sidebar.nav.surfacing'), icon: Sparkles, badge: '12' },
+    { to: '/', label: t('sidebar.nav.surfacing'), icon: Sparkles },
     { to: '/notes', label: t('sidebar.nav.notes'), icon: FileText },
     { to: '/graph', label: t('sidebar.nav.graph'), icon: Network },
-    { to: '/review', label: t('sidebar.nav.review'), icon: Brain, badge: '7' },
+    { to: '/review', label: t('sidebar.nav.review'), icon: Brain },
     { to: '/insights', label: t('sidebar.nav.insights'), icon: BarChart3 },
   ]
 
@@ -82,11 +88,6 @@ export default function Sidebar() {
               <item.icon className="w-4 h-4" strokeWidth={2} />
               <span>{item.label}</span>
             </div>
-            {item.badge && (
-              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-paper-200 dark:bg-ink-800 text-zinc-500 dark:text-zinc-400">
-                {item.badge}
-              </span>
-            )}
           </NavLink>
         ))}
 
@@ -107,33 +108,41 @@ export default function Sidebar() {
             </button>
           </div>
 
-          {tags.length === 0 ? (
+          {isLoading && <TagListSkeleton />}
+
+          {isError && !isLoading && (
+            <div className="px-3 py-3 text-center">
+              <p className="text-[12px] text-zinc-500">{t('tag.error.loadFailed')}</p>
+              <button
+                onClick={() => refetch()}
+                className="mt-1 text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline"
+              >
+                {t('tag.action.retry')}
+              </button>
+            </div>
+          )}
+
+          {!isLoading && !isError && tags.length === 0 && (
             <div className="px-3 py-4 flex flex-col items-center gap-1.5 text-center">
               <TagIcon className="w-5 h-5 text-zinc-300 dark:text-zinc-600" />
               <p className="text-[12px] text-zinc-400 dark:text-zinc-500">
                 {t('sidebar.tags.empty')}
               </p>
             </div>
-          ) : (
-            tags.map((tag) => (
-              <button
-                key={tag.id}
-                onClick={() => navigate(`/notes?tag=${tag.id}`)}
-                className="w-full flex items-center justify-between px-3 py-1.5 rounded-md text-[13px] text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-paper-200 dark:hover:bg-ink-850 transition group"
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className={`w-1.5 h-1.5 rounded-full ${tag.dot} shrink-0`} />
-                  <span className="truncate">
-                    <span className="text-zinc-400 dark:text-zinc-600 group-hover:text-zinc-500">#</span>
-                    {tag.name}
-                  </span>
-                </div>
-                <span className="text-[10px] text-zinc-400 dark:text-zinc-600 shrink-0 ml-2">
-                  {tag.noteCount}
-                </span>
-              </button>
-            ))
           )}
+
+          {!isLoading && !isError && tags.map((tag) => (
+            <TagItem
+              key={tag.id}
+              tag={tag}
+              onNavigate={() => {
+                trackAccess.mutate(tag.id)
+                navigate(`/notes?tag=${tag.id}`)
+              }}
+              onEdit={() => setEditTag(tag)}
+              onDelete={() => setDeleteTag(tag)}
+            />
+          ))}
 
           <button
             onClick={() => setShowCreate(true)}
@@ -146,6 +155,8 @@ export default function Sidebar() {
       </nav>
 
       {showCreate && <TagCreateModal onClose={() => setShowCreate(false)} />}
+      {editTag && <TagEditModal tag={editTag} onClose={() => setEditTag(null)} />}
+      {deleteTag && <TagDeleteConfirm tag={deleteTag} onClose={() => setDeleteTag(null)} />}
 
       {/* Logout */}
       <div className="px-3 pb-2">
@@ -169,7 +180,106 @@ export default function Sidebar() {
           <Stat label={t('sidebar.snapshot.streak')} value={`${cognitiveProfile.streak} ${t('sidebar.snapshot.streakUnit')}`} />
         </div>
       </div>
+
     </aside>
+  )
+}
+
+interface TagItemProps {
+  tag: TagOut
+  onNavigate: () => void
+  onEdit: () => void
+  onDelete: () => void
+}
+
+function TagItem({ tag, onNavigate, onEdit, onDelete }: TagItemProps) {
+  const { t } = useTranslation()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [menuOpen])
+
+  const dot = COLOR_DOT[tag.color] ?? 'bg-indigo-400'
+
+  return (
+    <div className="relative group">
+      <button
+        onClick={onNavigate}
+        className="w-full flex items-center justify-between px-3 py-1.5 rounded-md text-[13px] text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-paper-200 dark:hover:bg-ink-850 transition"
+      >
+        <div className="flex items-center gap-2 min-w-0">
+          <div className={`w-1.5 h-1.5 rounded-full ${dot} shrink-0`} />
+          <span className="truncate">
+            <span className="text-zinc-400 dark:text-zinc-600 group-hover:text-zinc-500">#</span>
+            {tag.name}
+          </span>
+        </div>
+        <span className="text-[10px] text-zinc-400 dark:text-zinc-600 shrink-0 ml-2 group-hover:opacity-0 transition-opacity">
+          {tag.note_count}
+        </span>
+      </button>
+
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          setMenuOpen((v) => !v)
+        }}
+        className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-paper-200 dark:hover:bg-ink-800 transition"
+      >
+        <MoreHorizontal className="w-3.5 h-3.5" />
+      </button>
+
+      {menuOpen && (
+        <div
+          ref={menuRef}
+          className="absolute right-2 top-full mt-1 z-40 card-surface bg-paper-50 dark:bg-ink-900 shadow-xl py-1 w-44 animate-fade-in"
+        >
+          <button
+            onClick={() => {
+              setMenuOpen(false)
+              onEdit()
+            }}
+            className="w-full text-left px-3 py-1.5 text-[12.5px] text-zinc-600 dark:text-zinc-300 hover:bg-paper-100 dark:hover:bg-ink-800 transition"
+          >
+            {t('sidebar.tags.menu.edit')}
+          </button>
+          <button
+            onClick={() => {
+              setMenuOpen(false)
+              onDelete()
+            }}
+            className="w-full text-left px-3 py-1.5 text-[12.5px] text-rose-500 hover:bg-paper-100 dark:hover:bg-ink-800 transition"
+          >
+            {t('sidebar.tags.menu.delete')}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function TagListSkeleton() {
+  return (
+    <div className="space-y-1.5 px-3">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="flex items-center gap-2 py-1.5">
+          <div className="w-1.5 h-1.5 rounded-full bg-paper-300 dark:bg-ink-700 animate-pulse" />
+          <div
+            className="h-3 rounded bg-paper-300 dark:bg-ink-700 animate-pulse"
+            style={{ width: `${60 + i * 20}px` }}
+          />
+        </div>
+      ))}
+    </div>
   )
 }
 
