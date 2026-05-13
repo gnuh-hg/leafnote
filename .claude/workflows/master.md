@@ -15,6 +15,16 @@
 
 **Không đọc = không bắt đầu.**
 
+### GitNexus — kiểm tra index trước khi làm
+
+Nếu task liên quan đến code (feature/bug/refactor): kiểm tra index có fresh không qua `gitnexus://repo/leafnote/context`. Nếu index stale hoặc sau khi có thay đổi lớn:
+
+```bash
+npx gitnexus analyze --skip-git
+```
+
+> `--skip-git` bỏ qua phân tích git history — nhanh hơn ~3x, đủ dùng cho mid-session re-index. Chỉ chạy full `npx gitnexus analyze` khi cần blame/author context.
+
 ---
 
 ## BƯỚC 1 — XÁC ĐỊNH LOẠI TASK
@@ -32,35 +42,19 @@
 
 ---
 
-## BƯỚC 2 — CÂN NHẮC DELEGATE
-
-`/delegate` giúp giảm tải cho Claude — dùng khi task thực sự nặng, không phải rule cứng:
-
-**Nên delegate khi:**
-- Scope rộng, cần giữ nhiều context cùng lúc (fullstack feature, refactor nhiều file)
-- Công việc lặp lại, cơ học (generate nhiều file tương tự)
-- Không có plan chi tiết sẵn — cần Gemini "tư duy" từ đầu
-
-**Tự làm khi:**
-- Đã có plan/outline chi tiết (chỉ cần điền vào)
-- Bugfix nhỏ, update doc, thêm i18n key (< 50 dòng)
-- Review, giải thích code (không viết nhiều)
-- Task là markdown thuần — ít rủi ro hơn code logic
-
-Cách delegate: đọc `.claude/skills/task-planner/SKILL.md` → soạn directive → `/delegate <mô tả>`
-
----
-
 ## BƯỚC 2A — Feature Task
 
-### Nếu tự làm (< 100 dòng, < 5 file):
 → Đọc `.claude/workflows/build-feature.md` và làm theo từng bước
 
-### Nếu delegate:
-1. Đọc `.claude/skills/task-planner/SKILL.md` — phân tích scope, chia subtask, chọn worker
-2. Soạn directive theo template chuẩn trong task-planner
-3. Chạy `/delegate <mô tả>`
-4. QC output theo `.claude/skills/gemini-delegation/SKILL.md` mục QC
+### GitNexus — trước khi viết code:
+```
+gitnexus_query({query: "tên tính năng hoặc domain liên quan"})
+```
+→ Hiểu entry point và luồng thực thi liên quan. Sau đó, **trước khi sửa bất kỳ symbol nào**:
+```
+gitnexus_impact({target: "symbolName", direction: "upstream"})
+```
+Nếu risk HIGH hoặc CRITICAL → báo user trước khi tiến hành.
 
 ### Context bắt buộc đọc trước khi viết code:
 | Task có... | Đọc thêm |
@@ -84,6 +78,14 @@ Cách delegate: đọc `.claude/skills/task-planner/SKILL.md` → soạn directi
 
 → Đọc `.claude/workflows/fix-bug.md` và làm theo đầy đủ
 
+### GitNexus — trace bug trước khi sửa:
+```
+gitnexus_query({query: "mô tả lỗi hoặc tên function bị lỗi"})
+gitnexus_context({name: "symbolBịLỗi"})   # callers + callees + execution flows
+gitnexus_impact({target: "symbolBịLỗi", direction: "upstream"})
+```
+→ Biết root cause nằm ở đâu và fix sẽ ảnh hưởng gì trước khi đụng vào code.
+
 ### Agent phù hợp để gọi:
 | Loại bug | Agent |
 |---|---|
@@ -106,7 +108,7 @@ Nếu risk HIGH hoặc CRITICAL → cảnh báo user, hỏi trước khi tiến 
 → Tự làm. Dùng `gitnexus_rename` thay find-and-replace.
 
 ### Scope lớn (nhiều file, thay đổi interface):
-→ Delegate `@refactor-worker` qua Gemini
+→ Gọi agent `@coder` hoặc làm trực tiếp với plan chi tiết
 
 ### Verify sau refactor:
 - `@architect` — kiểm tra layer separation sau khi xong
@@ -121,7 +123,7 @@ Nếu risk HIGH hoặc CRITICAL → cảnh báo user, hỏi trước khi tiến 
 → Tự làm. Theo convention trong `.claude/skills/doc-writing/SKILL.md`
 
 ### Scope lớn (viết lại nhiều file, tạo tài liệu mới):
-→ Delegate `@doc-worker` qua Gemini
+→ Tự làm với Plan mode hoặc gọi agent `@coder`
 
 ### Quy tắc bắt buộc:
 - Mọi file `.md` tạo mới: dòng đầu sau `#` phải là `> [mô tả ngắn một câu]`
@@ -159,6 +161,13 @@ Chọn agent theo loại code cần review:
 ## BƯỚC 3 — POST-TASK CHECKLIST (mọi task)
 
 Sau khi hoàn thành, check từng dòng trong bảng này:
+
+### GitNexus — bắt buộc trước khi commit
+
+```
+gitnexus_detect_changes()
+```
+Verify: scope thay đổi đúng dự kiến, không có symbol ngoài ý muốn bị ảnh hưởng. Nếu có unexpected change → investigate trước khi commit.
 
 ### Bảng trigger → update
 
@@ -218,6 +227,7 @@ Sau khi hoàn thành, check từng dòng trong bảng này:
 
 ### Quick mental checklist
 ```
+□ gitnexus_detect_changes() — scope thay đổi đúng dự kiến?
 □ CLAUDE.md             — bảng trạng thái file cập nhật?
 □ project-structure.md  — cây thư mục phản ánh thay đổi?
 □ api-spec.md           — endpoint mới ghi chưa?
@@ -264,16 +274,6 @@ Sau khi hoàn thành, check từng dòng trong bảng này:
 | `@python-reviewer` | FastAPI/Python: service layer, async, SQLAlchemy |
 | `@security-reviewer` | Supabase JWT, OWASP, secrets exposure |
 | `@tdd-guide` | TDD workflow: Vitest + pytest |
-
-### Gemini Workers (delegate qua `/delegate`)
-
-| Worker | Chuyên môn |
-|---|---|
-| `frontend-worker` | React, TypeScript, Tailwind, i18n |
-| `backend-worker` | FastAPI, Python, SQLAlchemy, Pydantic |
-| `refactor-worker` | DRY, SOLID, cleanup, extract |
-| `doc-worker` | Markdown, architecture documentation |
-| `test-worker` | pytest, Vitest, Playwright |
 
 ### Sub-workflows (đọc khi route đến)
 

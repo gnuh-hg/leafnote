@@ -142,8 +142,6 @@ Backend đọc từ `backend/.env`. Các key bắt buộc: `DATABASE_URL`, `SUPA
 | `frontend/src/assets/images/logo-leafnote.png` | `ready` | Logo chính của app |
 | `information/logo-brief.md` | `ready` | Prompt thiết kế logo cho AI/designer |
 | `AGENTS.md` | `ready` | GitNexus agent configuration cho codebase |
-| `.claude/skills/gemini-delegation/` | `ready` | Kỹ năng giao việc cho Gemini + cách dùng gemini-run.js |
-| `.claude/skills/task-planner/` | `ready` | 100-Token Rule, chọn worker, soạn directive |
 | `.claude/skills/browser-qa/` | `ready` | UI/browser testing workflow cho Leafnote frontend |
 | `.claude/skills/backend-patterns/` | `ready` | FastAPI + SQLAlchemy async patterns |
 | `.claude/skills/debug/` | `ready` | Debug React + FastAPI (console, network, backend logs) |
@@ -162,8 +160,6 @@ Backend đọc từ `backend/.env`. Các key bắt buộc: `DATABASE_URL`, `SUPA
 | `.claude/agents/security-reviewer.md` | `ready` | Security: Supabase JWT, OWASP, secrets |
 | `.claude/agents/tdd-guide.md` | `ready` | TDD workflow: Vitest + pytest |
 | `.claude/agents/tester.md` | `ready` | Browser QA tester — Chrome UI testing, 5-phase smoke/auth/feature/responsive/theme |
-| `GEMINI.md` | `ready` | Project context cho Gemini CLI workers |
-| `.gemini/` | `ready` | Gemini worker agents + response format |
 
 > Khi Claude tạo file mới, **cập nhật bảng này**.
 
@@ -267,24 +263,6 @@ fd config
 
 ---
 
-## Manager Protocol
-
-`/delegate` là công cụ để **giảm tải cho Claude** khi task thực sự nặng — không phải gate cứng nhắc.
-
-**Dùng `/delegate` khi:**
-- Task sẽ sinh > 100 dòng code mới VÀ Claude cần đọc nhiều file context cùng lúc
-- Scope rộng đến mức khó giữ toàn bộ context trong đầu (fullstack feature, refactor lớn)
-- Công việc lặp lại, cơ học (generate nhiều file tương tự nhau)
-
-**Không cần delegate khi:**
-- Đã có plan chi tiết sẵn (chỉ cần "điền vào chỗ trống")
-- Task là docs/markdown thuần — ít rủi ro hơn code
-- Task < 50 dòng dù là code hay docs
-
-**Cách delegate:** đọc `.claude/skills/task-planner/SKILL.md` → soạn directive → `/delegate <mô tả task>`
-
----
-
 ## Hành vi Claude trong phase này
 
 1. **Trước mọi task**: đọc `.claude/workflows/master.md` — điểm vào duy nhất, route đến đúng workflow/agent/skill cho loại task hiện tại. **Không bỏ qua.**
@@ -322,7 +300,7 @@ fd config
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **leafnote** (604 symbols, 712 relationships, 1 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **leafnote** (694 symbols, 830 relationships, 1 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
 
@@ -354,11 +332,11 @@ This project is indexed by GitNexus as **leafnote** (604 symbols, 712 relationsh
 
 | Task | Read this skill file |
 |------|---------------------|
-| Understand architecture / "How does X work?" | skill `gitnexus-exploring` (global) |
-| Blast radius / "What breaks if I change X?" | skill `gitnexus-impact-analysis` (global) |
-| Trace bugs / "Why is X failing?" | skill `gitnexus-debugging` (global) |
-| Rename / extract / split / refactor | skill `gitnexus-refactoring` (global) |
-| Tools, resources, schema reference | skill `gitnexus-guide` (global) |
-| Index, status, clean, wiki CLI commands | skill `gitnexus-cli` (global) |
+| Understand architecture / "How does X work?" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |
+| Blast radius / "What breaks if I change X?" | `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |
+| Trace bugs / "Why is X failing?" | `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` |
+| Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |
+| Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |
+| Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
 
 <!-- gitnexus:end -->

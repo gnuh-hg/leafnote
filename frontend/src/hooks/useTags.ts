@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import * as tagService from '../services/tags'
+import type { TagOut } from '../services/tags'
 import { useToastStore } from '../stores/toastStore'
 import { useAuthStore } from '../stores/authStore'
 
@@ -20,11 +21,25 @@ export function useCreateTag() {
 
   return useMutation({
     mutationFn: tagService.createTag,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['tags'] }),
-    onError: (err: { response?: { status?: number } }) => {
+    networkMode: 'offlineFirst',
+    retry: (count, err: { response?: { status?: number } }) =>
+      err?.response?.status == null && count < 3,
+    onMutate: async (newTag) => {
+      await qc.cancelQueries({ queryKey: ['tags'] })
+      const previous = qc.getQueryData<TagOut[]>(['tags'])
+      const tmpId = `tmp-${Date.now()}`
+      qc.setQueryData<TagOut[]>(['tags'], (old = []) => [
+        ...old,
+        { id: tmpId, ...newTag, note_count: 0, access_count: 0, created_at: new Date().toISOString() },
+      ])
+      return { previous }
+    },
+    onError: (err: { response?: { status?: number } }, _vars, ctx) => {
+      if (ctx?.previous) qc.setQueryData(['tags'], ctx.previous)
       if (err.response?.status === 409) addToast('error', t('toast.error.tagDuplicate'))
       else addToast('error', t('toast.error.generic'))
     },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['tags'] }),
   })
 }
 
@@ -36,11 +51,23 @@ export function useUpdateTag() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: tagService.TagUpdate }) =>
       tagService.updateTag(id, data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['tags'] }),
-    onError: (err: { response?: { status?: number } }) => {
+    networkMode: 'offlineFirst',
+    retry: (count, err: { response?: { status?: number } }) =>
+      err?.response?.status == null && count < 3,
+    onMutate: async ({ id, data }) => {
+      await qc.cancelQueries({ queryKey: ['tags'] })
+      const previous = qc.getQueryData<TagOut[]>(['tags'])
+      qc.setQueryData<TagOut[]>(['tags'], (old = []) =>
+        old.map((tag) => (tag.id === id ? { ...tag, ...data } : tag))
+      )
+      return { previous }
+    },
+    onError: (err: { response?: { status?: number } }, _vars, ctx) => {
+      if (ctx?.previous) qc.setQueryData(['tags'], ctx.previous)
       if (err.response?.status === 409) addToast('error', t('toast.error.tagDuplicate'))
       else addToast('error', t('toast.error.generic'))
     },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['tags'] }),
   })
 }
 
@@ -51,8 +78,20 @@ export function useDeleteTag() {
 
   return useMutation({
     mutationFn: tagService.deleteTag,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['tags'] }),
-    onError: () => addToast('error', t('toast.error.generic')),
+    networkMode: 'offlineFirst',
+    retry: (count, err: { response?: { status?: number } }) =>
+      err?.response?.status == null && count < 3,
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ['tags'] })
+      const previous = qc.getQueryData<TagOut[]>(['tags'])
+      qc.setQueryData<TagOut[]>(['tags'], (old = []) => old.filter((tag) => tag.id !== id))
+      return { previous }
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous) qc.setQueryData(['tags'], ctx.previous)
+      addToast('error', t('toast.error.generic'))
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['tags'] }),
   })
 }
 

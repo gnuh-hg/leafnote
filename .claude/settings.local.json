@@ -9,8 +9,6 @@
       "Bash(npm run *)",
       "Bash(npx *)",
       "Bash(node *)",
-      "Bash(gemini *)",
-      "Bash(GEMINI_API_KEY=* gemini *)",
       "Bash(gitnexus *)",
       "PowerShell(gitnexus *)",
       "PowerShell(Get-Content *)",
@@ -43,7 +41,6 @@
       "Bash(eza *)",
       "Bash(git add *)",
       "WebSearch",
-      "Bash(where gemini *)",
       "Bash(.\\\\venv\\\\Scripts\\\\python.exe -m alembic revision --autogenerate -m \"M002_create_tags_table\")",
       "Bash(python -m alembic revision --autogenerate -m \"M002_create_tags_table\")",
       "Bash(py --list)",
@@ -64,7 +61,11 @@
       "Bash(dir *)",
       "PowerShell(rtk git *)",
       "PowerShell(git check-ignore *)",
-      "WebFetch(domain:leafnote-api.onrender.com)"
+      "WebFetch(domain:leafnote-api.onrender.com)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\admin\\\\all\\\\project\\\\manask\" -Recurse -File -Name)",
+      "Bash(Select-Object -First 30)",
+      "Bash(rtk npx *)",
+      "Bash(Get-ChildItem *)"
     ]
   }
 }

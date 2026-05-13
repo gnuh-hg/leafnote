@@ -17,10 +17,9 @@ const COLORS = [
 
 interface TagCreateModalProps {
   onClose: () => void
-  onCreated?: (id: string) => void
 }
 
-export default function TagCreateModal({ onClose, onCreated }: TagCreateModalProps) {
+export default function TagCreateModal({ onClose }: TagCreateModalProps) {
   const { t } = useTranslation()
   const { data: tags = [] } = useTags()
   const createTag = useCreateTag()
@@ -39,15 +38,8 @@ export default function TagCreateModal({ onClose, onCreated }: TagCreateModalPro
       return
     }
 
-    createTag.mutate(
-      { name: slug, color },
-      {
-        onSuccess: (tag) => {
-          onCreated?.(tag.id)
-          onClose()
-        },
-      },
-    )
+    createTag.mutate({ name: slug, color })
+    onClose()
   }
 
   return createPortal(
@@ -142,7 +134,7 @@ export default function TagCreateModal({ onClose, onCreated }: TagCreateModalPro
             </button>
             <button
               onClick={submit}
-              disabled={!name.trim() || createTag.isPending}
+              disabled={!name.trim()}
               className="px-3 py-1.5 rounded-lg text-xs bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium transition shadow-lg shadow-emerald-500/20"
             >
               {t('tagCreate.actions.create')}

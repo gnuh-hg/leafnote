@@ -431,3 +431,30 @@ Mỗi entry tương ứng một phase hoặc một task lớn đã hoàn thành.
 - `.claude/memory/patterns.md` — viết nội dung (từ file trống)
 - `CLAUDE.md` — sửa (3 chỗ: Hành vi Claude, bảng trạng thái, bảng tham khảo nhanh)
 - `HISTORY.md` — sửa (entry này)
+
+---
+
+## 2026-05-13 — Optimistic Update + Offline Strategy cho Tag mutations
+
+**Mục tiêu**: Xây dựng pattern chuẩn cho mọi mutation trong Leafnote — UI phản hồi ngay (không chờ server), offline hoạt động rõ ràng và có thể tái dùng cho notes/leaves sau.
+
+**Đã làm**:
+- `useTags.ts`: thêm `onMutate` (snapshot + optimistic update), `onError` (rollback), `onSettled` (invalidate) cho toàn bộ mutations. Thêm `networkMode: 'offlineFirst'` + retry chỉ network error
+- `TagCreateModal`, `TagEditModal`, `TagDeleteConfirm`: đóng modal ngay sau `mutate()` — không chờ `onSuccess`
+- `Sidebar.tsx` (`TagItem`): lock item có id `tmp-*` bằng `pointer-events-none` + pulse animation — bảo vệ khỏi edit/delete khi server chưa confirm
+- `information/product-principles.md`: thêm "Principle 7 — Optimistic UX" và cập nhật Offline Support với phân tầng phase 1 vs phase 2+
+- `.claude/memory/patterns.md`: template mutation hook tái dùng
+- `.claude/memory/mistakes.md`: lỗi tmp ID lock
+- `.claude/memory/context.md`: chốt quyết định pattern
+
+**Files đã can thiệp**:
+- `frontend/src/hooks/useTags.ts` — sửa (optimistic + offline)
+- `frontend/src/components/TagCreateModal.tsx` — sửa (close ngay, xóa onCreated prop)
+- `frontend/src/components/TagEditModal.tsx` — sửa (close ngay)
+- `frontend/src/components/TagDeleteConfirm.tsx` — sửa (close ngay)
+- `frontend/src/components/Sidebar.tsx` — sửa (tmp ID lock)
+- `information/product-principles.md` — sửa (thêm Principle 7, cập nhật Offline)
+- `.claude/memory/context.md` — sửa
+- `.claude/memory/patterns.md` — sửa
+- `.claude/memory/mistakes.md` — sửa
+- `HISTORY.md` — sửa (entry này)

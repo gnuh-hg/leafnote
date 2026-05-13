@@ -196,6 +196,7 @@ function TagItem({ tag, onNavigate, onEdit, onDelete }: TagItemProps) {
   const { t } = useTranslation()
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const isTmp = tag.id.startsWith('tmp-')
 
   useEffect(() => {
     if (!menuOpen) return
@@ -211,7 +212,7 @@ function TagItem({ tag, onNavigate, onEdit, onDelete }: TagItemProps) {
   const dot = COLOR_DOT[tag.color] ?? 'bg-indigo-400'
 
   return (
-    <div className="relative group">
+    <div className={`relative group ${isTmp ? 'opacity-60 animate-pulse pointer-events-none' : ''}`}>
       <button
         onClick={onNavigate}
         className="w-full flex items-center justify-between px-3 py-1.5 rounded-md text-[13px] text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-paper-200 dark:hover:bg-ink-850 transition"
@@ -228,17 +229,19 @@ function TagItem({ tag, onNavigate, onEdit, onDelete }: TagItemProps) {
         </span>
       </button>
 
-      <button
-        onClick={(e) => {
-          e.stopPropagation()
-          setMenuOpen((v) => !v)
-        }}
-        className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-paper-200 dark:hover:bg-ink-800 transition"
-      >
-        <MoreHorizontal className="w-3.5 h-3.5" />
-      </button>
+      {!isTmp && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            setMenuOpen((v) => !v)
+          }}
+          className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-paper-200 dark:hover:bg-ink-800 transition"
+        >
+          <MoreHorizontal className="w-3.5 h-3.5" />
+        </button>
+      )}
 
-      {menuOpen && (
+      {menuOpen && !isTmp && (
         <div
           ref={menuRef}
           className="absolute right-2 top-full mt-1 z-40 card-surface bg-paper-50 dark:bg-ink-900 shadow-xl py-1 w-44 animate-fade-in"

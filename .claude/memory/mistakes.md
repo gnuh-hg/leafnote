@@ -7,6 +7,7 @@
 ## Format mỗi entry
 
 **[YYYY-MM-DD] — [Tên lỗi ngắn gọn]**
+
 - **Triệu chứng**: Điều gì xảy ra / user thấy gì
 - **Root cause**: Tại sao xảy ra
 - **Fix**: Đã sửa thế nào
@@ -16,14 +17,16 @@
 
 ## Entries
 
-**2026-05-12 — Gemini CLI agent mode gọi tool thay vì output text**
-- **Triệu chứng**: `gemini -p "..."` sinh ra lỗi `write_file not found`, `run_shell_command not found` thay vì output code block. Key bị corrupt conversation state, retry lỗi `INVALID_ARGUMENT: function response turn`.
-- **Root cause**: Gemini CLI mặc định chạy "agent executor" — model thấy nó có tool nên cố gọi `write_file`/`run_shell_command` để viết file. Khi tool không tồn tại, conversation state corrupt, retry 400.
-- **Fix**: Thêm flag `--no-sandbox` vào lời gọi `gemini -p` — flag này disable agent executor, ép model output text thuần.
-- **Phòng tránh**: Mọi lời gọi `gemini -p` trong delegate workflow đều phải dùng `gemini --no-sandbox -p "..."`. Cũng thêm instruction rõ trong directive: "OUTPUT ONLY AS TEXT. Do NOT use any tools."
+**2026-05-13 — Thêm entry HISTORY.md sai vị trí (đầu file thay vì cuối)**
 
-**2026-05-12 — Hiểu sai mục đích `/delegate`**
-- **Triệu chứng**: Áp dụng 100-Token Rule như gate cứng nhắc ("sinh > 100 dòng → bắt buộc delegate"), hoặc ngược lại bỏ qua delegate vì "docs không tính"
-- **Root cause**: Mô tả ban đầu dùng ngôn ngữ "BẮT BUỘC / không có ngoại lệ" che khuất mục đích thực: `/delegate` là công cụ **giảm tải cho Claude**, tương tự gọi subagent
-- **Fix**: Sửa lại mô tả trong CLAUDE.md, master.md, task-planner SKILL.md — framing lại thành judgment tool
-- **Phòng tránh**: Delegate khi task thực sự nặng (scope rộng, nhiều context cùng lúc, công việc lặp lại). Tự làm khi đã có plan chi tiết sẵn, task là docs thuần, hoặc < 50 dòng. Không cần hỏi "có > 100 dòng không?" — hỏi "task này có đủ nặng để Claude cần trợ giúp không?"
+- **Triệu chứng**: Entry mới nhất xuất hiện ở đầu file, đảo ngược thứ tự thời gian
+- **Root cause**: Dùng `Edit` với `old_string` là separator `---` đầu tiên gặp → entry bị chèn vào đầu thay vì cuối
+- **Fix**: Di chuyển entry xuống cuối file
+- **Phòng tránh**: `HISTORY.md` luôn append vào **cuối file** — entry mới nhất ở dưới cùng. Khi dùng `Edit`, target `old_string` là nội dung cuối cùng của file hiện tại, thêm entry sau đó.
+
+**2026-05-13 — Edit/delete trên optimistic item có tmp ID**
+
+- **Triệu chứng**: Gọi `PATCH /api/v1/tags/tmp-1234567` hoặc `DELETE /api/v1/tags/tmp-1234567` → 404 vì id này chưa tồn tại trên server
+- **Root cause**: Khi create dùng optimistic update, item có id `tmp-xxx` được thêm vào cache ngay. Nếu user click edit/delete trước khi `onSettled` invalidate và server trả id thật → API nhận id ảo
+- **Fix**: Lock mọi interaction trên item có `id.startsWith('tmp-')` — không render hover menu, không cho click navigate/edit/delete. `pointer-events-none` trên div wrapper.
+- **Phòng tránh**: Mọi list item cần check `isTmp = id.startsWith('tmp-')`. Template pattern đã có trong `patterns.md`. Cách khác (merge mutation vào queue) phức tạp hơn và không cần thiết ở phase 1.

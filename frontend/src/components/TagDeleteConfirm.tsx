@@ -14,7 +14,8 @@ export default function TagDeleteConfirm({ tag, onClose }: TagDeleteConfirmProps
   const deleteTag = useDeleteTag()
 
   const handleDelete = () => {
-    deleteTag.mutate(tag.id, { onSuccess: onClose })
+    deleteTag.mutate(tag.id)
+    onClose()
   }
 
   return createPortal(
@@ -49,8 +50,7 @@ export default function TagDeleteConfirm({ tag, onClose }: TagDeleteConfirmProps
           </button>
           <button
             onClick={handleDelete}
-            disabled={deleteTag.isPending}
-            className="px-3 py-1.5 rounded-lg text-xs bg-rose-500 hover:bg-rose-400 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium transition"
+            className="px-3 py-1.5 rounded-lg text-xs bg-rose-500 hover:bg-rose-400 text-white font-medium transition"
           >
             {t('tagDelete.actions.delete')}
           </button>

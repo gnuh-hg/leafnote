@@ -44,7 +44,6 @@ leafnote/
 │   ├── tdd-guide.md           # TDD workflow: Vitest + pytest
 │   └── typescript-reviewer.md # TypeScript/React reviewer (i18n, hooks, types)
 ├── commands/
-│   └── delegate.md            # /delegate slash command
 ├── hooks/
 │   ├── post-gen.md            # Hook sau khi generate code
 │   ├── pre-gen.md             # Hook trước khi generate code
@@ -55,8 +54,6 @@ leafnote/
 │   ├── mistakes.md            # Lỗi đã gặp, tránh lặp
 │   └── patterns.md            # Pattern code hay dùng
 ├── skills/                    # Mỗi skill: <tên>/SKILL.md + frontmatter name/description
-│   ├── gemini-delegation/     # Giao việc cho Gemini + gemini-run.js
-│   ├── task-planner/          # 100-Token Rule, chọn worker, soạn directive
 │   ├── browser-qa/            # UI/browser testing workflow
 │   ├── backend-patterns/      # FastAPI + SQLAlchemy async patterns
 │   ├── debug/                 # Debug React + FastAPI

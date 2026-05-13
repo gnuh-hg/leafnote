@@ -41,10 +41,8 @@ export default function TagEditModal({ tag, onClose }: TagEditModalProps) {
       return
     }
 
-    updateTag.mutate(
-      { id: tag.id, data: { name: normalized, color } },
-      { onSuccess: onClose },
-    )
+    updateTag.mutate({ id: tag.id, data: { name: normalized, color } })
+    onClose()
   }
 
   return createPortal(
@@ -139,7 +137,7 @@ export default function TagEditModal({ tag, onClose }: TagEditModalProps) {
             </button>
             <button
               onClick={submit}
-              disabled={!name.trim() || updateTag.isPending}
+              disabled={!name.trim()}
               className="px-3 py-1.5 rounded-lg text-xs bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium transition shadow-lg shadow-emerald-500/20"
             >
               {t('tagEdit.actions.save')}

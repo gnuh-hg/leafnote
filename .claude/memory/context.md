@@ -115,8 +115,17 @@ Toàn bộ UI từ `leafnote-demo/` đã được chuyển sang `leafnote/fronte
 
 ---
 
-## 2026-05-11 — Tích hợp everything-claude-code
+## 2026-05-13 — Optimistic Update + Offline Strategy (chuẩn mutation)
 
-**Quyết định**: Tích hợp các tài nguyên AI bổ sung (agents, skills, configs) từ project `everything-claude-code` vào cấu trúc `.claude/` của Leafnote.
-**Mục tiêu**: Nâng cao năng lực của Claude trong việc hiểu và tương tác với codebase, cung cấp các công cụ và hướng dẫn chuyên biệt cho các tác vụ phức tạp.
-**Cách thức**: Các file được tổ chức lại một cách ngữ nghĩa trong thư mục `.claude/ecc_collection/`, với các thư mục con như `agents/`, `skills/`, `configs/`, v.v. để phân loại rõ ràng. Tài liệu đi kèm được chuyển vào `information/ecc-project-docs/`.
+**Pattern đã chốt** cho mọi mutation trong Leafnote:
+
+- `networkMode: 'offlineFirst'` — mutation vẫn chạy khi offline, TanStack Query tự pause và retry khi online lại
+- `retry: (count, err) => err?.response?.status == null && count < 3` — chỉ retry network error, không retry 4xx
+- `onMutate` → snapshot + optimistic update; `onError` → rollback; `onSettled` → invalidate (không dùng `onSuccess` cho invalidate nữa)
+- Modal đóng ngay sau `mutate()` — không chờ server confirm; optimistic update đã cập nhật UI
+- tmp ID lock: item `id.startsWith('tmp-')` → `pointer-events-none`, không render hover menu, không navigate
+
+**Offline persistence**: Không dùng IndexedDB/localStorage queue ở phase 1 — TanStack Query built-in là đủ. Sẽ xem xét persist adapter khi có yêu cầu thực tế (phase 3+).
+
+**Files áp dụng đầu tiên**: `frontend/src/hooks/useTags.ts`, 3 TagModal, `Sidebar.tsx` (TagItem).
+

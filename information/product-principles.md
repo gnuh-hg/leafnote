@@ -79,11 +79,35 @@ App vẫn dùng được khi không có mạng — ít nhất là đọc và ghi
 
 **Ràng buộc kỹ thuật**:
 
-- Implement PWA với Service Worker từ M1/M2.
-- Ghi note khi offline → lưu vào local queue (IndexedDB) → tự sync khi có mạng trở lại.
 - UI hiển thị rõ trạng thái mạng: online / offline / syncing.
 - Tính năng phụ thuộc server (AI decompose, recall scheduling) có thể không có khi offline — hiển thị thông báo, không crash.
 - Conflict resolution khi sync: last-write-wins cho note content, không xoá data local.
+
+**Phân tầng theo phase**:
+
+| Phase | Cơ chế offline | Persistence |
+|---|---|---|
+| Phase 1 (hiện tại) | TanStack Query `networkMode: 'offlineFirst'` — mutation pause, retry tự động khi online | Mất khi reload trang khi offline (chấp nhận được) |
+| Phase 2+ | PWA Service Worker + IndexedDB queue | Persist qua reload, sync đầy đủ |
+
+**Quy tắc cho mọi mutation (phase 1)**:
+- Dùng `networkMode: 'offlineFirst'` + `retry: (count, err) => err?.response?.status == null && count < 3`
+- Optimistic update qua `onMutate` → UI cập nhật ngay dù online hay offline
+- Không dùng localStorage queue trừ khi có yêu cầu persist thực tế
+
+---
+
+## 7. Optimistic UX
+
+Mọi action của người dùng phải phản hồi ngay lập tức — không chờ server confirm mới cập nhật UI.
+
+**Ràng buộc kỹ thuật**:
+
+- Mọi mutation (tạo, sửa, xóa) phải có optimistic update: cập nhật cache ngay trong `onMutate`, rollback trong `onError`.
+- Modal/dialog đóng **ngay sau khi user confirm** — không chờ server. Optimistic update đã phản ánh thay đổi trên UI.
+- Lỗi từ server (4xx/5xx): hiển thị toast + tự động rollback về state cũ — user không cần biết "retry" là gì.
+- Item mới tạo (optimistic, chưa có server ID) phải được lock: không cho edit/delete cho đến khi server xác nhận ID thật. Item này hiển thị mờ + pulse để user biết đang pending.
+- Không hiện loading spinner cho action thông thường (create/update/delete) — chỉ hiện khi thực sự cần chờ (bulk import, AI processing).
 
 ---
 
@@ -97,4 +121,5 @@ App vẫn dùng được khi không có mạng — ít nhất là đọc và ghi
 | Adaptive UX | Có hiện gì thừa với user cũ không? |
 | Mobile | Test 375px, touch target ≥ 44px? |
 | Guest | Flow guest → login có mượt không? |
-| Offline | Offline write → sync có hoạt động không? |
+| Offline | Mutation dùng `networkMode: 'offlineFirst'`? Retry chỉ network error? |
+| Optimistic UX | Modal đóng ngay? tmp item bị lock? Rollback khi lỗi? |
