@@ -61,7 +61,10 @@
       "Bash(rtk curl *)",
       "Bash(powershell -Command \"Invoke-WebRequest -Uri 'http://localhost:5173/auth' -UseBasicParsing | Select-Object -ExpandProperty StatusCode\")",
       "Bash(powershell -Command ' *)",
-      "Bash(dir *)"
+      "Bash(dir *)",
+      "PowerShell(rtk git *)",
+      "PowerShell(git check-ignore *)",
+      "WebFetch(domain:leafnote-api.onrender.com)"
     ]
   }
 }
