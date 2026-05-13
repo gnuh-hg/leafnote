@@ -2,6 +2,7 @@ import asyncio
 import logging
 import sys
 import traceback
+import os
 from contextlib import asynccontextmanager
 
 from alembic import command
@@ -18,29 +19,39 @@ logger = logging.getLogger(__name__)
 
 def _run_migrations() -> None:
     try:
-        logger.info("Starting database migrations...")
-        alembic_cfg = Config("alembic.ini")
+        print("DEBUG: Starting database migrations...", flush=True)
+        print(f"DEBUG: Current Working Directory: {os.getcwd()}", flush=True)
+        print(f"DEBUG: Files in CWD: {os.listdir()}", flush=True)
+        
+        ini_path = "alembic.ini"
+        if not os.path.exists(ini_path):
+            print(f"ERROR: {ini_path} not found!", flush=True)
+            sys.exit(3)
+            
+        alembic_cfg = Config(ini_path)
         command.upgrade(alembic_cfg, "head")
-        logger.info("Database migrations completed successfully.")
+        print("DEBUG: Database migrations completed successfully.", flush=True)
     except Exception as e:
-        logger.error(f"Migration failed: {e}")
-        traceback.print_exc()
+        print(f"CRITICAL ERROR: Migration failed: {e}", flush=True)
+        traceback.print_exc(file=sys.stdout)
+        sys.stdout.flush()
         # Exit with a specific code to indicate migration failure
         sys.exit(3)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Running lifespan startup tasks...")
+    print("DEBUG: Running lifespan startup tasks...", flush=True)
     loop = asyncio.get_event_loop()
     try:
         await loop.run_in_executor(None, _run_migrations)
     except SystemExit as e:
-        # Re-raise SystemExit to ensure the app stops if migrations fail
+        print(f"DEBUG: SystemExit caught in lifespan: {e.code}", flush=True)
         raise e
     except Exception as e:
-        logger.error(f"Error in lifespan startup: {e}")
-        traceback.print_exc()
+        print(f"DEBUG: Error in lifespan startup: {e}", flush=True)
+        traceback.print_exc(file=sys.stdout)
+        sys.stdout.flush()
         raise e
     yield
 
