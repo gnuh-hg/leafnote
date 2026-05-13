@@ -42,7 +42,7 @@ export default function NotesList() {
   const tagById = (id: string) => tags.find((tg) => tg.id === id)
 
   return (
-    <div className="px-8 py-8 max-w-[1300px] mx-auto">
+    <div className="px-4 sm:px-8 py-6 sm:py-8 max-w-[1300px] mx-auto">
       {/* Heading */}
       <div className="mb-6">
         <div className="text-xs text-zinc-500 mb-2 flex items-center gap-1.5">
@@ -59,7 +59,7 @@ export default function NotesList() {
         </div>
         <div className="flex items-end justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="font-serif text-[44px] leading-tight font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+            <h1 className="font-serif text-3xl sm:text-[44px] leading-tight font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
               {t('notesList.heading')}
             </h1>
             <p className="text-zinc-500 dark:text-zinc-400 mt-2">{t('notesList.subheading')}</p>

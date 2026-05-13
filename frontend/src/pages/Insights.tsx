@@ -6,20 +6,20 @@ export default function Insights() {
   const { t } = useTranslation()
 
   return (
-    <div className="px-8 py-8 max-w-[1500px] mx-auto">
+    <div className="px-4 sm:px-8 py-6 sm:py-8 max-w-[1500px] mx-auto">
       <div className="mb-8">
         <div className="text-xs text-zinc-500 mb-2 flex items-center gap-1.5">
           <Brain className="w-3 h-3" />
           {t('insights.subheading', { reviews: cognitiveProfile.totalReviews })}
         </div>
-        <h1 className="font-serif text-[44px] leading-tight font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className="font-serif text-3xl sm:text-[44px] leading-tight font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
           {t('sidebar.nav.insights')}
         </h1>
         <p className="text-zinc-500 dark:text-zinc-400 mt-2 max-w-2xl">{t('insights.description')}</p>
       </div>
 
       {/* Top stats */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <BigStat
           icon={Layers}
           label={t('insights.stats.totalLeaves')}
@@ -107,7 +107,11 @@ export default function Insights() {
               </p>
             </div>
           </div>
-          <Heatmap />
+          <div className="overflow-x-auto">
+            <div className="min-w-[560px]">
+              <Heatmap />
+            </div>
+          </div>
         </div>
 
         {/* Behavioral signals */}

@@ -6,6 +6,33 @@ Mỗi entry tương ứng một phase hoặc một task lớn đã hoàn thành.
 
 ---
 
+## 2026-05-13 — Mobile UI: Bottom Navigation
+
+**Mục tiêu**: Thay thế sidebar drawer (trượt từ trái) bằng bottom navigation bar trên mobile. Sidebar giữ nguyên trên desktop (`md:`+). Bottom nav có 5 nav item chính + nút `...` mở bottom sheet chứa Tags và Logout.
+
+**Đã làm**:
+- Tạo `BottomNav.tsx`: fixed bottom bar, mobile-only (`md:hidden`), 6 slots (5 NavLink + `...`), active state emerald, safe area support
+- Tạo `MobileMoreSheet.tsx`: bottom sheet qua `createPortal`, chứa danh sách tags, tạo tag mới (mở TagCreateModal), logout
+- `App.tsx`: xóa drawer logic (sidebarOpen state, overlay), thêm `<BottomNav />`, thêm `pb-16 md:pb-0` vào `<main>`
+- `Sidebar.tsx`: đơn giản hóa về `hidden md:flex`, xóa open/onClose props và close button mobile
+- `TopBar.tsx`: xóa hamburger button, hiện avatar trên mobile (`w-7 h-7`)
+- `ToastContainer.tsx`: nâng `z-[60]`, dịch lên `bottom-20` trên mobile (tránh bị BottomNav che)
+- `ReviewFeed.tsx`, `KnowledgeGraph.tsx`: fix responsive padding
+- `locales/vi.json`, `locales/en.json`: thêm key `bottomNav.more`
+
+**Files đã can thiệp**:
+- `frontend/src/components/BottomNav.tsx` — tạo mới
+- `frontend/src/components/MobileMoreSheet.tsx` — tạo mới
+- `frontend/src/App.tsx` — sửa AppShell
+- `frontend/src/components/Sidebar.tsx` — desktop-only
+- `frontend/src/components/TopBar.tsx` — xóa hamburger
+- `frontend/src/components/ui/ToastContainer.tsx` — z-index + position mobile
+- `frontend/src/pages/ReviewFeed.tsx` — responsive padding
+- `frontend/src/pages/KnowledgeGraph.tsx` — responsive padding
+- `frontend/src/locales/vi.json`, `frontend/src/locales/en.json` — i18n key
+
+---
+
 ## 2026-05-04 — M1: Scaffolding
 
 **Mục tiêu**: Dựng skeleton repo — backend + frontend chạy được "Hello world", có CI và auth Supabase.

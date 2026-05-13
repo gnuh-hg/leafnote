@@ -33,7 +33,7 @@ export default function Dashboard() {
     id === 'all' ? t('dashboard.filter.all') : t(`leaf.surface.${id}`)
 
   return (
-    <div className="px-8 py-8 max-w-[1500px] mx-auto">
+    <div className="px-4 sm:px-8 py-6 sm:py-8 max-w-[1500px] mx-auto">
       {/* Hero */}
       <div className="mb-8">
         <div className="flex items-center gap-2 text-xs mb-2">
@@ -44,7 +44,7 @@ export default function Dashboard() {
             {t('dashboard.session', { minutes: todayStats.studyMinutes })}
           </span>
         </div>
-        <h1 className="font-serif text-[44px] leading-tight font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className="font-serif text-3xl sm:text-[44px] leading-tight font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
           {t('dashboard.heading')}
         </h1>
         <p className="text-zinc-500 dark:text-zinc-400 mt-2 max-w-2xl">
@@ -59,7 +59,7 @@ export default function Dashboard() {
           {/* Main feed */}
           <div className="col-span-12 lg:col-span-9">
             {/* Filter pills */}
-            <div className="flex items-center gap-2 mb-5 overflow-x-auto pb-1">
+            <div className="flex items-center gap-2 mb-5 overflow-x-auto pb-1 no-scrollbar">
               <Filter className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
               {FILTER_IDS.map((id) => (
                 <button

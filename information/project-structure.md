@@ -175,7 +175,9 @@ frontend/
     │   ├── editor/            # TiptapEditor, SurfacingPanel, LeafHighlight
     │   ├── recall/            # RecallCard, RatingBar
     │   ├── graph/             # KnowledgeGraph (Cytoscape/react-force-graph)
-    │   └── ui/                # shadcn/ui overrides + custom primitives
+    │   ├── ui/                # shadcn/ui overrides + custom primitives
+    │   ├── BottomNav.tsx      # Bottom navigation bar (mobile-only, md:hidden)
+    │   └── MobileMoreSheet.tsx # Bottom sheet từ nút "..." trong BottomNav (Tags + Logout)
     ├── pages/
     │   ├── AuthPage.tsx
     │   ├── WorkspacePage.tsx  # editor + leaf panel + surfacing + voice/image capture

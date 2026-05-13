@@ -1,4 +1,7 @@
 {
+  "bottomNav": {
+    "more": "More"
+  },
   "sidebar": {
     "tagline": "notes with a lifecycle",
     "nav": {

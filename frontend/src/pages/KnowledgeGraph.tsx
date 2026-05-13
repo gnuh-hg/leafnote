@@ -33,7 +33,7 @@ export default function KnowledgeGraph() {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="px-8 pt-8 pb-4 max-w-[1500px] mx-auto w-full">
+      <div className="px-4 sm:px-8 pt-6 sm:pt-8 pb-4 max-w-[1500px] mx-auto w-full">
         <div className="flex items-end justify-between">
           <div>
             <div className="flex items-center gap-2 text-xs text-zinc-500 mb-2">

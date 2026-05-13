@@ -112,7 +112,7 @@ export default function NoteEditor() {
   }
 
   return (
-    <div className="px-8 py-8 max-w-[1500px] mx-auto">
+    <div className="px-4 sm:px-8 py-6 sm:py-8 max-w-[1500px] mx-auto">
       {showFreshBanner && (
         <div className="mb-5 rounded-xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-transparent p-3.5 flex items-start gap-3 animate-fade-in">
           <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center shrink-0">
@@ -141,7 +141,7 @@ export default function NoteEditor() {
       )}
 
       {/* Header */}
-      <div className="flex items-start justify-between mb-6 gap-4">
+      <div className="flex items-start justify-between mb-6 gap-4 flex-wrap sm:flex-nowrap">
         <div className="min-w-0 flex-1">
           {/* Meta row */}
           <div className="flex items-center gap-2 text-xs mb-2 flex-wrap">
@@ -174,7 +174,7 @@ export default function NoteEditor() {
 
           {/* Title */}
           {mode === 'read' ? (
-            <h1 className="font-serif text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+            <h1 className="font-serif text-2xl sm:text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
               {title || <span className="text-zinc-400">{t('editor.untitled')}</span>}
             </h1>
           ) : (
@@ -186,7 +186,7 @@ export default function NoteEditor() {
               }}
               autoFocus={isNew && !initialInput}
               placeholder={isNew ? t('editor.titlePlaceholderNew') : t('editor.titlePlaceholder')}
-              className="font-serif text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 bg-transparent w-full focus:outline-none border-b border-dashed border-paper-300 dark:border-ink-700/60 focus:border-emerald-500/40 pb-1 placeholder:text-zinc-400 dark:placeholder:text-zinc-700"
+              className="font-serif text-2xl sm:text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 bg-transparent w-full focus:outline-none border-b border-dashed border-paper-300 dark:border-ink-700/60 focus:border-emerald-500/40 pb-1 placeholder:text-zinc-400 dark:placeholder:text-zinc-700"
             />
           )}
 
@@ -282,7 +282,7 @@ export default function NoteEditor() {
                 }`}
               >
                 <Eye className="w-3 h-3" />
-                {t('editor.mode.read')}
+                <span className="hidden sm:inline">{t('editor.mode.read')}</span>
               </button>
               <button
                 onClick={() => setMode('edit')}
@@ -293,7 +293,7 @@ export default function NoteEditor() {
                 }`}
               >
                 <Pencil className="w-3 h-3" />
-                {t('editor.mode.edit')}
+                <span className="hidden sm:inline">{t('editor.mode.edit')}</span>
               </button>
             </div>
           )}
@@ -314,7 +314,7 @@ export default function NoteEditor() {
 
       <div className="grid grid-cols-12 gap-6">
         {/* Note body */}
-        <div className="col-span-12 lg:col-span-7 card-surface p-8 bg-paper-50/60 dark:bg-ink-900/40">
+        <div className="col-span-12 lg:col-span-7 card-surface p-4 sm:p-8 bg-paper-50/60 dark:bg-ink-900/40">
           {mode === 'edit' && (
             <InputToolbar
               onVoice={() => setVoiceState('recording')}

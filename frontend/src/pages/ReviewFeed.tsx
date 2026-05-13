@@ -55,7 +55,7 @@ export default function ReviewFeed() {
   }
 
   return (
-    <div className="min-h-full flex flex-col items-center justify-start px-6 py-8">
+    <div className="min-h-full flex flex-col items-center justify-start px-4 sm:px-8 py-6 sm:py-8">
       {/* Header */}
       <div className="w-full max-w-2xl mb-8">
         <div className="flex items-center justify-between mb-3">

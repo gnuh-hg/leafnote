@@ -50,7 +50,7 @@ export default function Sidebar() {
   ]
 
   return (
-    <aside className="w-64 shrink-0 bg-paper-100/80 dark:bg-ink-900/70 backdrop-blur-xl border-r border-paper-300/60 dark:border-ink-700/60 flex flex-col transition-colors duration-200">
+    <aside className="hidden md:flex flex-col w-64 shrink-0 bg-paper-100/80 dark:bg-ink-900/70 backdrop-blur-xl border-r border-paper-300/60 dark:border-ink-700/60 transition-colors duration-200">
       {/* Wordmark */}
       <div className="px-5 pt-5 pb-4 border-b border-paper-300/40 dark:border-ink-700/40">
         <div className="flex items-center gap-2.5">

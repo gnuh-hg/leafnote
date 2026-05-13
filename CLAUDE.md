@@ -129,6 +129,8 @@ Backend đọc từ `backend/.env`. Các key bắt buộc: `DATABASE_URL`, `SUPA
 | `frontend/src/components/TagCreateModal.tsx` | `ready` | Modal tạo tag (real API) |
 | `frontend/src/components/TagEditModal.tsx` | `ready` | Modal sửa tag |
 | `frontend/src/components/TagDeleteConfirm.tsx` | `ready` | Confirm xóa tag |
+| `frontend/src/components/BottomNav.tsx` | `ready` | Bottom navigation bar (mobile-only, md:hidden) — 5 NavLink + nút `...` |
+| `frontend/src/components/MobileMoreSheet.tsx` | `ready` | Bottom sheet từ nút `...`: Tags list, tạo tag, logout |
 | `frontend/src/pages/Dashboard.tsx` | `scaffold` | Mock data |
 | `frontend/src/pages/NotesList.tsx` | `scaffold` | Mock notes, real tags filter UI |
 | `frontend/src/pages/NoteEditor.tsx` | `scaffold` | Mock notes, real tag picker |
