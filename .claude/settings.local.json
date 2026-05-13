@@ -65,7 +65,23 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\admin\\\\all\\\\project\\\\manask\" -Recurse -File -Name)",
       "Bash(Select-Object -First 30)",
       "Bash(rtk npx *)",
-      "Bash(Get-ChildItem *)"
+      "Bash(Get-ChildItem *)",
+      "Bash(gh repo *)",
+      "WebFetch(domain:api.github.com)",
+      "PowerShell(Invoke-WebRequest -Uri \"https://github.com/matt1398/claude-devtools/releases/download/v0.5.0/claude-devtools-Setup-0.5.0-x64.exe\" -OutFile \"$env:USERPROFILE\\\\Downloads\\\\claude-devtools-Setup-0.5.0-x64.exe\" -UseBasicParsing)",
+      "PowerShell(Get-Item *)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(pnpm --version)",
+      "PowerShell(pnpm *)",
+      "PowerShell(npm install *)",
+      "PowerShell(git clone *)",
+      "PowerShell(pnpm install *)",
+      "PowerShell(pnpm dev *)",
+      "PowerShell(pnpm approve-builds *)",
+      "PowerShell(cd \"$env:USERPROFILE\\\\claude-devtools\" && node node_modules/electron/install.js 2>&1)",
+      "PowerShell(Test-Path *)",
+      "PowerShell(pnpm build *)",
+      "PowerShell(pnpm dist:win *)"
     ]
   }
 }
