@@ -12,7 +12,7 @@ import {
   LogOut,
   MoreHorizontal,
 } from 'lucide-react'
-import logoLeafnote from '../assets/images/logo-leafnote.png'
+import logoLeafnote from '../assets/images/logo-leafnote.svg'
 import TagCreateModal from './TagCreateModal'
 import TagEditModal from './TagEditModal'
 import TagDeleteConfirm from './TagDeleteConfirm'
@@ -54,9 +54,9 @@ export default function Sidebar() {
       {/* Wordmark */}
       <div className="px-5 pt-5 pb-4 border-b border-paper-300/40 dark:border-ink-700/40">
         <div className="flex items-center gap-2.5">
-          <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <div className="relative w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
             <img src={logoLeafnote} alt="Leafnote" className="w-6 h-6 object-contain" />
-            <div className="absolute inset-0 rounded-xl ring-1 ring-white/10" />
+            <div className="absolute inset-0 rounded-xl ring-1 ring-emerald-200/60" />
           </div>
           <div>
             <div className="font-serif text-2xl font-semibold leading-none tracking-tight text-zinc-900 dark:text-zinc-100">

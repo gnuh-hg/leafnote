@@ -129,3 +129,33 @@ Toàn bộ UI từ `leafnote-demo/` đã được chuyển sang `leafnote/fronte
 
 **Files áp dụng đầu tiên**: `frontend/src/hooks/useTags.ts`, 3 TagModal, `Sidebar.tsx` (TagItem).
 
+---
+
+## 2026-05-14 — Tách kết nối DB: Transaction Pooler (app) + Session Pooler (migration)
+
+**Quyết định:** Backend dùng **hai connection string** thay vì một.
+
+- `DATABASE_URL` → Supabase Transaction Pooler (port `6543`, pgbouncer transaction mode). Dùng cho FastAPI runtime — chịu được high concurrency.
+- `DATABASE_DIRECT_URL` → Supabase Session Pooler (port `5432`). Dùng riêng cho Alembic migrations — hỗ trợ prepared statements và DDL.
+
+**Lý do:** asyncpg luôn `PREPARE` mỗi câu lệnh; với transaction pooler, server connection bị reuse khiến tên prepared statement mặc định (`__asyncpg_stmt_N__`) đụng nhau → `DuplicatePreparedStatementError`. Chỉ set `statement_cache_size=0` không đủ.
+
+**Pattern fix cho engine app:**
+```python
+connect_args={
+    "ssl": "require",
+    "statement_cache_size": 0,
+    "prepared_statement_name_func": lambda: f"__asyncpg_{uuid.uuid4().hex}__",
+}
+```
+Tên unique mỗi câu lệnh → không bao giờ collision dù pgbouncer reuse connection.
+
+**Quyết định kèm theo: bỏ migration khỏi app startup.**
+
+- Xóa `_run_migrations()` trong `lifespan` của `main.py`.
+- Migration chạy như deploy step riêng. Trên Render (free tier không có Pre-Deploy Command), đặt **Build Command**: `pip install -r backend/requirements.txt && cd backend && alembic upgrade head`.
+- Migration fail = deploy fail = phiên bản cũ vẫn chạy → an toàn hơn crash app.
+
+**Tooling:** `backend/scripts/check_env.py` verify env vars không in secret. Chạy `python -m scripts.check_env` từ `backend/`.
+
+**Files chính:** `backend/app/core/{config,database,auth}.py`, `backend/app/main.py`, `backend/alembic/env.py`, `backend/.env.example`, `backend/scripts/check_env.py`.

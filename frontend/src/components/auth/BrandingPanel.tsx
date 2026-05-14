@@ -1,6 +1,6 @@
 import { Leaf } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import logoLeafnote from '../../assets/images/logo-leafnote.png'
+import logoLeafnote from '../../assets/images/logo-leafnote.svg'
 
 export default function BrandingPanel() {
   const { t } = useTranslation()
@@ -26,9 +26,9 @@ export default function BrandingPanel() {
       {/* Logo + tagline */}
       <div className="relative z-10 text-center space-y-4">
         <div className="flex items-center justify-center gap-3">
-          <div className="relative w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
+          <div className="relative w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-lg">
             <img src={logoLeafnote} alt="Leafnote" className="w-8 h-8 object-contain" />
-            <div className="absolute inset-0 rounded-2xl ring-1 ring-white/20" />
+            <div className="absolute inset-0 rounded-2xl ring-1 ring-white/30" />
           </div>
           <span className="font-serif text-3xl font-semibold text-white tracking-tight">
             Leafnote

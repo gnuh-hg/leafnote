@@ -1,14 +1,12 @@
 import axios from 'axios'
 import { useAuthStore } from '../stores/authStore'
 
-const baseURL = import.meta.env.VITE_API_URL
-
-if (!baseURL) {
-  console.warn('VITE_API_URL is not defined, falling back to localhost:8000')
-}
+// Dev: VITE_API_URL unset → relative path → Vite proxy handles CORS-free forwarding to localhost:8000
+// Prod: VITE_API_URL set in Vercel dashboard → absolute URL to Render backend
+const baseURL = import.meta.env.VITE_API_URL ?? ''
 
 export const api = axios.create({
-  baseURL: baseURL || 'http://localhost:8000',
+  baseURL,
 })
 
 api.interceptors.request.use((config) => {

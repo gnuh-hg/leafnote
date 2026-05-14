@@ -104,8 +104,12 @@ Backend đọc từ `backend/.env`. Các key bắt buộc: `DATABASE_URL`, `SUPA
 | `backend/app/schemas/tag.py` | `ready` | TagCreate/Update/Out, VALID_COLORS |
 | `backend/app/services/auth.py` | `ready` | Auth business logic |
 | `backend/app/services/tags.py` | `ready` | Tag CRUD + track_access (sort by access_count) |
-| `backend/app/core/auth.py` | `ready` | JWT verify middleware (get_current_user) |
-| `backend/app/core/database.py` | `ready` | AsyncSession + Base |
+| `backend/app/core/auth.py` | `ready` | JWT verify (ES256+JWKS / HS256 legacy), JWKS cache TTL 10', verify `iss` |
+| `backend/app/core/database.py` | `ready` | AsyncSession + Base, `prepared_statement_name_func` cho transaction pooler |
+| `backend/app/core/config.py` | `ready` | `DATABASE_URL` (pooler 6543) + `DATABASE_DIRECT_URL` (pooler 5432) |
+| `backend/app/main.py` | `ready` | FastAPI app — migration **không** chạy trong lifespan |
+| `backend/alembic/env.py` | `ready` | Migration dùng `DATABASE_DIRECT_URL` (session pooler 5432) |
+| `backend/scripts/check_env.py` | `ready` | Verify env vars + live probe DB/JWKS, không in secret |
 | `backend/app/api/v1/routes/auth.py` | `ready` | GET/PATCH /auth/me |
 | `backend/app/api/v1/routes/tags.py` | `ready` | 5 endpoints: list/create/update/delete/access |
 | `backend/app/api/v1/router.py` | `ready` | API router aggregator |

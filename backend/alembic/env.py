@@ -11,7 +11,10 @@ from app.models import User  # noqa: F401 — register models
 from app.models.tag import Tag  # noqa: F401 — register models
 
 config = context.config
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+# Migrations go through the Session Pooler (port 5432), which supports
+# prepared statements natively. The Transaction Pooler used by the app
+# runtime is unsuitable for DDL.
+config.set_main_option("sqlalchemy.url", settings.DATABASE_DIRECT_URL)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
