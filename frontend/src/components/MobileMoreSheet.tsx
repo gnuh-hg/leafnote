@@ -77,7 +77,8 @@ export default function MobileMoreSheet({ onClose }: MobileMoreSheetProps) {
             </div>
           )}
 
-          {isError && !isLoading && (
+          {/* Only show full error state when there is no cached data to fall back to. */}
+          {isError && tags.length === 0 && !isLoading && (
             <div className="py-3 text-center">
               <p className="text-[12px] text-zinc-500">{t('tag.error.loadFailed')}</p>
               <button onClick={() => refetch()} className="mt-1 text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline">
@@ -93,7 +94,7 @@ export default function MobileMoreSheet({ onClose }: MobileMoreSheetProps) {
             </div>
           )}
 
-          {!isLoading && !isError && tags.map((tag) => {
+          {tags.map((tag) => {
             const dot = COLOR_DOT[tag.color] ?? 'bg-indigo-400'
             const isTmp = tag.id.startsWith('tmp-')
             return (

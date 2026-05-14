@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import * as tagService from '../services/tags'
 import type { TagOut } from '../services/tags'
@@ -11,6 +11,14 @@ export function useTags() {
     queryKey: ['tags'],
     queryFn: tagService.getTags,
     enabled: !!session,
+    // Tags rarely change; treat cache as fresh for 5 minutes to avoid refetch
+    // storms on every window focus. Cached data still shows if a background
+    // refetch fails — `isError` doesn't wipe the list.
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    retry: (count, err: { response?: { status?: number } }) =>
+      err?.response?.status == null && count < 2,
   })
 }
 

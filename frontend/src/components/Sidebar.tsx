@@ -108,9 +108,10 @@ export default function Sidebar() {
             </button>
           </div>
 
-          {isLoading && <TagListSkeleton />}
+          {isLoading && tags.length === 0 && <TagListSkeleton />}
 
-          {isError && !isLoading && (
+          {/* Only show full error state when there is no cached data to fall back to. */}
+          {isError && tags.length === 0 && !isLoading && (
             <div className="px-3 py-3 text-center">
               <p className="text-[12px] text-zinc-500">{t('tag.error.loadFailed')}</p>
               <button
@@ -131,7 +132,7 @@ export default function Sidebar() {
             </div>
           )}
 
-          {!isLoading && !isError && tags.map((tag) => (
+          {tags.map((tag) => (
             <TagItem
               key={tag.id}
               tag={tag}
