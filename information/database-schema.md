@@ -32,3 +32,30 @@
 **Constraints**: `UniqueConstraint('user_id', 'name')` — tên tag unique per user.
 
 **Index**: `ix_tags_user_id` trên `user_id`.
+
+---
+
+## notes
+
+| Column | Type | Constraints | Ghi chú |
+|---|---|---|---|
+| `id` | UUID | PK | uuid4 default |
+| `user_id` | UUID | FK → users.id, INDEX | Chủ sở hữu note |
+| `title` | TEXT | NOT NULL, default `''` | Tiêu đề note |
+| `body` | TEXT | NOT NULL, default `''` | Nội dung ghi chú (plain text) — nguồn chân lý |
+| `plain_text` | TEXT | NOT NULL, default `''` | Bản sao của body — dùng cho search, sau này full-text search |
+| `created_at` | TIMESTAMPTZ | DEFAULT now() | Timezone-aware (UTC) |
+| `updated_at` | TIMESTAMPTZ | DEFAULT now(), onupdate | Timezone-aware (UTC) |
+
+**Index**: `ix_notes_user_id` trên `user_id`.
+
+---
+
+## note_tags
+
+| Column | Type | Constraints | Ghi chú |
+|---|---|---|---|
+| `note_id` | UUID | FK → notes.id ON DELETE CASCADE, PK | |
+| `tag_id` | UUID | FK → tags.id ON DELETE CASCADE, PK | |
+
+**PK**: composite `(note_id, tag_id)` — bảng nối many-to-many.

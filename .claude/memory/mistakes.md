@@ -48,3 +48,21 @@
 - **Root cause**: Trang JWT Keys hiện cả Key ID (`72DA9E53-8198-...`) lẫn nút mở "Legacy JWT Secret" ở tab riêng. Dễ nhầm copy Key ID (UUID 36 chars) → giống định dạng secret nhưng KHÔNG phải secret.
 - **Fix**: Lấy Legacy HS256 Shared Secret từ tab **"Legacy JWT Secret"** của trang JWT Keys (không phải Key ID hiện trong bảng). Giá trị thật là base64 random ~40+ chars, không có dấu gạch nối.
 - **Phòng tránh**: Khi Supabase đã rotate sang asymmetric, có thể bỏ HS256 hoàn toàn sau khi tất cả refresh token cũ hết hạn (Revoke legacy key trên dashboard rồi xóa env var). `scripts/check_env.py` chỉ check format, không verify giá trị secret — phải verify thủ công từ dashboard.
+
+---
+
+**[2026-05-14] — pgbouncer transaction mode: prepared statement does not exist (sequel)**
+
+- **Triệu chứng**: Backend chạy bình thường vài request, rồi random `InvalidSQLStatementNameError: prepared statement "__asyncpg_xxx__" does not exist`. Khác lỗi `DuplicatePreparedStatementError` trước đó.
+- **Root cause**: Fix cũ (`prepared_statement_name_func` cho tên unique) chỉ giải quyết name collision. Pgbouncer transaction mode **rotate server backend mỗi transaction** — SQLAlchemy reuse cùng asyncpg connection trong pool nhưng pgbouncer thì cho transaction này connect server A, transaction kế server B. PREPARE đăng ký trên A nhưng EXECUTE lại chạy trên B → "does not exist".
+- **Fix**: Thêm `poolclass=NullPool` trong `create_async_engine` — mỗi session lấy asyncpg connection mới, đóng sau khi xong → prepare + execute luôn cùng một backend cho vòng đời connection đó. Đồng thời thêm `prepared_statement_cache_size=0`.
+- **Phòng tránh**: Với Supabase Transaction Pooler (6543) + asyncpg, **luôn phải dùng `NullPool`** — không pool ở SQLAlchemy. Pool ở pgbouncer là đủ và lành mạnh hơn. Nếu cần long-lived connection (LISTEN/NOTIFY, advisory lock cross-request), phải dùng session pooler (5432) thay vì transaction pooler.
+
+---
+
+**[2026-05-14] — CORS block vì trailing slash trong `CORS_ORIGINS`**
+
+- **Triệu chứng**: Frontend Vercel gọi backend Render → browser block với `No 'Access-Control-Allow-Origin' header`. Backend không crash, response có status 200/4xx nhưng thiếu CORS header.
+- **Root cause**: `CORS_ORIGINS` trên Render đặt là `["https://leafnote-vn.vercel.app/", ...]` (có dấu `/` cuối). Browser gửi `Origin: https://leafnote-vn.vercel.app` (KHÔNG có `/`). Starlette CORSMiddleware so khớp exact string → không match → không thêm CORS header.
+- **Fix**: Bỏ trailing slash trong env var: `["https://leafnote-vn.vercel.app","http://localhost:5173"]`.
+- **Phòng tránh**: Origin trong CORS_ORIGINS phải là **scheme + host + port (nếu có)** — không có path, không có trailing slash. Khi paste URL từ trình duyệt cẩn thận browser thường thêm `/`.

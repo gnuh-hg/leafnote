@@ -170,80 +170,6 @@ export const projects: Project[] = [
   { id: 'p5', name: 'Lịch sử VN cận đại', dot: 'bg-rose-400', leafCount: 14, noteCount: 2, heat: 0.18 },
 ]
 
-export const notes: Note[] = [
-  {
-    id: 'n1',
-    title: 'Popper và falsificationism',
-    projectId: 'p1',
-    tagIds: ['t1', 't7'],
-    updatedAt: '3 giờ trước',
-    leafCount: 5,
-    excerpt: 'Karl Popper bác bỏ inductivism của Vienna Circle, đề xuất tiêu chí phân biệt khoa học là khả năng bị bác bỏ.',
-  },
-  {
-    id: 'n2',
-    title: 'Kuhn — Paradigm shift và khoa học cách mạng',
-    projectId: 'p1',
-    tagIds: ['t1', 't6', 't7'],
-    updatedAt: 'hôm qua',
-    leafCount: 6,
-    excerpt: 'Khoa học không tiến hoá tuyến tính mà qua các giai đoạn normal science → crisis → revolution.',
-  },
-  {
-    id: 'n3',
-    title: 'Lakatos — Research programmes',
-    projectId: 'p1',
-    tagIds: ['t1', 't6'],
-    updatedAt: '4 ngày trước',
-    leafCount: 4,
-    excerpt: 'Lakatos kết hợp Popper và Kuhn, đề xuất hard core và protective belt.',
-  },
-  {
-    id: 'n4',
-    title: 'FSRS — Three-component model',
-    projectId: 'p2',
-    tagIds: ['t2', 't7'],
-    updatedAt: '6 giờ trước',
-    leafCount: 5,
-    excerpt: 'Mô hình ghi nhớ dựa trên difficulty, stability, retrievability.',
-  },
-  {
-    id: 'n5',
-    title: 'So sánh SM-2 và FSRS',
-    projectId: 'p2',
-    tagIds: ['t2'],
-    updatedAt: '2 ngày trước',
-    leafCount: 3,
-    excerpt: 'SM-2 dùng ease factor đơn giản, FSRS fit tham số per-user qua MLE.',
-  },
-  {
-    id: 'n6',
-    title: 'Embedding ngữ nghĩa và RAG',
-    projectId: 'p3',
-    tagIds: ['t3', 't7'],
-    updatedAt: 'hôm qua',
-    leafCount: 5,
-    excerpt: 'Vector embedding cho phép retrieval theo ngữ nghĩa thay vì keyword.',
-  },
-  {
-    id: 'n7',
-    title: 'CRISPR-Cas9 — Cơ chế cắt DNA',
-    projectId: 'p4',
-    tagIds: ['t4'],
-    updatedAt: '5 ngày trước',
-    leafCount: 4,
-    excerpt: 'Hệ thống dùng guide RNA định vị target sequence trên DNA.',
-  },
-  {
-    id: 'n8',
-    title: 'Phong trào Cần Vương',
-    projectId: 'p5',
-    tagIds: ['t5'],
-    updatedAt: '1 tuần trước',
-    leafCount: 3,
-    excerpt: 'Khởi nguồn từ chiếu Cần Vương 1885 của vua Hàm Nghi.',
-  },
-]
 
 export const leaves: Leaf[] = [
   // Project 1: Triết học khoa học
@@ -560,57 +486,6 @@ export const leaves: Leaf[] = [
     dormant: true,
   },
 ]
-
-export const decompositionDemo: DecompositionDemo = {
-  noteId: 'n2',
-  title: 'Kuhn — Paradigm shift và khoa học cách mạng',
-  body: [
-    {
-      type: 'p',
-      segments: [
-        { text: 'Trong tác phẩm ' },
-        { text: 'The Structure of Scientific Revolutions', italic: true },
-        { text: ' (1962), Thomas Kuhn lập luận rằng ' },
-        { text: 'khoa học không tiến hoá tuyến tính qua tích lũy dữ liệu', leafId: 'a2', leafType: 'proposition' },
-        { text: ', mà qua các giai đoạn xen kẽ giữa ' },
-        { text: 'normal science', leafId: 'a3', leafType: 'definition' },
-        { text: ' và ' },
-        { text: 'scientific revolution', leafId: 'a3b', leafType: 'definition' },
-        { text: '.' },
-      ],
-    },
-    {
-      type: 'p',
-      segments: [
-        { text: 'Trong giai đoạn normal science, các nhà khoa học vận hành trong khuôn khổ một ' },
-        { text: 'paradigm', leafId: 'a3c', leafType: 'definition' },
-        { text: ' chung — tập hợp các giả định, phương pháp và mô hình mẫu được cộng đồng chấp nhận. Khi các ' },
-        { text: 'anomaly tích tụ đủ lớn dẫn tới crisis và revolution', leafId: 'a3', leafType: 'relation' },
-        { text: ', paradigm cũ bị thay thế.' },
-      ],
-    },
-    {
-      type: 'p',
-      segments: [
-        { text: 'Khái niệm này khác biệt căn bản với ' },
-        { text: 'falsificationism của Popper', leafId: 'a1', leafType: 'definition' },
-        { text: ' — Popper xem khoa học là quá trình bác bỏ giả thuyết liên tục, trong khi Kuhn cho rằng các nhà khoa học bám paradigm cho đến khi không thể.' },
-      ],
-    },
-  ],
-  detectedLeaves: [
-    { id: 'a2', content: 'Kuhn cho rằng khoa học tiến hoá qua các paradigm shift, không phải tích lũy tuyến tính.', type: 'proposition', confidence: 0.96, status: 'existing' },
-    { id: 'a3', content: 'Normal science vận hành trong khuôn khổ paradigm; khi anomaly tích tụ đủ lớn, crisis xảy ra dẫn tới revolution.', type: 'relation', confidence: 0.92, status: 'existing' },
-    { id: 'a3b', content: 'Scientific revolution là giai đoạn paradigm cũ bị thay thế bởi paradigm mới.', type: 'definition', confidence: 0.88, status: 'new' },
-    { id: 'a3c', content: 'Paradigm là tập hợp các giả định, phương pháp và mô hình mẫu được cộng đồng khoa học chấp nhận.', type: 'definition', confidence: 0.94, status: 'new' },
-    { id: 'a1', content: 'Falsifiability là tiêu chí phân biệt khoa học với phi-khoa học, không phải verifiability.', type: 'definition', confidence: 0.85, status: 'linked' },
-  ],
-  insights: [
-    { kind: 'related', text: 'Liên kết phát hiện: paradigm shift ↔ falsificationism (đối lập nhận thức luận)' },
-    { kind: 'gap', text: 'Khoảng trống: chưa có lá nào về "incommensurability" — khái niệm liền kề Kuhn thường đề cập' },
-    { kind: 'conflict', text: 'Mâu thuẫn nhẹ với lá #a1 — Popper và Kuhn quan điểm trái ngược' },
-  ],
-}
 
 // Forgetting curve — 30 ngày, retention dự đoán
 export const forgettingCurveData: ForgettingCurvePoint[] = Array.from({ length: 30 }, (_, i) => {

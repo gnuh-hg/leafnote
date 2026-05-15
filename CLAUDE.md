@@ -97,7 +97,13 @@ Backend đọc từ `backend/.env`. Các key bắt buộc: `DATABASE_URL`, `SUPA
 | `.claude/workflows/fix-bug.md` | `ready` | Workflow debug có hệ thống |
 | `.claude/workflows/ship-product.md` | `ready` | Checklist trước khi deploy lên production |
 | `.claude/workflows/build-feature.md` | `ready` | Workflow build feature fullstack |
-| `backend/` | `phase2-tags` | FastAPI + auth + Tag CRUD |
+| `backend/` | `phase2-notes` | FastAPI + auth + Tag CRUD + Note CRUD |
+| `backend/app/models/note.py` | `ready` | Note model + bảng nối `note_tags` |
+| `backend/app/schemas/note.py` | `ready` | NoteCreate/Update/ListItem/Out |
+| `backend/app/services/notes.py` | `ready` | Note CRUD + filter tag + flatten plain_text |
+| `backend/app/api/v1/routes/notes.py` | `ready` | 5 endpoint: list/get/create/update/delete |
+| `backend/alembic/versions/m004_create_notes_table.py` | `ready` | Migration tạo `notes` + `note_tags` |
+| `future.md` | `ready` | Tính năng đã scope nhưng dời sau (leaf AI, media, search...) |
 | `backend/app/models/user.py` | `ready` | User model (SQLAlchemy) |
 | `backend/app/models/tag.py` | `ready` | Tag model (UniqueConstraint user_id+name) |
 | `backend/app/schemas/auth.py` | `ready` | Pydantic schemas (UserOut, UserUpdate) |
@@ -135,9 +141,13 @@ Backend đọc từ `backend/.env`. Các key bắt buộc: `DATABASE_URL`, `SUPA
 | `frontend/src/components/TagDeleteConfirm.tsx` | `ready` | Confirm xóa tag |
 | `frontend/src/components/BottomNav.tsx` | `ready` | Bottom navigation bar (mobile-only, md:hidden) — 5 NavLink + nút `...` |
 | `frontend/src/components/MobileMoreSheet.tsx` | `ready` | Bottom sheet từ nút `...`: Tags list, tạo tag, logout |
+| `frontend/src/components/MobileInsightSheet.tsx` | `ready` | Bottom sheet mobile cho NoteEditor: tab Engine/Leaves/Insights |
 | `frontend/src/pages/Dashboard.tsx` | `scaffold` | Mock data |
-| `frontend/src/pages/NotesList.tsx` | `scaffold` | Mock notes, real tags filter UI |
-| `frontend/src/pages/NoteEditor.tsx` | `scaffold` | Mock notes, real tag picker |
+| `frontend/src/pages/NotesList.tsx` | `ready` | Real notes qua useNotes, filter tag qua URL |
+| `frontend/src/pages/NoteEditor.tsx` | `ready` | BlockNote editor + autosave 600ms + tag picker thật |
+| `frontend/src/components/editor/BlockEditor.tsx` | `ready` | Wrapper BlockNote: schema không media, dark/light theme |
+| `frontend/src/services/notes.ts` | `ready` | Axios wrapper 5 endpoint Notes |
+| `frontend/src/hooks/useNotes.ts` | `ready` | TanStack Query hooks cho Note CRUD |
 | `frontend/src/pages/KnowledgeGraph.tsx` | `scaffold` | Mock data |
 | `frontend/src/pages/ReviewFeed.tsx` | `scaffold` | Mock data |
 | `frontend/src/pages/Insights.tsx` | `scaffold` | Mock data |

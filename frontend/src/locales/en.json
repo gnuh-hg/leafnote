@@ -1,4 +1,10 @@
 {
+  "common": {
+    "loading": "Loading...",
+    "comingSoon": "Coming soon",
+    "close": "Close",
+    "dismiss": "Dismiss"
+  },
   "bottomNav": {
     "more": "More"
   },
@@ -136,6 +142,15 @@
       "viewContext": "View context →"
     }
   },
+  "notes": {
+    "mobile": {
+      "back": "Back",
+      "openInsights": "Leaves & Insights",
+      "tabLeaves": "Leaves",
+      "tabInsights": "Insights",
+      "tabEngine": "Engine"
+    }
+  },
   "notesList": {
     "count": "{{filtered}}/{{total}} notes",
     "filterInfo": "filtered by {{count}} tags (AND)",
@@ -160,6 +175,11 @@
     "open": "Open →"
   },
   "editor": {
+    "creating": "Creating new note...",
+    "saving": "Saving...",
+    "delete": "Delete note",
+    "deleteConfirm": "Delete this note? This cannot be undone.",
+    "notFound": "Note not found. It may have been deleted.",
     "savedAt": "Saved at {{time}}",
     "leafCount": "{{count}} leaves extracted",
     "newNote": "New note · auto-save every 2s",
@@ -179,7 +199,9 @@
     },
     "viewGraph": "View graph",
     "save": "Save & decompose",
+    "saveShortcut": "Save (Ctrl+S)",
     "saveAgain": "Save & re-decompose",
+    "unsavedConfirm": "You have unsaved changes. Leave?",
     "freshBanner": {
       "title": "AI just extracted {{count}} leaves from this note",
       "description": "Review below — keep, edit, merge, split, or discard each leaf. The final call is yours."
@@ -201,11 +223,16 @@
       "emptyDescription": "Just start typing — after you click Save & decompose, AI will extract leaves and show them here for review."
     },
     "insights": {
-      "title": "AI insights"
+      "title": "AI insights",
+      "empty": "No insights yet"
     },
     "legend": {
       "readMode": "Highlights",
-      "editMode": "Edit text, AI will re-extract"
+      "editMode": "Edit text, AI will re-extract",
+      "definition": "Definition",
+      "clause": "Clause",
+      "relation": "Relation",
+      "fact": "Fact"
     },
     "toolbar": {
       "record": "Record",
@@ -230,6 +257,7 @@
       "deleteProposal": "proposed deletion",
       "suffix": "for your review."
     },
+    "noContent": "No content yet",
     "placeholder": "Start typing here — no need for a title first, no need to pick a folder...",
     "leafRow": {
       "confidence": "AI confidence {{pct}}%",

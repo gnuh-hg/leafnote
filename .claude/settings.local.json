@@ -104,7 +104,19 @@
       "Bash(.venv/Scripts/python.exe -m scripts.check_env)",
       "Bash(.venv/Scripts/python.exe -m alembic upgrade head)",
       "Bash(.venv/Scripts/python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000)",
-      "Bash(taskkill //F //IM python.exe //FI \"WINDOWTITLE eq *\")"
+      "Bash(taskkill //F //IM python.exe //FI \"WINDOWTITLE eq *\")",
+      "Bash(npm view *)",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('editor', {}\\), ensure_ascii=False, indent=2\\)\\)\")",
+      "Bash(.venv/Scripts/alembic.exe current *)",
+      "Bash(.venv/Scripts/alembic.exe upgrade *)",
+      "Bash(.venv/Scripts/python.exe -c ' *)",
+      "Bash(Invoke-WebRequest http://localhost:8000/health -TimeoutSec 3)",
+      "Bash(Select-Object StatusCode, StatusDescription)",
+      "Bash(./venv/Scripts/python.exe -c \"from app.core.auth import get_current_user_id, get_current_user; from app.core.database import engine; from app.api.v1.routes import notes, tags; print\\('OK'\\)\")",
+      "PowerShell(git show 33cc57a:frontend/src/pages/NoteEditor.tsx > C:\\\\Users\\\\admin\\\\AppData\\\\Local\\\\Temp\\\\old_NoteEditor.tsx; \\(Get-Item C:\\\\Users\\\\admin\\\\AppData\\\\Local\\\\Temp\\\\old_NoteEditor.tsx\\).Length)",
+      "Bash(gh api *)",
+      "PowerShell(gh api *)",
+      "Bash(Select-Object -Property Name, Length)"
     ]
   }
 }

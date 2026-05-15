@@ -44,47 +44,72 @@ def _find_key(jwks: dict, kid: str | None) -> dict | None:
     return next((k for k in jwks.get("keys", []) if k.get("kid") == kid), None)
 
 
-async def get_current_user(
+async def _verify_jwt(token: str) -> dict:
+    issuer = f"{settings.SUPABASE_URL}/auth/v1"
+    header = jwt.get_unverified_header(token)
+    alg = header.get("alg", "HS256")
+
+    if alg == "ES256":
+        kid = header.get("kid")
+        jwks = await _get_jwks()
+        key_data = _find_key(jwks, kid)
+        if key_data is None:
+            jwks = await _get_jwks(force_refresh=True)
+            key_data = _find_key(jwks, kid)
+        if key_data is None:
+            raise JWTError("Unknown signing key")
+        return jwt.decode(
+            token,
+            jwk.construct(key_data),
+            algorithms=["ES256"],
+            audience="authenticated",
+            issuer=issuer,
+        )
+    if alg == "HS256":
+        return jwt.decode(
+            token,
+            settings.SUPABASE_JWT_SECRET,
+            algorithms=["HS256"],
+            audience="authenticated",
+            issuer=issuer,
+        )
+    raise JWTError(f"Unsupported alg: {alg}")
+
+
+# In-memory cache of users known to have a row in the DB. Lets hot paths
+# skip the SELECT-or-INSERT round-trip after the first request per user.
+# Process-local; warms naturally per worker.
+_known_user_ids: set[UUID] = set()
+
+
+async def get_current_user_id(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: AsyncSession = Depends(get_db),
-) -> User:
-    token = credentials.credentials
-    issuer = f"{settings.SUPABASE_URL}/auth/v1"
+) -> UUID:
     try:
-        header = jwt.get_unverified_header(token)
-        alg = header.get("alg", "HS256")
-
-        if alg == "ES256":
-            kid = header.get("kid")
-            jwks = await _get_jwks()
-            key_data = _find_key(jwks, kid)
-            if key_data is None:
-                # Key may have just rotated — refresh once and retry.
-                jwks = await _get_jwks(force_refresh=True)
-                key_data = _find_key(jwks, kid)
-            if key_data is None:
-                raise JWTError("Unknown signing key")
-            payload = jwt.decode(
-                token,
-                jwk.construct(key_data),
-                algorithms=["ES256"],
-                audience="authenticated",
-                issuer=issuer,
-            )
-        elif alg == "HS256":
-            payload = jwt.decode(
-                token,
-                settings.SUPABASE_JWT_SECRET,
-                algorithms=["HS256"],
-                audience="authenticated",
-                issuer=issuer,
-            )
-        else:
-            raise JWTError(f"Unsupported alg: {alg}")
-
+        payload = await _verify_jwt(credentials.credentials)
         user_id = UUID(payload["sub"])
         email = payload.get("email", "")
     except (JWTError, KeyError, ValueError):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-    return await auth_service.get_or_create_user(db, user_id, email)
+    if user_id not in _known_user_ids:
+        await auth_service.get_or_create_user(db, user_id, email)
+        _known_user_ids.add(user_id)
+    return user_id
+
+
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: AsyncSession = Depends(get_db),
+) -> User:
+    try:
+        payload = await _verify_jwt(credentials.credentials)
+        user_id = UUID(payload["sub"])
+        email = payload.get("email", "")
+    except (JWTError, KeyError, ValueError):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+    user = await auth_service.get_or_create_user(db, user_id, email)
+    _known_user_ids.add(user_id)
+    return user

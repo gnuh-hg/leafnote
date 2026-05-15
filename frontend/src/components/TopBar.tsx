@@ -45,10 +45,10 @@ export default function TopBar() {
       <div className="flex items-center gap-1.5 sm:gap-2">
         <button
           onClick={() => i18n.changeLanguage(i18n.language === 'vi' ? 'en' : 'vi')}
-          className="hidden sm:flex px-2 py-1 rounded-lg hover:bg-paper-200 dark:hover:bg-ink-850 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition text-[11px] font-medium tracking-wide"
+          className="flex px-2 py-1 rounded-lg hover:bg-paper-200 dark:hover:bg-ink-850 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition text-[11px] font-medium tracking-wide"
           title={i18n.language === 'vi' ? 'Switch to English' : 'Chuyển sang tiếng Việt'}
         >
-          {i18n.language === 'vi' ? 'VI' : 'EN'}
+          {i18n.language === 'vi' ? 'EN' : 'VI'}
         </button>
         <button
           onClick={toggleTheme}
@@ -66,7 +66,7 @@ export default function TopBar() {
         </button>
         <button
           onClick={() => navigate('/note/new')}
-          className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-medium transition shadow-lg shadow-emerald-500/20"
+          className="hidden md:flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-medium transition shadow-lg shadow-emerald-500/20"
         >
           <Plus className="w-4 h-4" />
           <span className="hidden sm:inline">{t('topbar.newNote')}</span>

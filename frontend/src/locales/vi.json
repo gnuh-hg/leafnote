@@ -1,4 +1,10 @@
 {
+  "common": {
+    "loading": "Đang tải...",
+    "comingSoon": "Sắp ra mắt",
+    "close": "Đóng",
+    "dismiss": "Đóng"
+  },
   "bottomNav": {
     "more": "Thêm"
   },
@@ -136,6 +142,15 @@
       "viewContext": "Xem ngữ cảnh →"
     }
   },
+  "notes": {
+    "mobile": {
+      "back": "Quay lại",
+      "openInsights": "Leaves & Insights",
+      "tabLeaves": "Lá",
+      "tabInsights": "Phân tích",
+      "tabEngine": "Engine"
+    }
+  },
   "notesList": {
     "count": "{{filtered}}/{{total}} ghi chú",
     "filterInfo": "lọc theo {{count}} tag (AND)",
@@ -160,6 +175,11 @@
     "open": "Mở →"
   },
   "editor": {
+    "creating": "Đang tạo note mới...",
+    "saving": "Đang lưu...",
+    "delete": "Xoá note",
+    "deleteConfirm": "Xoá note này? Hành động không thể hoàn tác.",
+    "notFound": "Không tìm thấy note. Có thể đã bị xoá.",
     "savedAt": "Đã lưu lúc {{time}}",
     "leafCount": "{{count}} lá được tách",
     "newNote": "Note mới · auto-save 2s/lần",
@@ -179,7 +199,9 @@
     },
     "viewGraph": "Xem graph",
     "save": "Lưu & phân rã",
+    "saveShortcut": "Lưu (Ctrl+S)",
     "saveAgain": "Lưu & phân rã lại",
+    "unsavedConfirm": "Bạn có thay đổi chưa lưu. Rời trang?",
     "freshBanner": {
       "title": "AI vừa phân rã {{count}} lá từ note này",
       "description": "Bạn duyệt phía dưới — giữ, sửa, gộp, tách hoặc bỏ từng lá. Quyết định cuối là của bạn."
@@ -201,11 +223,16 @@
       "emptyDescription": "Cứ gõ tự nhiên — sau khi bạn bấm Lưu & phân rã, AI sẽ tách lá và hiện tại đây để bạn duyệt."
     },
     "insights": {
-      "title": "AI phát hiện"
+      "title": "AI phát hiện",
+      "empty": "Chưa có phân tích nào"
     },
     "legend": {
-      "readMode": "Highlight",
-      "editMode": "Bạn sửa, AI sẽ tách lại"
+      "readMode": "Làm nổi bật",
+      "editMode": "Bạn sửa, AI sẽ tách lại",
+      "definition": "Định nghĩa",
+      "clause": "Mệnh đề",
+      "relation": "Quan hệ",
+      "fact": "Dữ kiện"
     },
     "toolbar": {
       "record": "Ghi âm",
@@ -230,6 +257,7 @@
       "deleteProposal": "đề xuất xoá",
       "suffix": "để bạn xác nhận."
     },
+    "noContent": "Chưa có nội dung",
     "placeholder": "Bắt đầu gõ ở đây — không cần đặt tiêu đề trước, không cần chọn thư mục...",
     "leafRow": {
       "confidence": "AI tin {{pct}}%",

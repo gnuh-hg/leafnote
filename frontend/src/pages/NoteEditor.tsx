@@ -1,70 +1,276 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useQueryClient } from '@tanstack/react-query'
 import {
-  Leaf,
-  Sparkles,
-  Plus,
-  AlertTriangle,
-  GitMerge,
-  Link2,
-  CheckCircle2,
-  CircleDashed,
-  Layers,
-  Eye,
-  Pencil,
-  Cpu,
-  User,
-  Edit2,
-  Trash2,
-  Split,
-  Wand2,
   RefreshCw,
   X,
   Tag as TagIcon,
+  Check,
+  ArrowLeft,
+  CheckCircle2,
+  Trash2,
+  Loader2,
+  Eye,
+  Pencil,
+  Layers,
+  Plus,
+  Sparkles,
   Mic,
   Image as ImageIcon,
+  Wand2,
   Square,
-  Check,
 } from 'lucide-react'
-import { decompositionDemo, notes as allNotes } from '../data/mockData'
-import type { DecompositionDemo, DetectedLeaf } from '../data/mockData'
-import { TYPE_STYLES } from '../components/LeafCard'
+import PlainEditor from '../components/editor/PlainEditor'
+import MobileInsightSheet from '../components/MobileInsightSheet'
 import { useTags } from '../hooks/useTags'
-import { COLOR_DOT } from '../services/tags'
+import { COLOR_DOT, type TagOut } from '../services/tags'
+import {
+  useCreateNote,
+  useDeleteNote,
+  useNote,
+  useUpdateNote,
+} from '../hooks/useNotes'
 
 export default function NoteEditor() {
+  const { id: routeId } = useParams()
+  const isNewRoute = routeId === 'new'
+  if (isNewRoute) return <NewNoteEditor />
+  return <ExistingNoteEditor noteId={routeId as string} />
+}
+
+function NewNoteEditor() {
   const { t } = useTranslation()
-  const { id } = useParams()
   const navigate = useNavigate()
-  const isNew = id === 'new'
-  const [searchParams, setSearchParams] = useSearchParams()
-  const initialInput = searchParams.get('input')
-  const isFresh = searchParams.get('fresh') === '1'
-
+  const qc = useQueryClient()
   const { data: tags = [] } = useTags()
+  const createNote = useCreateNote()
 
-  const note = decompositionDemo
-  const sourceNote = isNew
-    ? null
-    : allNotes.find((n) => n.id === id) ??
-      allNotes.find((n) => n.id === note.noteId)
-
-  const plainBody = note.body
-    .map((b) => b.segments.map((s) => s.text).join(''))
-    .join('\n\n')
-
-  const [activeLeaf, setActiveLeaf] = useState<string | null>(null)
-  const [mode, setMode] = useState<'read' | 'edit'>(isNew ? 'edit' : 'read')
+  const [title, setTitle] = useState('')
+  const [body, setBody] = useState('')
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([])
   const [dirty, setDirty] = useState(false)
-  const [draft, setDraft] = useState(isNew ? '' : plainBody)
-  const [title, setTitle] = useState(isNew ? '' : note.title)
-  const [showFreshBanner, setShowFreshBanner] = useState(isFresh)
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
-    sourceNote?.tagIds ? [...sourceNote.tagIds] : [],
+
+  const onSave = useCallback(() => {
+    if (createNote.isPending) return
+    createNote.mutate(
+      { title, body, tag_ids: selectedTagIds },
+      {
+        onSuccess: (note) => {
+          qc.setQueryData(['note', note.id], note)
+          navigate(`/note/${note.id}?fresh=1`, { replace: true })
+        },
+      },
+    )
+  }, [body, createNote, navigate, qc, selectedTagIds, title])
+
+  useUnsavedGuard(dirty)
+  useSaveShortcut(onSave, dirty)
+
+  return (
+    <EditorShell
+      t={t}
+      isNew
+      title={title}
+      onTitleChange={(v) => {
+        setTitle(v)
+        setDirty(true)
+      }}
+      tags={tags}
+      selectedTagIds={selectedTagIds}
+      toggleTag={(tid) => {
+        setSelectedTagIds((prev) =>
+          prev.includes(tid) ? prev.filter((x) => x !== tid) : [...prev, tid],
+        )
+        setDirty(true)
+      }}
+      saving={createNote.isPending}
+      savedAt={null}
+      dirty={dirty}
+      onSave={onSave}
+      onDelete={null}
+      body={body}
+      onBodyChange={(val) => {
+        setBody(val)
+        setDirty(true)
+      }}
+    />
   )
+}
+
+function ExistingNoteEditor({ noteId }: { noteId: string }) {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const { data: tags = [] } = useTags()
+  const { data: note, isLoading, isError } = useNote(noteId)
+  const update = useUpdateNote(noteId)
+  const deleteNote = useDeleteNote()
+
+  const [title, setTitle] = useState('')
+  const [body, setBody] = useState('')
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([])
+  const [savedAt, setSavedAt] = useState<Date | null>(null)
+  const [dirty, setDirty] = useState(false)
+  const hydratedFor = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (!note) return
+    if (hydratedFor.current === note.id) return
+    hydratedFor.current = note.id
+    setTitle(note.title)
+    setSelectedTagIds(note.tag_ids)
+    setSavedAt(new Date(note.updated_at))
+    setBody(note.body)
+    setDirty(false)
+  }, [note])
+
+  const onSave = useCallback(() => {
+    if (!dirty || update.isPending) return
+    update.mutate(
+      { title, body, tag_ids: selectedTagIds },
+      {
+        onSuccess: () => {
+          setSavedAt(new Date())
+          setDirty(false)
+        },
+      },
+    )
+  }, [body, dirty, selectedTagIds, title, update])
+
+  useUnsavedGuard(dirty)
+  useSaveShortcut(onSave, dirty)
+
+  const onDelete = () => {
+    if (!window.confirm(t('editor.deleteConfirm'))) return
+    deleteNote.mutate(noteId, {
+      onSuccess: () => {
+        setDirty(false)
+        navigate('/notes', { replace: true })
+      },
+    })
+  }
+
+  if (isLoading) {
+    return (
+      <div className="px-4 sm:px-8 py-12 max-w-[800px] mx-auto text-center text-zinc-500">
+        <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
+        {t('common.loading')}
+      </div>
+    )
+  }
+  if (isError || !note) {
+    return (
+      <div className="px-4 sm:px-8 py-12 max-w-[800px] mx-auto text-center text-zinc-500">
+        {t('editor.notFound')}
+      </div>
+    )
+  }
+
+  return (
+    <EditorShell
+      t={t}
+      isNew={false}
+      title={title}
+      onTitleChange={(v) => {
+        setTitle(v)
+        setDirty(true)
+      }}
+      tags={tags}
+      selectedTagIds={selectedTagIds}
+      toggleTag={(tid) => {
+        setSelectedTagIds((prev) =>
+          prev.includes(tid) ? prev.filter((x) => x !== tid) : [...prev, tid],
+        )
+        setDirty(true)
+      }}
+      saving={update.isPending}
+      savedAt={savedAt}
+      dirty={dirty}
+      onSave={onSave}
+      onDelete={onDelete}
+      body={body}
+      onBodyChange={(val) => {
+        setBody(val)
+        setDirty(true)
+      }}
+    />
+  )
+}
+
+function useUnsavedGuard(dirty: boolean) {
+  useEffect(() => {
+    if (!dirty) return
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [dirty])
+}
+
+function useSaveShortcut(onSave: () => void, enabled: boolean) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault()
+        if (enabled) onSave()
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [enabled, onSave])
+}
+
+interface EditorShellProps {
+  t: any
+  isNew: boolean
+  title: string
+  onTitleChange: (v: string) => void
+  tags: TagOut[]
+  selectedTagIds: string[]
+  toggleTag: (id: string) => void
+  saving: boolean
+  savedAt: Date | null
+  dirty: boolean
+  onSave: () => void
+  onDelete: (() => void) | null
+  body: string
+  onBodyChange: (val: string) => void
+}
+
+function EditorShell({
+  t,
+  isNew,
+  title,
+  onTitleChange,
+  tags,
+  selectedTagIds,
+  toggleTag,
+  saving,
+  savedAt,
+  dirty,
+  onSave,
+  onDelete,
+  body,
+  onBodyChange,
+}: EditorShellProps) {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [tagPickerOpen, setTagPickerOpen] = useState(false)
+  const [mode, setMode] = useState<'read' | 'edit'>(isNew ? 'edit' : 'read')
+  const [showFreshBanner, setShowFreshBanner] = useState(searchParams.get('fresh') === '1')
+  const [voiceState, setVoiceState] = useState<'idle' | 'recording' | 'done'>('idle')
+  const [imagePanelOpen, setImagePanelOpen] = useState(false)
+  const [insightSheetOpen, setInsightSheetOpen] = useState(false)
+  const navigate = useNavigate()
   const pickerRef = useRef<HTMLDivElement>(null)
+
+  const dismissFreshBanner = () => {
+    setShowFreshBanner(false)
+    const next = new URLSearchParams(searchParams)
+    next.delete('fresh')
+    setSearchParams(next, { replace: true })
+  }
 
   useEffect(() => {
     if (!tagPickerOpen) return
@@ -76,103 +282,117 @@ export default function NoteEditor() {
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [tagPickerOpen])
-  const [voiceState, setVoiceState] = useState<'idle' | 'recording' | 'done'>(
-    initialInput === 'voice' ? 'recording' : 'idle',
-  )
-  const [imagePanelOpen, setImagePanelOpen] = useState(initialInput === 'image')
 
-  useEffect(() => {
-    if (initialInput) {
-      const next = new URLSearchParams(searchParams)
-      next.delete('input')
-      setSearchParams(next, { replace: true })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const tagById = (tid: string) => tags.find((tg) => tg.id === tid)
+  const tagById = useCallback((tid: string) => tags.find((tg) => tg.id === tid), [tags])
   const selectedTags = useMemo(
-    () => selectedTagIds.map(tagById).filter(Boolean),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedTagIds, tags],
+    () => selectedTagIds.map(tagById).filter((tg): tg is TagOut => !!tg),
+    [selectedTagIds, tagById],
   )
-
-  const toggleTag = (tid: string) => {
-    setSelectedTagIds((prev) =>
-      prev.includes(tid) ? prev.filter((x) => x !== tid) : [...prev, tid],
-    )
-    setDirty(true)
-  }
-
-  const handleSave = () => {
-    setDirty(false)
-    if (isNew) {
-      navigate(`/note/${note.noteId}?fresh=1`)
-    }
-  }
 
   return (
-    <div className="px-4 sm:px-8 py-6 sm:py-8 max-w-[1500px] mx-auto">
+    <div className="px-4 sm:px-8 py-4 sm:py-8 pb-24 md:pb-8 max-w-[1500px] mx-auto">
       {showFreshBanner && (
         <div className="mb-5 rounded-xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-transparent p-3.5 flex items-start gap-3 animate-fade-in">
           <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center shrink-0">
-            <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-300 animate-pulse-soft" />
+            <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-300" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-[13px] font-medium text-emerald-900 dark:text-emerald-100 mb-0.5">
-              {t('editor.freshBanner.title', { count: note.detectedLeaves.length })}
+              {t('editor.freshBanner.title', { count: 0 })}
             </div>
-            <div className="text-[11.5px] text-zinc-400">
+            <div className="text-[11.5px] text-zinc-500 dark:text-zinc-400">
               {t('editor.freshBanner.description')}
             </div>
           </div>
           <button
-            onClick={() => {
-              setShowFreshBanner(false)
-              const next = new URLSearchParams(searchParams)
-              next.delete('fresh')
-              setSearchParams(next, { replace: true })
-            }}
+            onClick={dismissFreshBanner}
             className="p-1 rounded text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-paper-200 dark:hover:bg-ink-800 shrink-0"
+            aria-label={t('common.dismiss')}
           >
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex items-start justify-between mb-6 gap-4 flex-wrap sm:flex-nowrap">
+      {/* Mobile compact action bar */}
+      <div className="flex items-center gap-2 mb-3 md:hidden">
+        <button
+          onClick={() => navigate(-1)}
+          className="p-2 -ml-1 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-paper-200 dark:hover:bg-ink-800 transition shrink-0"
+          aria-label={t('notes.mobile.back')}
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </button>
+        <div className="flex-1 min-w-0 text-[11px] text-zinc-500 truncate">
+          {saving ? (
+            <span className="flex items-center gap-1 text-amber-500">
+              <RefreshCw className="w-3 h-3 animate-spin" />
+              {t('editor.saving')}
+            </span>
+          ) : dirty ? (
+            <span className="flex items-center gap-1 text-amber-500">
+              <RefreshCw className="w-3 h-3" />
+              {t('editor.unsaved')}
+            </span>
+          ) : savedAt ? (
+            <span className="flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+              {t('editor.savedAt', { time: savedAt.toLocaleTimeString() })}
+            </span>
+          ) : isNew ? (
+            <span className="flex items-center gap-1 text-emerald-500">
+              <Plus className="w-3 h-3" />
+              {t('editor.newNote')}
+            </span>
+          ) : null}
+        </div>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            onClick={onSave}
+            disabled={(!isNew && !dirty) || saving}
+            className="px-3 py-1.5 rounded-lg text-[12px] font-medium flex items-center gap-1.5 transition bg-emerald-500 hover:bg-emerald-400 text-white disabled:bg-paper-200 dark:disabled:bg-ink-800 disabled:text-zinc-500 disabled:cursor-not-allowed shadow-sm shadow-emerald-500/20 disabled:shadow-none"
+          >
+            <RefreshCw className={`w-3 h-3 ${saving ? 'animate-spin' : ''}`} />
+            {isNew ? t('editor.save') : t('editor.saveAgain')}
+          </button>
+          {onDelete && (
+            <button
+              onClick={onDelete}
+              className="p-2 rounded-lg text-zinc-500 hover:text-rose-500 hover:bg-rose-500/10 transition"
+              title={t('editor.delete')}
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-start justify-between mb-6 gap-4 flex-wrap lg:flex-nowrap">
         <div className="min-w-0 flex-1">
-          {/* Meta row */}
-          <div className="flex items-center gap-2 text-xs mb-2 flex-wrap">
-            {!isNew && (
-              <>
-                <span className="text-zinc-500">{t('editor.savedAt', { time: '14:32' })}</span>
-                <span className="text-zinc-700">·</span>
-                <span className="text-zinc-500 flex items-center gap-1">
-                  <Leaf className="w-3 h-3" />
-                  {t('editor.leafCount', { count: note.detectedLeaves.length })}
-                </span>
-              </>
-            )}
-            {isNew && (
-              <span className="text-emerald-300 flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-2 text-xs mb-2 flex-wrap text-zinc-500">
+            {saving ? (
+              <span className="flex items-center gap-1 text-amber-500">
+                <RefreshCw className="w-3 h-3 animate-spin" />
+                {t('editor.saving')}
+              </span>
+            ) : dirty ? (
+              <span className="flex items-center gap-1 text-amber-500">
+                <RefreshCw className="w-3 h-3" />
+                {t('editor.unsaved')}
+              </span>
+            ) : savedAt ? (
+              <span className="flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                {t('editor.savedAt', { time: savedAt.toLocaleTimeString() })}
+              </span>
+            ) : isNew ? (
+              <span className="flex items-center gap-1 text-emerald-500">
                 <Plus className="w-3 h-3" />
                 {t('editor.newNote')}
               </span>
-            )}
-            {dirty && !isNew && (
-              <>
-                <span className="text-zinc-700">·</span>
-                <span className="text-amber-300 flex items-center gap-1 animate-pulse-soft">
-                  <RefreshCw className="w-3 h-3" />
-                  {t('editor.unsaved')}
-                </span>
-              </>
-            )}
+            ) : null}
           </div>
 
-          {/* Title */}
           {mode === 'read' ? (
             <h1 className="font-serif text-2xl sm:text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
               {title || <span className="text-zinc-400">{t('editor.untitled')}</span>}
@@ -180,38 +400,30 @@ export default function NoteEditor() {
           ) : (
             <input
               value={title}
-              onChange={(e) => {
-                setTitle(e.target.value)
-                setDirty(true)
-              }}
-              autoFocus={isNew && !initialInput}
+              onChange={(e) => onTitleChange(e.target.value)}
               placeholder={isNew ? t('editor.titlePlaceholderNew') : t('editor.titlePlaceholder')}
-              className="font-serif text-2xl sm:text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 bg-transparent w-full focus:outline-none border-b border-dashed border-paper-300 dark:border-ink-700/60 focus:border-emerald-500/40 pb-1 placeholder:text-zinc-400 dark:placeholder:text-zinc-700"
+              className="font-serif text-2xl sm:text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 bg-transparent w-full focus:outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-700 border-b border-dashed border-paper-300 dark:border-ink-700/60 focus:border-emerald-500/40 pb-1"
             />
           )}
 
-          {/* Tag chips row */}
           <div className="mt-3 flex items-center gap-1.5 flex-wrap relative">
-            {selectedTags.map((tg) => {
-              if (!tg) return null
-              return (
-                <span
-                  key={tg.id}
-                  className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11.5px] bg-paper-100 dark:bg-ink-850 border border-paper-300/40 dark:border-ink-700/40 text-zinc-700 dark:text-zinc-200"
+            {selectedTags.map((tg) => (
+              <span
+                key={tg.id}
+                className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11.5px] bg-paper-100 dark:bg-ink-850 border border-paper-300/40 dark:border-ink-700/40 text-zinc-700 dark:text-zinc-200"
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${COLOR_DOT[tg.color] ?? 'bg-indigo-400'}`} />
+                <span className="text-zinc-500">#</span>
+                {tg.name}
+                <button
+                  onClick={() => toggleTag(tg.id)}
+                  className="ml-0.5 text-zinc-600 hover:text-rose-300"
+                  title={t('editor.removeTag')}
                 >
-                  <span className={`w-1.5 h-1.5 rounded-full ${COLOR_DOT[tg.color] ?? 'bg-indigo-400'}`} />
-                  <span className="text-zinc-500">#</span>
-                  {tg.name}
-                  <button
-                    onClick={() => toggleTag(tg.id)}
-                    className="ml-0.5 text-zinc-600 hover:text-rose-300"
-                    title={t('editor.removeTag')}
-                  >
-                    <X className="w-2.5 h-2.5" />
-                  </button>
-                </span>
-              )
-            })}
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </span>
+            ))}
             <button
               onClick={() => setTagPickerOpen((v) => !v)}
               className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11.5px] border border-dashed border-paper-300/60 dark:border-ink-700/60 text-zinc-500 hover:text-emerald-600 hover:border-emerald-500/40 transition"
@@ -220,8 +432,47 @@ export default function NoteEditor() {
               {selectedTags.length === 0 ? t('editor.addTag') : t('editor.editTag')}
             </button>
 
+            {/* Mobile mode toggle — inline in tags row */}
+            {!isNew && (
+              <div className="flex md:hidden ml-auto p-0.5 rounded-lg bg-paper-200 dark:bg-ink-850 border border-paper-300/60 dark:border-ink-700/60">
+                <button
+                  onClick={() => {
+                    if (mode === 'edit' && dirty && !saving) onSave()
+                    setMode('read')
+                  }}
+                  disabled={saving}
+                  className={`px-2.5 py-1 rounded text-[11px] font-medium flex items-center gap-1 transition disabled:cursor-not-allowed ${
+                    mode === 'read'
+                      ? 'bg-paper-300 dark:bg-ink-800 text-zinc-900 dark:text-zinc-100'
+                      : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                  }`}
+                >
+                  {saving && mode === 'edit' ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Eye className="w-3 h-3" />
+                  )}
+                  {t('editor.mode.read')}
+                </button>
+                <button
+                  onClick={() => setMode('edit')}
+                  className={`px-2.5 py-1 rounded text-[11px] font-medium flex items-center gap-1 transition ${
+                    mode === 'edit'
+                      ? 'bg-paper-300 dark:bg-ink-800 text-zinc-900 dark:text-zinc-100'
+                      : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                  }`}
+                >
+                  <Pencil className="w-3 h-3" />
+                  {t('editor.mode.edit')}
+                </button>
+              </div>
+            )}
+
             {tagPickerOpen && (
-              <div ref={pickerRef} className="absolute left-0 top-full mt-1 z-30 card-surface bg-paper-50 dark:bg-ink-900 shadow-2xl py-1 w-72 max-h-72 overflow-y-auto animate-fade-in">
+              <div
+                ref={pickerRef}
+                className="absolute left-0 top-full mt-1 z-30 card-surface bg-paper-50 dark:bg-ink-900 shadow-2xl py-1 w-72 max-h-72 overflow-y-auto animate-fade-in"
+              >
                 <div className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-zinc-500 font-medium border-b border-paper-300/60 dark:border-ink-700/60 flex items-center justify-between">
                   <span>{t('editor.tagPicker.title')}</span>
                   <button
@@ -234,12 +485,6 @@ export default function NoteEditor() {
                 {tags.length === 0 && (
                   <div className="px-3 py-4 text-center">
                     <p className="text-[12px] text-zinc-500">{t('tagPicker.empty')}</p>
-                    <button
-                      onClick={() => setTagPickerOpen(false)}
-                      className="mt-1 text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline"
-                    >
-                      {t('tagPicker.emptyCreate')}
-                    </button>
                   </div>
                 )}
                 {tags.map((tg) => {
@@ -270,19 +515,27 @@ export default function NoteEditor() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="hidden md:flex items-center gap-2 shrink-0 flex-wrap">
           {!isNew && (
             <div className="flex p-0.5 rounded-lg bg-paper-200 dark:bg-ink-850 border border-paper-300/60 dark:border-ink-700/60">
               <button
-                onClick={() => setMode('read')}
-                className={`px-2.5 py-1 rounded text-[11px] font-medium flex items-center gap-1.5 transition ${
+                onClick={() => {
+                  if (mode === 'edit' && dirty && !saving) onSave()
+                  setMode('read')
+                }}
+                disabled={saving}
+                className={`px-2.5 py-1 rounded text-[11px] font-medium flex items-center gap-1.5 transition disabled:cursor-not-allowed ${
                   mode === 'read'
                     ? 'bg-paper-300 dark:bg-ink-800 text-zinc-900 dark:text-zinc-100'
                     : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
                 }`}
               >
-                <Eye className="w-3 h-3" />
-                <span className="hidden sm:inline">{t('editor.mode.read')}</span>
+                {saving && mode === 'edit' ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <Eye className="w-3 h-3" />
+                )}
+                {t('editor.mode.read')}
               </button>
               <button
                 onClick={() => setMode('edit')}
@@ -293,562 +546,307 @@ export default function NoteEditor() {
                 }`}
               >
                 <Pencil className="w-3 h-3" />
-                <span className="hidden sm:inline">{t('editor.mode.edit')}</span>
+                {t('editor.mode.edit')}
               </button>
             </div>
           )}
-          {!isNew && (
-            <button className="px-3 py-1.5 rounded-lg text-xs text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-paper-200 dark:hover:bg-ink-850 transition">
-              {t('editor.viewGraph')}
+          <button
+            onClick={onSave}
+            disabled={(!isNew && !dirty) || saving}
+            className="p-1.5 sm:px-3 sm:py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition shadow-lg shadow-emerald-500/20 bg-emerald-500 hover:bg-emerald-400 text-white disabled:bg-paper-200 dark:disabled:bg-ink-800 disabled:text-zinc-500 disabled:cursor-not-allowed disabled:shadow-none"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${saving ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">{isNew ? t('editor.save') : t('editor.saveAgain')}</span>
+          </button>
+          {onDelete && (
+            <button
+              onClick={onDelete}
+              className="p-1.5 sm:px-3 sm:py-1.5 rounded-lg text-xs text-zinc-500 hover:text-rose-500 hover:bg-rose-500/10 transition flex items-center gap-1.5"
+              title={t('editor.delete')}
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{t('editor.delete')}</span>
             </button>
           )}
-          <button
-            onClick={handleSave}
-            className="px-3 py-1.5 rounded-lg text-xs bg-emerald-500 hover:bg-emerald-400 text-white font-medium transition flex items-center gap-1.5 shadow-lg shadow-emerald-500/20"
-          >
-            <RefreshCw className="w-3 h-3" />
-            {isNew ? t('editor.save') : t('editor.saveAgain')}
-          </button>
         </div>
       </div>
 
       <div className="grid grid-cols-12 gap-6">
-        {/* Note body */}
-        <div className="col-span-12 lg:col-span-7 card-surface p-4 sm:p-8 bg-paper-50/60 dark:bg-ink-900/40">
+        <div className="col-span-12 lg:col-span-7 card-surface p-3 sm:p-8 bg-paper-50/60 dark:bg-ink-900/40 min-h-[500px]">
           {mode === 'edit' && (
-            <InputToolbar
-              onVoice={() => setVoiceState('recording')}
-              onImage={() => setImagePanelOpen(true)}
-            />
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-paper-300/40 dark:border-ink-700/40">
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setVoiceState('recording')}
+                  className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[11.5px] text-zinc-500 hover:text-emerald-600 hover:bg-paper-200 dark:hover:bg-ink-850 transition"
+                >
+                  <Mic className="w-3 h-3" />
+                  {t('editor.toolbar.record')}
+                </button>
+                <button
+                  onClick={() => setImagePanelOpen(true)}
+                  className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[11.5px] text-zinc-500 hover:text-emerald-600 hover:bg-paper-200 dark:hover:bg-ink-850 transition"
+                >
+                  <ImageIcon className="w-3 h-3" />
+                  {t('editor.toolbar.image')}
+                </button>
+                <button className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[11.5px] text-zinc-500 hover:text-emerald-600 hover:bg-paper-200 dark:hover:bg-ink-850 transition">
+                  <Wand2 className="w-3 h-3" />
+                  {t('editor.toolbar.aiTitle')}
+                </button>
+              </div>
+              <div className="text-[10.5px] text-zinc-500 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                {t('editor.toolbar.autosave')}
+              </div>
+            </div>
           )}
 
           {mode === 'edit' && voiceState !== 'idle' && (
-            <VoicePanel
-              state={voiceState}
-              setState={setVoiceState}
-              onTranscript={(text: string) => {
-                setDraft((prev) => (prev ? prev + '\n\n' + text : text))
-                setDirty(true)
-                setVoiceState('idle')
-              }}
-            />
+            <div className="mb-4 rounded-xl border border-rose-500/30 bg-rose-500/5 p-4 animate-fade-in">
+              <div className="flex items-center gap-3">
+                {voiceState === 'recording' ? (
+                  <button
+                    onClick={() => setVoiceState('done')}
+                    className="w-10 h-10 rounded-full bg-rose-500 flex items-center justify-center shadow-lg shadow-rose-500/30 animate-pulse hover:scale-105 transition shrink-0"
+                  >
+                    <Square className="w-3.5 h-3.5 text-white fill-white" />
+                  </button>
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-paper-200 dark:bg-ink-800 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="text-[12.5px] font-medium text-zinc-800 dark:text-zinc-100 mb-0.5">
+                    {voiceState === 'recording' ? t('editor.voice.recording') : t('editor.voice.done')}
+                  </div>
+                  <div className="text-[10.5px] text-zinc-500">
+                    {voiceState === 'recording' ? '00:12' : t('editor.voice.insertHint')}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {voiceState === 'done' && (
+                    <button
+                      onClick={() => {
+                        onBodyChange(body + '\n\n' + '[Voice transcript]...')
+                        setVoiceState('idle')
+                      }}
+                      className="px-2.5 py-1 rounded-md text-[11px] bg-emerald-500 hover:bg-emerald-400 text-white font-medium transition"
+                    >
+                      {t('editor.voice.insert')}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setVoiceState('idle')}
+                    className="p-1 rounded text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-paper-200 dark:hover:bg-ink-800"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
 
           {mode === 'edit' && imagePanelOpen && (
-            <ImagePanel onClose={() => setImagePanelOpen(false)} />
+            <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 animate-fade-in">
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-[12px] font-medium text-zinc-800 dark:text-zinc-100 flex items-center gap-2">
+                  <ImageIcon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-300" />
+                  {t('editor.image.title')}
+                </div>
+                <button
+                  onClick={() => setImagePanelOpen(false)}
+                  className="p-1 rounded text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-paper-200 dark:hover:bg-ink-800"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <div className="rounded-lg border-2 border-dashed border-paper-300 dark:border-ink-700 hover:border-emerald-500/40 transition p-6 text-center cursor-pointer bg-paper-100/40 dark:bg-ink-850/40">
+                <Plus className="w-4 h-4 text-zinc-400 mx-auto mb-1.5" />
+                <p className="text-[12px] text-zinc-600 dark:text-zinc-300">{t('editor.image.dropHint')}</p>
+                <p className="text-[10.5px] text-zinc-500 mt-0.5">{t('editor.image.formats')}</p>
+              </div>
+            </div>
           )}
 
           {mode === 'read' ? (
-            <ReadBody note={note} activeLeaf={activeLeaf} setActiveLeaf={setActiveLeaf} />
+            <ReadBody body={body} t={t} />
           ) : (
-            <EditBody
-              draft={draft}
-              setDraft={(v: string) => {
-                setDraft(v)
-                setDirty(true)
-              }}
-              isNew={isNew}
-            />
-          )}
-
-          {!isNew && (
-            <div className="mt-8 pt-5 border-t border-paper-300/40 dark:border-ink-700/40 flex items-center gap-4 text-[10px] text-zinc-500 flex-wrap">
-              <span className="uppercase tracking-wider font-medium">
-                {mode === 'read' ? t('editor.legend.readMode') : t('editor.legend.editMode')}
-              </span>
-              <Legend color="rgba(129, 140, 248, 0.4)" label={t('leaf.type.definition')} />
-              <Legend color="rgba(251, 191, 36, 0.4)" label={t('leaf.type.proposition')} />
-              <Legend color="rgba(52, 211, 153, 0.4)" label={t('leaf.type.relation')} />
-              <Legend color="rgba(56, 189, 248, 0.4)" label={t('leaf.type.fact')} />
-            </div>
-          )}
-        </div>
-
-        {/* Right panel */}
-        <div className="col-span-12 lg:col-span-5 space-y-4">
-          {/* Engine status */}
-          <div className="card-surface p-4 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 border-emerald-500/20">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                <Layers className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-300" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-[13px] font-medium text-zinc-800 dark:text-zinc-100 flex items-center gap-2">
-                  {t('editor.engine.title')}
-                  {isNew ? (
-                    <span className="text-[10px] text-zinc-500 font-normal">
-                      · {t('editor.engine.waiting')}
-                    </span>
-                  ) : dirty ? (
-                    <span className="text-[10px] text-amber-300 font-normal">
-                      · {t('editor.engine.willRerun')}
-                    </span>
-                  ) : (
-                    <span className="text-[10px] text-emerald-400 font-normal">
-                      · {t('editor.engine.synced')}
-                    </span>
-                  )}
+            <div className="space-y-4">
+              <PlainEditor
+                value={body}
+                onChange={onBodyChange}
+                placeholder={t('editor.placeholder')}
+              />
+              {!isNew && (
+                <div className="mt-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 flex items-start gap-2.5">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-300 mt-0.5 shrink-0" />
+                  <div className="text-[11.5px] text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                    <span className="text-emerald-700 dark:text-emerald-200 font-medium">{t('editor.editHint.prefix')}</span>, {t('editor.editHint.body')} <span className="text-zinc-800 dark:text-zinc-100">"{t('editor.editHint.deleteProposal')}"</span> {t('editor.editHint.suffix')}
+                  </div>
                 </div>
-                <div className="text-[11px] text-zinc-500">
-                  {isNew
-                    ? t('editor.engine.descriptionNew')
-                    : t('editor.engine.descriptionDone', { newCount: 2, matchCount: 2, linkedCount: 1 })}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Detected leaves */}
-          {!isNew && (
-            <div className="card-surface p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Leaf className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                  <h3 className="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">
-                    {t('editor.leaves.title', { count: note.detectedLeaves.length })}
-                  </h3>
-                  <AiTag>{t('editor.leaves.aiReview')}</AiTag>
-                </div>
-                <button className="text-[11px] text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
-                  {t('editor.leaves.showAll')}
-                </button>
-              </div>
-              <div className="space-y-2">
-                {note.detectedLeaves.map((leaf) => (
-                  <LeafRow
-                    key={leaf.id}
-                    leaf={leaf}
-                    isActive={activeLeaf === leaf.id}
-                    onHover={setActiveLeaf}
-                  />
-                ))}
-              </div>
-              <button className="w-full mt-3 py-2 rounded-lg border border-dashed border-paper-300 dark:border-ink-700 text-[12px] text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:border-paper-400 dark:hover:border-ink-600 transition flex items-center justify-center gap-1.5">
-                <Plus className="w-3 h-3" />
-                {t('editor.leaves.addManual')}
-                <ManualTag />
-              </button>
+              )}
             </div>
           )}
+          {!isNew && <LegendRow t={t} mode={mode} />}
 
-          {/* Empty state for new note */}
-          {isNew && (
-            <div className="card-surface p-5 text-center">
-              <div className="w-10 h-10 rounded-xl bg-paper-200 dark:bg-ink-850 flex items-center justify-center mx-auto mb-2">
-                <Leaf className="w-4 h-4 text-zinc-500" />
-              </div>
-              <div className="text-[13px] text-zinc-600 dark:text-zinc-300 mb-1">
-                {t('editor.leaves.emptyTitle')}
-              </div>
-              <div className="text-[11px] text-zinc-500 leading-relaxed">
-                {t('editor.leaves.emptyDescription')}
-              </div>
-            </div>
-          )}
-
-          {/* Insights */}
-          {!isNew && (
-            <div className="card-surface p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                <h3 className="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">
-                  {t('editor.insights.title')}
-                </h3>
-                <AiTag />
-              </div>
-              <div className="space-y-2.5">
-                {note.insights.map((ins, i) => {
-                  const cfg = {
-                    related: { Icon: Link2, color: 'text-sky-600 dark:text-sky-300' },
-                    gap: { Icon: CircleDashed, color: 'text-emerald-600 dark:text-emerald-300' },
-                    conflict: { Icon: AlertTriangle, color: 'text-rose-600 dark:text-rose-300' },
-                  }[ins.kind] ?? { Icon: Link2, color: 'text-sky-600 dark:text-sky-300' }
-                  return (
-                    <div key={i} className="flex items-start gap-2.5">
-                      <cfg.Icon className={`w-3.5 h-3.5 ${cfg.color} mt-0.5 shrink-0`} />
-                      <p className="text-[12px] text-zinc-600 dark:text-zinc-300 leading-relaxed">
-                        {ins.text}
-                      </p>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* ── Input toolbar (edit mode) ─────────────────────────────────────────────── */
-
-function InputToolbar({ onVoice, onImage }: { onVoice: () => void; onImage: () => void }) {
-  const { t } = useTranslation()
-  return (
-    <div className="flex items-center justify-between mb-4 pb-3 border-b border-paper-300/40 dark:border-ink-700/40">
-      <div className="flex items-center gap-1">
-        <ToolbarBtn icon={Mic} label={t('editor.toolbar.record')} onClick={onVoice} />
-        <ToolbarBtn icon={ImageIcon} label={t('editor.toolbar.image')} onClick={onImage} />
-        <ToolbarBtn icon={Wand2} label={t('editor.toolbar.aiTitle')} />
-      </div>
-      <div className="text-[10.5px] text-zinc-500 flex items-center gap-1.5">
-        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-        {t('editor.toolbar.autosave')}
-      </div>
-    </div>
-  )
-}
-
-function ToolbarBtn({ icon: Icon, label, onClick }: {
-  icon: React.ComponentType<{ className?: string }>
-  label: string
-  onClick?: () => void
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[11.5px] text-zinc-500 hover:text-emerald-600 hover:bg-paper-200 dark:hover:bg-ink-850 transition"
-    >
-      <Icon className="w-3 h-3" />
-      {label}
-    </button>
-  )
-}
-
-/* ── Voice quick panel ─────────────────────────────────────────────────────── */
-
-function VoicePanel({ state, setState, onTranscript }: {
-  state: 'recording' | 'done'
-  setState: (s: 'idle' | 'recording' | 'done') => void
-  onTranscript: (text: string) => void
-}) {
-  const { t } = useTranslation()
-  return (
-    <div className="mb-4 rounded-xl border border-rose-500/30 bg-rose-500/5 p-4">
-      <div className="flex items-center gap-3">
-        {state === 'recording' ? (
+          {/* Mobile: open Leaves & Insights sheet */}
           <button
-            onClick={() => setState('done')}
-            className="w-12 h-12 rounded-full bg-rose-500 flex items-center justify-center shadow-lg shadow-rose-500/30 animate-pulse-soft hover:scale-105 transition shrink-0"
+            onClick={() => setInsightSheetOpen(true)}
+            className="mt-5 w-full md:hidden flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-[13px] text-emerald-700 dark:text-emerald-300 transition"
           >
-            <Square className="w-4 h-4 text-white fill-white" />
-          </button>
-        ) : (
-          <div className="w-12 h-12 rounded-full bg-paper-200 dark:bg-ink-800 border border-emerald-500/30 flex items-center justify-center shrink-0">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-          </div>
-        )}
-        <div className="flex-1 min-w-0">
-          {state === 'recording' && (
-            <>
-              <div className="flex items-center gap-1 h-5 mb-1">
-                {Array.from({ length: 22 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-0.5 bg-rose-400 rounded-full animate-pulse-soft"
-                    style={{
-                      height: `${8 + Math.sin(i * 0.7) * 7 + Math.random() * 5}px`,
-                      animationDelay: `${i * 0.05}s`,
-                    }}
-                  />
-                ))}
-              </div>
-              <div className="text-[12px] text-rose-300 font-medium tabular-nums">
-                00:42 · {t('editor.voice.recording')}
-              </div>
-            </>
-          )}
-          {state === 'done' && (
-            <>
-              <div className="text-[12.5px] text-zinc-700 dark:text-zinc-200 font-medium mb-0.5">
-                {t('editor.voice.done')}
-              </div>
-              <div className="text-[10.5px] text-zinc-500">
-                {t('editor.voice.insertHint')}
-              </div>
-            </>
-          )}
-        </div>
-        <div className="flex items-center gap-1.5 shrink-0">
-          {state === 'done' && (
-            <button
-              onClick={() =>
-                onTranscript(
-                  '[Voice transcript] — Trong tác phẩm The Structure of Scientific Revolutions, Kuhn lập luận rằng khoa học không tiến hoá tuyến tính...',
-                )
-              }
-              className="px-2.5 py-1 rounded-md text-[11px] bg-emerald-500 hover:bg-emerald-400 text-white font-medium transition"
-            >
-              {t('editor.voice.insert')}
-            </button>
-          )}
-          <button
-            onClick={() => setState('idle')}
-            className="p-1 rounded text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-paper-200 dark:hover:bg-ink-800"
-          >
-            <X className="w-3.5 h-3.5" />
+            <Layers className="w-4 h-4" />
+            {t('notes.mobile.openInsights')}
           </button>
         </div>
-      </div>
-    </div>
-  )
-}
 
-/* ── Image quick panel ─────────────────────────────────────────────────────── */
-
-function ImagePanel({ onClose }: { onClose: () => void }) {
-  const { t } = useTranslation()
-  return (
-    <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
-      <div className="flex items-center justify-between mb-3">
-        <div className="text-[12px] font-medium text-zinc-700 dark:text-zinc-200 flex items-center gap-2">
-          <ImageIcon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-300" />
-          {t('editor.image.title')}
+        <div className="hidden lg:block lg:col-span-5 space-y-4">
+          <EnginePanel t={t} isNew={isNew} dirty={dirty} />
+          <LeavesPanel t={t} />
+          {!isNew && <InsightsPanel t={t} />}
         </div>
-        <button
-          onClick={onClose}
-          className="p-1 rounded text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-paper-200 dark:hover:bg-ink-800"
-        >
-          <X className="w-3.5 h-3.5" />
-        </button>
       </div>
-      <div className="rounded-lg border-2 border-dashed border-paper-300 dark:border-ink-700 hover:border-emerald-500/40 transition p-4 text-center cursor-pointer bg-paper-100/40 dark:bg-ink-850/40">
-        <Plus className="w-4 h-4 text-zinc-400 mx-auto mb-1.5" />
-        <p className="text-[12px] text-zinc-600 dark:text-zinc-300">{t('editor.image.dropHint')}</p>
-        <p className="text-[10.5px] text-zinc-500 mt-0.5">{t('editor.image.formats')}</p>
-      </div>
+
+      <MobileInsightSheet
+        isOpen={insightSheetOpen}
+        onClose={() => setInsightSheetOpen(false)}
+        t={t}
+        isNew={isNew}
+        dirty={dirty}
+      />
     </div>
   )
 }
 
-/* ── Body modes ────────────────────────────────────────────────────────────── */
-
-function ReadBody({ note, activeLeaf, setActiveLeaf }: {
-  note: DecompositionDemo
-  activeLeaf: string | null
-  setActiveLeaf: (id: string | null) => void
-}) {
+function ReadBody({ body, t }: { body: string; t: (key: string) => string }) {
+  const paragraphs = body.split(/\n\s*\n/)
   return (
-    <div className="max-w-none">
-      {note.body.map((block, i) => (
-        <p
-          key={i}
-          className="text-[16px] leading-[1.85] text-zinc-700 dark:text-zinc-200 font-serif mb-5 last:mb-0"
-        >
-          {block.segments.map((seg, j) => {
-            if (seg.leafId) {
-              const isActive = activeLeaf === seg.leafId
-              return (
-                <span
-                  key={j}
-                  className={`leaf-highlight type-${seg.leafType} ${isActive ? 'active' : ''}`}
-                  onMouseEnter={() => setActiveLeaf(seg.leafId!)}
-                  onMouseLeave={() => setActiveLeaf(null)}
-                >
-                  {seg.text}
-                </span>
-              )
-            }
-            if (seg.italic) {
-              return (
-                <em key={j} className="text-zinc-600 dark:text-zinc-300">
-                  {seg.text}
-                </em>
-              )
-            }
-            return <span key={j}>{seg.text}</span>
-          })}
+    <div className="font-serif text-[16px] leading-[1.85] text-zinc-800 dark:text-zinc-200">
+      {paragraphs.map((p, i) => (
+        <p key={i} className="mb-5 whitespace-pre-wrap">
+          {p}
         </p>
       ))}
+      {!body && <p className="text-zinc-400 italic">{t('editor.noContent')}</p>}
     </div>
   )
 }
 
-function EditBody({ draft, setDraft, isNew }: {
-  draft: string
-  setDraft: (v: string) => void
+function EnginePanel({
+  t,
+  isNew,
+  dirty,
+}: {
+  t: any
   isNew: boolean
+  dirty: boolean
 }) {
-  const { t } = useTranslation()
   return (
-    <div>
-      <textarea
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        autoFocus={!isNew}
-        rows={isNew ? 14 : 18}
-        placeholder={isNew ? t('editor.placeholder') : ''}
-        className="w-full bg-transparent text-[16px] leading-[1.85] font-serif text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none resize-none"
-      />
-      {!isNew && (
-        <div className="mt-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 flex items-start gap-2.5">
-          <Wand2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-300 mt-0.5 shrink-0" />
-          <div className="text-[11.5px] text-zinc-600 dark:text-zinc-300 leading-relaxed">
-            <span className="text-emerald-700 dark:text-emerald-200 font-medium">
-              {t('editor.editHint.prefix')}
-            </span>
-            {', '}
-            {t('editor.editHint.body')}{' '}
-            <span className="text-zinc-800 dark:text-zinc-100">
-              &quot;{t('editor.editHint.deleteProposal')}&quot;
-            </span>{' '}
-            {t('editor.editHint.suffix')}
-          </div>
+    <div className="card-surface p-4 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 border-emerald-500/20">
+      <div className="flex items-center gap-2">
+        <div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center shrink-0">
+          <Layers className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-300" />
         </div>
-      )}
-    </div>
-  )
-}
-
-/* ── Leaf row with manual actions ──────────────────────────────────────────── */
-
-function LeafRow({ leaf, isActive, onHover }: {
-  leaf: DetectedLeaf
-  isActive: boolean
-  onHover: (id: string | null) => void
-}) {
-  const { t } = useTranslation()
-  const T = TYPE_STYLES[leaf.type] ?? TYPE_STYLES.definition
-  const [editing, setEditing] = useState(false)
-  const [content, setContent] = useState(leaf.content)
-
-  return (
-    <div
-      onMouseEnter={() => onHover(leaf.id)}
-      onMouseLeave={() => onHover(null)}
-      className={`group rounded-lg border transition ${
-        isActive
-          ? 'bg-paper-200 dark:bg-ink-800 border-emerald-500/40'
-          : 'bg-paper-100/50 dark:bg-ink-850/50 border-paper-300/40 dark:border-ink-700/40 hover:bg-paper-200 dark:hover:bg-ink-800'
-      }`}
-    >
-      <div className="p-3">
-        <div className="flex items-center justify-between mb-1.5">
-          <div className="flex items-center gap-1.5">
-            <span className={`pill border ${T.color}`}>
-              <T.icon className="w-2.5 h-2.5" />
-              {t(T.label)}
-            </span>
-            <StatusBadge status={leaf.status} />
+        <div className="flex-1 min-w-0">
+          <div className="text-[13px] font-medium text-zinc-800 dark:text-zinc-100 flex items-center gap-2 flex-wrap">
+            {t('editor.engine.title')}
+            {isNew ? (
+              <span className="text-[10px] text-zinc-500 font-normal">
+                · {t('editor.engine.waiting')}
+              </span>
+            ) : dirty ? (
+              <span className="text-[10px] text-amber-500 font-normal">
+                · {t('editor.engine.willRerun')}
+              </span>
+            ) : (
+              <span className="text-[10px] text-emerald-500 font-normal">
+                · {t('editor.engine.synced')}
+              </span>
+            )}
           </div>
-          <span className="text-[10px] font-mono text-zinc-500">
-            {t('editor.leafRow.confidence', { pct: Math.round(leaf.confidence * 100) })}
-          </span>
-        </div>
-
-        {editing ? (
-          <textarea
-            value={content}
-            autoFocus
-            onChange={(e) => setContent(e.target.value)}
-            rows={3}
-            className="w-full bg-paper-50 dark:bg-ink-900 border border-emerald-500/40 rounded p-2 text-[13px] text-zinc-900 dark:text-zinc-100 font-serif leading-relaxed focus:outline-none resize-none"
-          />
-        ) : (
-          <p className="text-[13px] text-zinc-700 dark:text-zinc-200 leading-relaxed font-serif">
-            {content}
-          </p>
-        )}
-
-        <div className="mt-2 pt-2 border-t border-paper-300/30 dark:border-ink-700/30 flex items-center gap-0.5 opacity-60 group-hover:opacity-100 transition">
-          {editing ? (
-            <>
-              <RowAction
-                icon={CheckCircle2}
-                label={t('editor.leafRow.save')}
-                tone="emerald"
-                onClick={() => setEditing(false)}
-              />
-              <RowAction
-                icon={Trash2}
-                label={t('editor.leafRow.cancel')}
-                onClick={() => {
-                  setContent(leaf.content)
-                  setEditing(false)
-                }}
-              />
-            </>
-          ) : (
-            <>
-              <RowAction icon={Edit2} label={t('editor.leafRow.edit')} onClick={() => setEditing(true)} />
-              <RowAction icon={Split} label={t('editor.leafRow.split')} />
-              <RowAction icon={GitMerge} label={t('editor.leafRow.merge')} />
-              <RowAction icon={Trash2} label={t('editor.leafRow.discard')} tone="rose" />
-              <div className="flex-1" />
-              <ManualTag />
-            </>
-          )}
+          <div className="text-[11px] text-zinc-500 mt-0.5">
+            {isNew
+              ? t('editor.engine.descriptionNew')
+              : t('editor.engine.descriptionDone', {
+                  newCount: 0,
+                  matchCount: 0,
+                  linkedCount: 0,
+                })}
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-function RowAction({ icon: Icon, label, tone, onClick }: {
-  icon: React.ComponentType<{ className?: string }>
-  label: string
-  tone?: 'emerald' | 'rose'
-  onClick?: () => void
-}) {
-  const tones = {
-    emerald: 'text-emerald-400 hover:bg-emerald-500/10',
-    rose: 'text-zinc-500 hover:text-rose-300 hover:bg-rose-500/10',
-  }
+function LeavesPanel({ t }: { t: any }) {
   return (
-    <button
-      onClick={onClick}
-      className={`flex items-center gap-1 px-1.5 py-1 rounded text-[10.5px] transition ${
-        (tone && tones[tone]) || 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-paper-200 dark:hover:bg-ink-800'
-      }`}
-    >
-      <Icon className="w-2.5 h-2.5" />
-      {label}
-    </button>
+    <div className="card-surface p-4">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2 flex-wrap text-zinc-500">
+          <Layers className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <h3 className="text-[11px] uppercase tracking-wider font-medium">
+            {t('editor.leaves.title', { count: 0 })}
+          </h3>
+          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
+            {t('editor.leaves.aiReview')}
+          </span>
+        </div>
+      </div>
+      <div className="text-center py-6">
+        <div className="text-[13px] text-zinc-600 dark:text-zinc-300 mb-1">
+          {t('editor.leaves.emptyTitle')}
+        </div>
+        <div className="text-[11px] text-zinc-500 leading-relaxed max-w-[280px] mx-auto">
+          {t('editor.leaves.emptyDescription')}
+        </div>
+      </div>
+    </div>
   )
 }
 
-function Legend({ color, label }: { color: string; label: string }) {
+function LegendRow({
+  t,
+  mode,
+}: {
+  t: any
+  mode: 'read' | 'edit'
+}) {
+  return (
+    <div className="mt-8 pt-5 border-t border-paper-300/40 dark:border-ink-700/40 flex items-center gap-3 sm:gap-4 text-[10px] text-zinc-500 flex-wrap">
+      <span className="uppercase tracking-wider font-medium">
+        {mode === 'read' ? t('editor.legend.readMode') : t('editor.legend.editMode')}
+      </span>
+      <LegendSwatch color="rgba(129,140,248,0.4)" label={t('editor.legend.definition')} />
+      <LegendSwatch color="rgba(251,191,36,0.4)" label={t('editor.legend.clause')} />
+      <LegendSwatch color="rgba(52,211,153,0.4)" label={t('editor.legend.relation')} />
+      <LegendSwatch color="rgba(56,189,248,0.4)" label={t('editor.legend.fact')} />
+    </div>
+  )
+}
+
+function LegendSwatch({ color, label }: { color: string; label: string }) {
   return (
     <span className="flex items-center gap-1.5">
       <span className="w-3 h-2 rounded-sm" style={{ background: color }} />
-      <span className="text-zinc-400">{label}</span>
+      <span className="text-zinc-500 dark:text-zinc-400">{label}</span>
     </span>
   )
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const { t } = useTranslation()
-  const cfg = {
-    new: { label: t('editor.status.new'), color: 'text-emerald-300 bg-emerald-500/10', Icon: Plus },
-    existing: { label: t('editor.status.existing'), color: 'text-zinc-400 bg-zinc-500/10', Icon: CheckCircle2 },
-    linked: { label: t('editor.status.linked'), color: 'text-sky-300 bg-sky-500/10', Icon: Link2 },
-  }[status]
-  if (!cfg) return null
+function InsightsPanel({ t }: { t: any }) {
   return (
-    <span className={`pill ${cfg.color}`}>
-      <cfg.Icon className="w-2.5 h-2.5" />
-      {cfg.label}
-    </span>
-  )
-}
-
-function AiTag({ children }: { children?: React.ReactNode }) {
-  const { t } = useTranslation()
-  return (
-    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
-      <Cpu className="w-2.5 h-2.5" />
-      {children ?? t('editor.tag.ai')}
-    </span>
-  )
-}
-
-function ManualTag() {
-  const { t } = useTranslation()
-  return (
-    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20">
-      <User className="w-2.5 h-2.5" />
-      {t('editor.tag.manual')}
-    </span>
+    <div className="card-surface p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+        <h3 className="text-[11px] uppercase tracking-wider text-zinc-500 font-medium">
+          {t('editor.insights.title')}
+        </h3>
+      </div>
+      <div className="text-[12px] text-zinc-500 leading-relaxed">
+        {t('editor.insights.empty')}
+      </div>
+    </div>
   )
 }

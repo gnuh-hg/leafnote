@@ -4,6 +4,29 @@
 
 Mỗi entry tương ứng một phase hoặc một task lớn đã hoàn thành.
 
+> **Chú ý**: Entry mới luôn được **append vào cuối file**, theo trình tự thời gian tăng dần (cũ → mới). Không chèn vào đầu, không sort lại theo ngày — giữ nguyên thứ tự đã ghi để phản ánh đúng dòng chảy công việc.
+
+---
+
+## 2026-05-14 — Notes CRUD + BlockNote editor (Notion-style)
+
+**Mục tiêu**: Thay mock `notes` / `decompositionDemo` bằng CRUD note thật, dùng BlockNote làm editor block-based kiểu Notion (heading, list, checkbox, quote, code, divider, table). Chưa làm: tách lá AI, image/audio/video block.
+
+**Đã làm**:
+- Backend: tạo `models/note.py` (Note + bảng nối `note_tags`), `schemas/note.py`, `services/notes.py` (CRUD + filter theo tag, flatten body → `plain_text` cho excerpt), `api/v1/routes/notes.py` (5 endpoint REST), mount router prefix `/notes`, migration `m004_create_notes_table.py`
+- Frontend: cài `@blocknote/core@0.31.0 @blocknote/react @blocknote/mantine`, tạo `components/editor/BlockEditor.tsx` (wrapper disable image/audio/video/file block, áp dark theme, slash menu)
+- Frontend: tạo `services/notes.ts` + `hooks/useNotes.ts` (useNotes / useNote / useCreateNote / useUpdateNote / useDeleteNote — optimistic update + offlineFirst theo pattern useTags)
+- Rewrite `pages/NoteEditor.tsx`: `/note/new` tự POST → redirect sang `/note/:id`; autosave debounce 600 ms cho title & body; tag picker dùng API thật; nút delete; hiển thị trạng thái "Đang lưu / Đã lưu lúc HH:mm". Xoá toàn bộ panel detected-leaves / engine / insights / voice / image
+- Rewrite `pages/NotesList.tsx`: dùng `useNotes(tagIds)` filter qua URL query `?tag=...`; skeleton loading; empty state
+- Xoá `notes[]` và `decompositionDemo` khỏi `data/mockData.ts` (giữ lại các export khác Dashboard/Graph/Review/Insights còn dùng)
+- Thêm i18n keys: `common.loading`, `editor.creating`, `editor.saving`, `editor.delete`, `editor.deleteConfirm`, `editor.notFound`
+- Cập nhật `information/database-schema.md` (thêm `notes` + `note_tags`), `information/api-spec.md` (thêm 5 endpoint Notes)
+- Tạo `future.md`
+
+**Files đã can thiệp**: xem mục tương ứng trong `CLAUDE.md` (bảng trạng thái) — backend 5 file mới, frontend 6 file mới, mockData/locales/docs cập nhật.
+
+**Verification**: `npx tsc --noEmit` pass. Browser QA sẽ chạy ở bước tiếp theo (chạy backend + dev server, thử tạo/sửa/xoá note + copy-paste Notion).
+
 ---
 
 ## 2026-05-13 — Mobile UI: Bottom Navigation
@@ -485,3 +508,25 @@ Mỗi entry tương ứng một phase hoặc một task lớn đã hoàn thành.
 - `.claude/memory/patterns.md` — sửa
 - `.claude/memory/mistakes.md` — sửa
 - `HISTORY.md` — sửa (entry này)
+
+---
+
+## 2026-05-15 — Chốt taxonomy: Document Types & Leaf Types
+
+**Mục tiêu**: Làm rõ mức độ và cách chia nhỏ note thành leaf — vốn còn mơ hồ. Chốt 2 trục phân loại (`document_type` cho note, `leaf_type` cho leaf) làm spec cho Leaf engine (Phase 2+).
+
+**Quyết định chính**:
+- `document_type` — enum đóng 5 loại + `freeform` (không chạy leaf engine): `theory`, `narrative`, `procedure`, `reference`, `meeting`, `freeform`. Chấp nhận không bao quát hết — mở rộng theo dữ liệu thực, không tự đoán trước.
+- `leaf_type` — enum đóng 5 loại + `note` fallback: `definition`, `fact`, `example`, `question`, `note`. Cố tình gộp `claim`/`principle` → `fact`; `term` → `definition`; `procedure_step`/`quote`/`formula`/`code_snippet` → `fact` + metadata. Lý do gộp: hai loại có cùng cách surface thì không xứng là type riêng — chênh lệch xử lý bằng metadata.
+- `relation` — **edge** trong graph, không phải leaf. Lý do: relation không có nội dung độc lập, edge nhanh hơn cho graph view, review engine không phải xử lý leaf không content. Nếu sau cần relation có giải thích → promote thành `fact` + 2 edge.
+- Granularity: 1 leaf = 1 ý đứng một mình hiểu được. Trần ~80 từ/leaf, sàn ~15 từ. AI quyết theo ngữ nghĩa, không theo câu/đoạn cứng.
+
+**Đã làm**:
+- Thêm section "9. Taxonomy — Document Types & Leaf Types" vào `information/features.md` — gồm 7 tiểu mục: document_type, leaf_type, relation, trường chung, granularity, ràng buộc, out-of-scope.
+- Ghi entry này vào `HISTORY.md`.
+
+**Files đã can thiệp**:
+- `information/features.md` — thêm section 9 (~95 dòng spec)
+- `HISTORY.md` — thêm entry này
+
+**Không làm trong scope này**: chưa code (Leaf engine thuộc Phase 2+), chưa migration DB, chưa sửa prompt AI. Spec này là input cho phase sau.

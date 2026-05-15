@@ -9,6 +9,7 @@ from app.core.config import settings
 from app.core.database import Base
 from app.models import User  # noqa: F401 — register models
 from app.models.tag import Tag  # noqa: F401 — register models
+from app.models.note import Note  # noqa: F401 — register models
 
 config = context.config
 # Migrations go through the Session Pooler (port 5432), which supports

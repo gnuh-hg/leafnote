@@ -115,3 +115,211 @@ html.dark body {
 .leaf-highlight.type-fact:hover {
   background: linear-gradient(180deg, transparent 50%, rgba(56, 189, 248, 0.4) 50%);
 }
+
+/* BlockNote — re-theme via CSS variables.
+   Structural (border-radius, font) on base selector.
+   Colors on .light/.dark to match BlockNote's own specificity level. */
+.bn-container,
+.bn-mantine {
+  --bn-border-radius: 0.75rem;
+  --bn-border-radius-medium: 0.5rem;
+  --bn-border-radius-small: 0.3rem;
+  --bn-font-family: inherit;
+}
+
+/* Light theme — paper/emerald palette. Matches .bn-container.light specificity. */
+.bn-container.light,
+.bn-mantine.light {
+  --bn-colors-editor-background: transparent;
+  --bn-colors-editor-text: 63, 63, 70;
+  --bn-colors-menu-background: 245, 241, 232;
+  --bn-colors-menu-text: 63, 63, 70;
+  --bn-colors-tooltip-background: 39, 39, 47;
+  --bn-colors-tooltip-text: 228, 228, 231;
+  --bn-colors-hovered-background: 16, 185, 129;
+  --bn-colors-hovered-text: 255, 255, 255;
+  --bn-colors-selected-background: 16, 185, 129;
+  --bn-colors-selected-text: 255, 255, 255;
+  --bn-colors-disabled-background: 168, 154, 122;
+  --bn-colors-disabled-text: 161, 161, 170;
+  --bn-colors-side-menu: 63, 63, 70;
+  --bn-colors-border: 168, 154, 122;
+  --bn-colors-shadow: 20, 20, 30;
+}
+
+/* Dark theme — ink palette. */
+.bn-container.dark,
+.bn-mantine.dark,
+html.dark .bn-container,
+html.dark .bn-mantine {
+  --bn-colors-editor-background: transparent;
+  --bn-colors-editor-text: 228, 228, 231;
+  --bn-colors-menu-background: 31, 31, 41;
+  --bn-colors-menu-text: 228, 228, 231;
+  --bn-colors-tooltip-background: 20, 20, 28;
+  --bn-colors-tooltip-text: 228, 228, 231;
+  --bn-colors-hovered-background: 16, 185, 129;
+  --bn-colors-hovered-text: 167, 243, 208;
+  --bn-colors-selected-background: 16, 185, 129;
+  --bn-colors-selected-text: 167, 243, 208;
+  --bn-colors-disabled-background: 63, 63, 75;
+  --bn-colors-disabled-text: 113, 113, 122;
+  --bn-colors-side-menu: 161, 161, 170;
+  --bn-colors-border: 63, 63, 75;
+  --bn-colors-shadow: 0, 0, 0;
+}
+
+/* Strip the inner editor's own background; keep padding-inline-start for drag handles */
+.leafnote-block-editor .bn-editor,
+.leafnote-block-editor .bn-default-styles {
+  background: transparent;
+  padding-inline-end: 0;
+}
+@media (max-width: 640px) {
+  .leafnote-block-editor .bn-editor {
+    padding-inline-start: 2.5rem;
+  }
+}
+
+/* Slash menu (suggestion dropdown) — Mantine Paper doesn't pick up CSS vars,
+   so we override directly. */
+.bn-suggestion-menu {
+  background-color: rgb(245, 241, 232) !important;
+  border: 1px solid rgba(168, 154, 122, 0.35) !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 4px 16px rgba(20, 20, 30, 0.10) !important;
+}
+html.dark .bn-suggestion-menu {
+  background-color: rgb(31, 31, 41) !important;
+  border-color: rgba(63, 63, 75, 0.6) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Hover / keyboard-selected item — emerald highlight */
+.bn-suggestion-menu-item[aria-selected="true"],
+.bn-suggestion-menu-item:hover {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  border-radius: 0.5rem !important;
+}
+html.dark .bn-suggestion-menu-item[aria-selected="true"],
+html.dark .bn-suggestion-menu-item:hover {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Formatting toolbar (appears when text is selected) — always dark popup for legibility */
+.bn-toolbar {
+  background-color: rgb(39, 39, 47) !important;
+  color: rgb(228, 228, 231) !important;
+  border: 1px solid rgba(82, 82, 95, 0.4) !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+.bn-toolbar * {
+  color: inherit !important;
+}
+html.dark .bn-toolbar {
+  background-color: rgb(20, 20, 28) !important;
+  border-color: rgba(63, 63, 75, 0.6) !important;
+}
+.bn-toolbar button:hover,
+.bn-toolbar [role="button"]:hover {
+  background-color: rgba(16, 185, 129, 0.25) !important;
+  border-radius: 0.3rem !important;
+}
+
+/* Group label — uppercase tracking like Leafnote section headers */
+.bn-suggestion-menu-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+  padding: 0.5rem 0.65rem 0.25rem;
+}
+
+/* Keyboard shortcut chip — BlockNote uses mantine-Badge-root (not kbd) in suggestion menu.
+   Keep kbd rule for .bn-toolbar just in case, and add Badge overrides for the menu. */
+.bn-suggestion-menu-item kbd,
+.bn-grid-suggestion-menu-item kbd,
+.bn-toolbar kbd {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.4rem;
+  font-size: 9.5px;
+  font-weight: 500;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(168, 154, 122, 0.18);
+  border: 1px solid rgba(168, 154, 122, 0.35);
+  border-radius: 0.3rem;
+  color: rgb(82, 82, 91);
+  box-shadow: none;
+}
+html.dark .bn-suggestion-menu-item kbd,
+html.dark .bn-grid-suggestion-menu-item kbd,
+html.dark .bn-toolbar kbd {
+  background: rgba(63, 63, 75, 0.5);
+  border-color: rgba(82, 82, 95, 0.6);
+  color: rgb(161, 161, 170);
+}
+
+/* Mantine Badge used as shortcut chip inside slash menu */
+.bn-suggestion-menu .mantine-Badge-root {
+  background: rgba(168, 154, 122, 0.18) !important;
+  border: 1px solid rgba(168, 154, 122, 0.35) !important;
+  border-radius: 0.3rem !important;
+  padding: 0.1rem 0.4rem !important;
+  height: auto !important;
+  min-height: unset !important;
+}
+.bn-suggestion-menu .mantine-Badge-label {
+  font-size: 9.5px !important;
+  font-weight: 500 !important;
+  font-family: ui-monospace, SFMono-Regular, monospace !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  color: rgb(82, 82, 91) !important;
+}
+html.dark .bn-suggestion-menu .mantine-Badge-root {
+  background: rgba(63, 63, 75, 0.5) !important;
+  border-color: rgba(82, 82, 95, 0.6) !important;
+}
+html.dark .bn-suggestion-menu .mantine-Badge-label {
+  color: rgb(161, 161, 170) !important;
+}
+
+/* Slash menu — compact size */
+.bn-suggestion-menu {
+  font-size: 13px !important;
+  max-width: 260px !important;
+  min-width: 200px !important;
+}
+.bn-suggestion-menu-item {
+  padding-block: 0.2rem !important;
+  min-height: unset !important;
+}
+.bn-suggestion-menu-item-title {
+  font-size: 12.5px !important;
+}
+.bn-suggestion-menu-item-subtitle {
+  font-size: 11px !important;
+}
+
+/* Hide BlockNote's block emoji/icon picker */
+.leafnote-block-editor .bn-block-icon,
+.leafnote-block-editor .bn-block-icon-wrapper {
+  display: none !important;
+}
+
+/* Soften the empty placeholder line */
+.leafnote-block-editor .bn-inline-content:empty::before,
+.leafnote-block-editor [data-placeholder]:empty::before {
+  color: rgb(161, 161, 170);
+  font-style: normal;
+  opacity: 0.7;
+}
+html.dark .leafnote-block-editor .bn-inline-content:empty::before,
+html.dark .leafnote-block-editor [data-placeholder]:empty::before {
+  color: rgb(82, 82, 95);
+}

@@ -59,3 +59,31 @@
 ```json
 { "id": "uuid", "name": "string", "color": "amber", "note_count": 0, "access_count": 0, "last_accessed": null, "created_at": "iso8601", "updated_at": "iso8601" }
 ```
+
+---
+
+## Notes
+
+| Method | Path | Auth | Mô tả |
+|---|---|---|---|
+| `GET` | `/api/v1/notes` | Required | Danh sách note của user, sort `updated_at DESC`. Query `?tag_id=...` lặp lại nhiều lần để filter (note phải gắn ít nhất 1 trong các tag) |
+| `GET` | `/api/v1/notes/{note_id}` | Required | Lấy note đầy đủ kèm nội dung text; 404 nếu không phải của user |
+| `POST` | `/api/v1/notes` | Required | Tạo note → 201; body trống mặc định `""` |
+| `PATCH` | `/api/v1/notes/{note_id}` | Required | Cập nhật `title` / `body` / `tag_ids` (đều optional, ghi đè) |
+| `DELETE` | `/api/v1/notes/{note_id}` | Required | Xoá note → 204 |
+
+### Body shape
+
+`body` là `string` — nội dung text thuần của ghi chú. Backend dùng body này để sinh excerpt.
+
+### NoteListItem schema
+
+```json
+{ "id": "uuid", "title": "string", "excerpt": "string (max 200 chars)", "tag_ids": ["uuid"], "updated_at": "iso8601" }
+```
+
+### NoteOut schema (chi tiết)
+
+```json
+{ "id": "uuid", "title": "string", "body": "string", "tag_ids": ["uuid"], "excerpt": "string", "created_at": "iso8601", "updated_at": "iso8601" }
+```

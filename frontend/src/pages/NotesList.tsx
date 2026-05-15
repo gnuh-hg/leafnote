@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { FileText, Leaf, Clock, X, Plus, Tag as TagIcon, Filter } from 'lucide-react'
-import { notes } from '../data/mockData'
+import { FileText, Clock, X, Plus, Tag as TagIcon, Filter, Loader2, Leaf } from 'lucide-react'
 import { useTags } from '../hooks/useTags'
+import { useNotes } from '../hooks/useNotes'
 import { COLOR_DOT } from '../services/tags'
 
 export default function NotesList() {
@@ -16,6 +16,8 @@ export default function NotesList() {
     const raw = searchParams.get('tag')
     return raw ? raw.split(',').filter(Boolean) : []
   }, [searchParams])
+
+  const { data: notes = [], isLoading } = useNotes(activeTagIds)
 
   const setActiveTags = (ids: string[]) => {
     const next = new URLSearchParams(searchParams)
@@ -32,22 +34,14 @@ export default function NotesList() {
     }
   }
 
-  const filteredNotes = useMemo(() => {
-    if (activeTagIds.length === 0) return notes
-    return notes.filter((n) =>
-      activeTagIds.every((tid) => (n.tagIds ?? []).includes(tid)),
-    )
-  }, [activeTagIds])
-
   const tagById = (id: string) => tags.find((tg) => tg.id === id)
 
   return (
-    <div className="px-4 sm:px-8 py-6 sm:py-8 max-w-[1300px] mx-auto">
-      {/* Heading */}
+    <div className="px-4 sm:px-8 py-6 sm:py-8 pb-24 md:pb-8 max-w-[1300px] mx-auto">
       <div className="mb-6">
         <div className="text-xs text-zinc-500 mb-2 flex items-center gap-1.5">
           <FileText className="w-3 h-3" />
-          {t('notesList.count', { filtered: filteredNotes.length, total: notes.length })}
+          {t('notesList.count', { filtered: notes.length, total: notes.length })}
           {activeTagIds.length > 0 && (
             <>
               <span className="text-zinc-700">·</span>
@@ -66,7 +60,7 @@ export default function NotesList() {
           </div>
           <button
             onClick={() => navigate('/note/new')}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-medium transition shadow-lg shadow-emerald-500/20"
+            className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-medium transition shadow-lg shadow-emerald-500/20"
           >
             <Plus className="w-4 h-4" />
             {t('notesList.newNote')}
@@ -74,50 +68,55 @@ export default function NotesList() {
         </div>
       </div>
 
-      {/* Tag filter chips */}
-      <div className="mb-6 card-surface p-3 bg-paper-100/50 dark:bg-ink-900/50">
-        <div className="flex items-center gap-2 mb-2">
-          <Filter className="w-3 h-3 text-zinc-500" />
-          <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">
-            {t('notesList.tagFilter.label')}
-          </span>
-          {activeTagIds.length > 0 && (
-            <button
-              onClick={() => setActiveTags([])}
-              className="ml-auto text-[11px] text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-200 flex items-center gap-1"
-            >
-              <X className="w-3 h-3" />
-              {t('notesList.tagFilter.clear')}
-            </button>
-          )}
-        </div>
-        <div className="flex flex-wrap gap-1.5">
-          {tags.map((tg) => {
-            const isActive = activeTagIds.includes(tg.id)
-            return (
+      {tags.length > 0 && (
+        <div className="mb-6 card-surface p-3 bg-paper-100/50 dark:bg-ink-900/50">
+          <div className="flex items-center gap-2 mb-2">
+            <Filter className="w-3 h-3 text-zinc-500" />
+            <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">
+              {t('notesList.tagFilter.label')}
+            </span>
+            {activeTagIds.length > 0 && (
               <button
-                key={tg.id}
-                onClick={() => toggleTag(tg.id)}
-                className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-[11.5px] border transition ${
-                  isActive
-                    ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-700 dark:text-emerald-100'
-                    : 'bg-paper-100 dark:bg-ink-850 border-paper-300/40 dark:border-ink-700/40 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-paper-400 dark:hover:border-ink-600'
-                }`}
+                onClick={() => setActiveTags([])}
+                className="ml-auto text-[11px] text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-200 flex items-center gap-1"
               >
-                <span className={`w-1.5 h-1.5 rounded-full ${COLOR_DOT[tg.color] ?? 'bg-indigo-400'}`} />
-                <span>
-                  <span className="text-zinc-600">#</span>
-                  {tg.name}
-                </span>
-                <span className="text-[10px] text-zinc-500">{tg.note_count}</span>
+                <X className="w-3 h-3" />
+                {t('notesList.tagFilter.clear')}
               </button>
-            )
-          })}
+            )}
+          </div>
+          <div className="flex flex-nowrap overflow-x-auto gap-1.5 pb-0.5 -mx-0.5 px-0.5">
+            {tags.map((tg) => {
+              const isActive = activeTagIds.includes(tg.id)
+              return (
+                <button
+                  key={tg.id}
+                  onClick={() => toggleTag(tg.id)}
+                  className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-[11.5px] border transition ${
+                    isActive
+                      ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-700 dark:text-emerald-100'
+                      : 'bg-paper-100 dark:bg-ink-850 border-paper-300/40 dark:border-ink-700/40 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-paper-400 dark:hover:border-ink-600'
+                  }`}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${COLOR_DOT[tg.color] ?? 'bg-indigo-400'}`} />
+                  <span>
+                    <span className="text-zinc-600">#</span>
+                    {tg.name}
+                  </span>
+                  <span className="text-[10px] text-zinc-500">{tg.note_count}</span>
+                </button>
+              )
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Notes grid */}
-      {notes.length === 0 ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center py-24 text-zinc-500">
+          <Loader2 className="w-5 h-5 animate-spin mr-2" />
+          {t('common.loading')}
+        </div>
+      ) : notes.length === 0 && activeTagIds.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-5">
             <FileText className="w-8 h-8 text-emerald-500/60" />
@@ -135,7 +134,7 @@ export default function NotesList() {
             {t('notesList.emptyMain.cta')}
           </button>
         </div>
-      ) : filteredNotes.length === 0 ? (
+      ) : notes.length === 0 ? (
         <div className="card-surface p-12 text-center">
           <TagIcon className="w-8 h-8 text-zinc-600 mx-auto mb-3" />
           <div className="text-[14px] text-zinc-700 dark:text-zinc-300 mb-1">
@@ -153,7 +152,7 @@ export default function NotesList() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {filteredNotes.map((note) => (
+          {notes.map((note) => (
             <button
               key={note.id}
               onClick={() => navigate(`/note/${note.id}`)}
@@ -161,17 +160,16 @@ export default function NotesList() {
             >
               <div className="flex items-center gap-2 text-[11px] mb-2 text-zinc-500">
                 <Clock className="w-3 h-3" />
-                {note.updatedAt}
+                {new Date(note.updated_at).toLocaleString()}
               </div>
               <h3 className="font-serif text-xl text-zinc-900 dark:text-zinc-100 font-semibold leading-snug mb-2">
-                {note.title}
+                {note.title || t('editor.untitled')}
               </h3>
               <p className="text-[13px] text-zinc-500 dark:text-zinc-400 leading-relaxed line-clamp-3 mb-3">
                 {note.excerpt}
               </p>
-              {/* Tag pills */}
               <div className="flex flex-wrap gap-1 mb-3">
-                {(note.tagIds ?? []).map((tid) => {
+                {note.tag_ids.map((tid) => {
                   const tg = tagById(tid)
                   if (!tg) return null
                   return (
@@ -189,7 +187,7 @@ export default function NotesList() {
               <div className="flex items-center justify-between pt-3 border-t border-paper-300/40 dark:border-ink-700/40 text-[11px]">
                 <span className="text-zinc-500 flex items-center gap-1.5">
                   <Leaf className="w-3 h-3" />
-                  {t('notesList.leafCount', { count: note.leafCount })}
+                  {t('notesList.leafCount', { count: 0 })}
                 </span>
                 <span className="text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-500 dark:group-hover:text-emerald-300">
                   {t('notesList.open')}
@@ -199,6 +197,15 @@ export default function NotesList() {
           ))}
         </div>
       )}
+
+      {/* Mobile FAB */}
+      <button
+        onClick={() => navigate('/note/new')}
+        className="fixed bottom-20 right-4 md:hidden w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white flex items-center justify-center shadow-xl shadow-emerald-500/30 transition active:scale-95 z-20"
+        aria-label={t('notesList.newNote')}
+      >
+        <Plus className="w-6 h-6" />
+      </button>
     </div>
   )
 }

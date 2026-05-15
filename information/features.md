@@ -261,6 +261,103 @@ Trang trợ giúp — giải thích khái niệm và hướng dẫn sử dụng.
 
 ---
 
+## 9. Taxonomy — Document Types & Leaf Types
+
+Hai trục phân loại điều khiển cách AI tách leaf và cách hệ thống surface lại. Đây là *data model spec*, không phải UI page — được dùng bởi Note (tách leaf), Graph (edge), Review (engine).
+
+### 9.1. `document_type` — gán cho mỗi note
+
+Người dùng chọn khi tạo note (hoặc AI đoán + cho phép override). Mỗi loại dẫn một prompt tách leaf riêng. Enum **đóng**.
+
+| document_type | Mô tả | Có chạy leaf engine? |
+|---|---|---|
+| `theory` | Lý thuyết, kiến thức học thuật, khái niệm | Có — prompt tập trung `definition` + `relation` |
+| `narrative` | Nhật ký, kể chuyện, ghi chú trải nghiệm | Có — prompt tập trung `fact` (sự kiện) + `question` |
+| `procedure` | Quy trình, how-to, công thức nấu ăn, hướng dẫn | Có — prompt tập trung `fact` (có `ordinal`) |
+| `reference` | Tra cứu, cheatsheet, danh sách tham khảo | Có — prompt tập trung `definition` + `fact` |
+| `meeting` | Ghi chú họp, thảo luận | Có — prompt tập trung `fact` (có `source`) + `question` |
+| `freeform` | Brainstorm, draft, ghi chú chưa cấu trúc | **Không** — không tách leaf |
+
+**Nguyên tắc mở rộng**: không tự liệt kê thêm trước khi có dữ liệu. Khi có user thật, đo xem `freeform` chứa nhiều note cùng dạng nào (ví dụ nhiều code snippet) → promote thành document_type mới ở phase sau.
+
+### 9.2. `leaf_type` — gán cho từng leaf
+
+Taxonomy **đóng**, 5 loại + 1 thoát hiểm. Mỗi loại có cách surface khác biệt — đây là điều kiện đủ để tồn tại một type.
+
+| leaf_type | Vai trò surface | Metadata bắt buộc / tùy |
+|---|---|---|
+| `definition` | Flashcard 2 chiều (term ↔ meaning) | `term`, `meaning` |
+| `fact` | Flashcard 1 chiều hoặc cloze | nội dung; tùy: `ordinal`, `source`, `format` (`text`\|`math`\|`code`), `polarity` |
+| `example` | Surface kèm leaf gốc | `parent_leaf_id`, `polarity` (`positive`\|`negative`) |
+| `question` | Surface để bật suy nghĩ, không có đáp án cố định | nội dung câu hỏi |
+| `note` | Fallback khi AI không phân loại tự tin | nội dung; **không vào review engine** |
+
+**Cố tình gộp** (giảm noise gán nhãn, tránh AI nhầm giữa các loại giống nhau):
+
+- `claim` / `principle` → `fact`
+- `term` → `definition`
+- `procedure_step` → `fact` + `ordinal` + `parent_note_id`
+- `counter-example` → `example` + `polarity: negative`
+- `quote` → `fact` + `source`
+- `formula` → `fact` + `format: math`
+- `code_snippet` → `fact` + `format: code`
+
+### 9.3. `relation` — edge, không phải leaf
+
+Quan hệ giữa 2 leaf được lưu là **cạnh trong knowledge graph**, không phải một leaf độc lập.
+
+```
+relation_edge:
+  from_leaf_id
+  to_leaf_id
+  type: "causes" | "part_of" | "contradicts" | "supports" | "related"
+  confidence: 0..1
+  source: "ai" | "user"
+```
+
+**Lý do chọn edge thay vì leaf:**
+
+- Relation không có nội dung để học/flashcard riêng — nội dung của nó *là* 2 leaf hai đầu.
+- Graph view truy vấn nhanh hơn (edge thật, không phải join qua bảng leaf).
+- Review engine không phải xử lý loại "leaf không có content".
+- Nếu sau cần relation phức tạp (có giải thích riêng), promote thành leaf `fact` + 2 edge — không mất gì.
+
+### 9.4. Trường chung của mọi leaf
+
+```
+leaf:
+  id
+  note_id            # leaf gốc thuộc note nào
+  type: leaf_type
+  content: text
+  metadata: jsonb    # ordinal, source, polarity, format, parent_leaf_id, term, meaning...
+  confidence: 0..1   # độ tự tin của AI khi tách
+  user_edited: bool  # đã sửa tay chưa
+  created_at, updated_at
+```
+
+### 9.5. Granularity (mức độ chia)
+
+- 1 leaf = 1 ý đứng một mình hiểu được (không cần ngữ cảnh leaf khác).
+- Trần ~80 từ/leaf. Vượt → tách tiếp.
+- Sàn: không tách leaf nếu content < ~15 từ (giữ nguyên đoạn trong note, không bơm noise vào review).
+- AI quyết tách theo ngữ nghĩa, **không** theo câu hay đoạn cứng.
+
+### 9.6. Ràng buộc taxonomy
+
+- `leaf_type` và `document_type` là enum **đóng** — không cho AI/người dùng tự sinh nhãn mới.
+- Mở rộng taxonomy phải đi qua migration + cập nhật prompt + cập nhật UI filter.
+- `leaf_type` mới chỉ được thêm khi nó có **cách surface khác** các loại hiện có. Nếu surface giống loại đã có → dùng metadata, không tạo type mới.
+
+### 9.7. Out of scope (dời sau — xem `future.md`)
+
+- AI tự suggest `document_type` khi tạo note
+- Người dùng tự định nghĩa relation type mới
+- Multi-language leaf (vi/en trộn trong cùng note)
+- Versioning của leaf khi note được sửa
+
+---
+
 ## Gate done cho mỗi page
 
 1. Toàn bộ MH hoạt động đúng trên staging
