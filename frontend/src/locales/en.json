@@ -3,7 +3,11 @@
     "loading": "Loading...",
     "comingSoon": "Coming soon",
     "close": "Close",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete"
   },
   "bottomNav": {
     "more": "More"
@@ -209,10 +213,16 @@
     "engine": {
       "title": "Leaf Knowledge Engine",
       "waiting": "waiting for content",
-      "willRerun": "will re-run on save",
+      "willRerun": "save before re-splitting",
       "synced": "synced",
-      "descriptionNew": "After saving, AI will decompose, generate title, and attach embeddings",
-      "descriptionDone": "Decomposition done · {{newCount}} new · {{matchCount}} matched · {{linkedCount}} linked"
+      "running": "splitting...",
+      "freeform": "Freeform note — no leaf extraction",
+      "split": "Split into leaves",
+      "resplit": "Re-split",
+      "quality": "Quality",
+      "wasRetried": "retried",
+      "descriptionNew": "After you save, click \"Split\" to extract knowledge leaves",
+      "descriptionDone": "{{count}} leaves extracted"
     },
     "leaves": {
       "title": "Extracted leaves ({{count}})",
@@ -220,7 +230,12 @@
       "showAll": "All ↓",
       "addManual": "Add leaf manually",
       "emptyTitle": "No leaves yet",
-      "emptyDescription": "Just start typing — after you click Save & decompose, AI will extract leaves and show them here for review."
+      "emptyDescription": "Just start typing — after saving, click \"Split\" to have AI extract leaves.",
+      "notSplitTitle": "Not yet split",
+      "notSplitDescription": "Click \"Split\" in the Engine panel to have AI extract leaves from this note.",
+      "freeformTitle": "Freeform note",
+      "freeformDescription": "Freeform notes don't run through the engine. Change document type to enable splitting.",
+      "loadError": "Failed to load leaves"
     },
     "insights": {
       "title": "AI insights",
@@ -238,7 +253,17 @@
       "record": "Record",
       "image": "Image / OCR",
       "aiTitle": "AI title",
-      "autosave": "Auto-save 2s · offline → sync when online"
+      "autosave": "Auto-save 2s · offline → sync when online",
+      "noteLink": "Link note (@)",
+      "noteLinkPrompt": "Enter URL",
+      "heading1": "Heading 1",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
+      "bold": "Bold",
+      "italic": "Italic",
+      "bulletList": "Bullet list",
+      "orderedList": "Numbered list",
+      "blockquote": "Quote"
     },
     "voice": {
       "recording": "recording — tap to stop",
@@ -276,7 +301,38 @@
     "tag": {
       "ai": "AI",
       "manual": "You"
+    },
+    "documentType": {
+      "label": "Document type",
+      "theory": "Theory",
+      "narrative": "Narrative",
+      "procedure": "Procedure",
+      "reference": "Reference",
+      "meeting": "Meeting",
+      "freeform": "Freeform"
     }
+  },
+  "leafType": {
+    "definition": "Definition",
+    "fact": "Fact",
+    "example": "Example",
+    "question": "Question",
+    "note": "Note"
+  },
+  "leafCard": {
+    "edited": "Edited",
+    "uncertain": "AI uncertain",
+    "uncertainTooltip": "Confidence {{value}} — review recommended",
+    "term": "Term",
+    "step": "Step {{n}}",
+    "source": "Source",
+    "deleteConfirm": "Delete this leaf?"
+  },
+  "leafEdit": {
+    "title": "Edit leaf",
+    "type": "Type",
+    "content": "Content",
+    "contentPlaceholder": "Leaf content..."
   },
   "graph": {
     "subheading": "Updated by behavior · hot clusters stand out, dormant leaves fade",
@@ -478,6 +534,11 @@
     },
     "warning": {
       "offline": "You are offline"
+    },
+    "engine": {
+      "retried": "Engine retried — final leaves passed quality threshold",
+      "lowQuality": "Leaf quality too low — note may be too short or unstructured",
+      "unavailable": "Leaf engine temporarily unavailable"
     }
   },
   "tagPicker": {

@@ -16,19 +16,20 @@ import {
   Layers,
   Plus,
   Sparkles,
-  Mic,
   Image as ImageIcon,
-  Wand2,
   Square,
 } from 'lucide-react'
 import PlainEditor from '../components/editor/PlainEditor'
 import MobileInsightSheet from '../components/MobileInsightSheet'
+import { LiveEnginePanel, LiveLeavesPanel } from '../components/LeavesPanelLive'
 import { useTags } from '../hooks/useTags'
 import { COLOR_DOT, type TagOut } from '../services/tags'
+import type { DocumentType } from '../services/notes'
 import {
   useCreateNote,
   useDeleteNote,
   useNote,
+  useNotes,
   useUpdateNote,
 } from '../hooks/useNotes'
 
@@ -44,17 +45,19 @@ function NewNoteEditor() {
   const navigate = useNavigate()
   const qc = useQueryClient()
   const { data: tags = [] } = useTags()
+  const { data: allNotes = [] } = useNotes()
   const createNote = useCreateNote()
 
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([])
+  const documentType: DocumentType = 'freeform'
   const [dirty, setDirty] = useState(false)
 
   const onSave = useCallback(() => {
     if (createNote.isPending) return
     createNote.mutate(
-      { title, body, tag_ids: selectedTagIds },
+      { title, body, tag_ids: selectedTagIds, document_type: documentType },
       {
         onSuccess: (note) => {
           qc.setQueryData(['note', note.id], note)
@@ -62,7 +65,7 @@ function NewNoteEditor() {
         },
       },
     )
-  }, [body, createNote, navigate, qc, selectedTagIds, title])
+  }, [body, createNote, documentType, navigate, qc, selectedTagIds, title])
 
   useUnsavedGuard(dirty)
   useSaveShortcut(onSave, dirty)
@@ -71,6 +74,7 @@ function NewNoteEditor() {
     <EditorShell
       t={t}
       isNew
+      noteId={undefined}
       title={title}
       onTitleChange={(v) => {
         setTitle(v)
@@ -84,6 +88,7 @@ function NewNoteEditor() {
         )
         setDirty(true)
       }}
+      documentType={documentType}
       saving={createNote.isPending}
       savedAt={null}
       dirty={dirty}
@@ -94,6 +99,7 @@ function NewNoteEditor() {
         setBody(val)
         setDirty(true)
       }}
+      notes={allNotes.map((n) => ({ id: n.id, title: n.title }))}
     />
   )
 }
@@ -102,6 +108,7 @@ function ExistingNoteEditor({ noteId }: { noteId: string }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { data: tags = [] } = useTags()
+  const { data: allNotes = [] } = useNotes()
   const { data: note, isLoading, isError } = useNote(noteId)
   const update = useUpdateNote(noteId)
   const deleteNote = useDeleteNote()
@@ -109,6 +116,7 @@ function ExistingNoteEditor({ noteId }: { noteId: string }) {
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([])
+  const [documentType, setDocumentType] = useState<DocumentType>('freeform')
   const [savedAt, setSavedAt] = useState<Date | null>(null)
   const [dirty, setDirty] = useState(false)
   const hydratedFor = useRef<string | null>(null)
@@ -119,6 +127,7 @@ function ExistingNoteEditor({ noteId }: { noteId: string }) {
     hydratedFor.current = note.id
     setTitle(note.title)
     setSelectedTagIds(note.tag_ids)
+    setDocumentType(note.document_type)
     setSavedAt(new Date(note.updated_at))
     setBody(note.body)
     setDirty(false)
@@ -127,7 +136,7 @@ function ExistingNoteEditor({ noteId }: { noteId: string }) {
   const onSave = useCallback(() => {
     if (!dirty || update.isPending) return
     update.mutate(
-      { title, body, tag_ids: selectedTagIds },
+      { title, body, tag_ids: selectedTagIds, document_type: documentType },
       {
         onSuccess: () => {
           setSavedAt(new Date())
@@ -135,7 +144,7 @@ function ExistingNoteEditor({ noteId }: { noteId: string }) {
         },
       },
     )
-  }, [body, dirty, selectedTagIds, title, update])
+  }, [body, dirty, documentType, selectedTagIds, title, update])
 
   useUnsavedGuard(dirty)
   useSaveShortcut(onSave, dirty)
@@ -170,6 +179,7 @@ function ExistingNoteEditor({ noteId }: { noteId: string }) {
     <EditorShell
       t={t}
       isNew={false}
+      noteId={noteId}
       title={title}
       onTitleChange={(v) => {
         setTitle(v)
@@ -183,6 +193,7 @@ function ExistingNoteEditor({ noteId }: { noteId: string }) {
         )
         setDirty(true)
       }}
+      documentType={documentType}
       saving={update.isPending}
       savedAt={savedAt}
       dirty={dirty}
@@ -193,6 +204,7 @@ function ExistingNoteEditor({ noteId }: { noteId: string }) {
         setBody(val)
         setDirty(true)
       }}
+      notes={allNotes.map((n) => ({ id: n.id, title: n.title }))}
     />
   )
 }
@@ -222,14 +234,18 @@ function useSaveShortcut(onSave: () => void, enabled: boolean) {
   }, [enabled, onSave])
 }
 
+type TFn = (key: string, opts?: Record<string, unknown>) => string
+
 interface EditorShellProps {
-  t: any
+  t: TFn
   isNew: boolean
+  noteId: string | undefined
   title: string
   onTitleChange: (v: string) => void
   tags: TagOut[]
   selectedTagIds: string[]
   toggleTag: (id: string) => void
+  documentType: DocumentType
   saving: boolean
   savedAt: Date | null
   dirty: boolean
@@ -237,16 +253,19 @@ interface EditorShellProps {
   onDelete: (() => void) | null
   body: string
   onBodyChange: (val: string) => void
+  notes: { id: string; title: string }[]
 }
 
 function EditorShell({
   t,
   isNew,
+  noteId,
   title,
   onTitleChange,
   tags,
   selectedTagIds,
   toggleTag,
+  documentType,
   saving,
   savedAt,
   dirty,
@@ -254,6 +273,7 @@ function EditorShell({
   onDelete,
   body,
   onBodyChange,
+  notes,
 }: EditorShellProps) {
   const [searchParams, setSearchParams] = useSearchParams()
   const [tagPickerOpen, setTagPickerOpen] = useState(false)
@@ -407,7 +427,7 @@ function EditorShell({
           )}
 
           <div className="mt-3 flex items-center gap-1.5 flex-wrap relative">
-            {selectedTags.map((tg) => (
+{selectedTags.map((tg) => (
               <span
                 key={tg.id}
                 className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11.5px] bg-paper-100 dark:bg-ink-850 border border-paper-300/40 dark:border-ink-700/40 text-zinc-700 dark:text-zinc-200"
@@ -573,35 +593,6 @@ function EditorShell({
 
       <div className="grid grid-cols-12 gap-6">
         <div className="col-span-12 lg:col-span-7 card-surface p-3 sm:p-8 bg-paper-50/60 dark:bg-ink-900/40 min-h-[500px]">
-          {mode === 'edit' && (
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-paper-300/40 dark:border-ink-700/40">
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setVoiceState('recording')}
-                  className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[11.5px] text-zinc-500 hover:text-emerald-600 hover:bg-paper-200 dark:hover:bg-ink-850 transition"
-                >
-                  <Mic className="w-3 h-3" />
-                  {t('editor.toolbar.record')}
-                </button>
-                <button
-                  onClick={() => setImagePanelOpen(true)}
-                  className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[11.5px] text-zinc-500 hover:text-emerald-600 hover:bg-paper-200 dark:hover:bg-ink-850 transition"
-                >
-                  <ImageIcon className="w-3 h-3" />
-                  {t('editor.toolbar.image')}
-                </button>
-                <button className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[11.5px] text-zinc-500 hover:text-emerald-600 hover:bg-paper-200 dark:hover:bg-ink-850 transition">
-                  <Wand2 className="w-3 h-3" />
-                  {t('editor.toolbar.aiTitle')}
-                </button>
-              </div>
-              <div className="text-[10.5px] text-zinc-500 flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                {t('editor.toolbar.autosave')}
-              </div>
-            </div>
-          )}
-
           {mode === 'edit' && voiceState !== 'idle' && (
             <div className="mb-4 rounded-xl border border-rose-500/30 bg-rose-500/5 p-4 animate-fade-in">
               <div className="flex items-center gap-3">
@@ -671,13 +662,16 @@ function EditorShell({
           )}
 
           {mode === 'read' ? (
-            <ReadBody body={body} t={t} />
+            <PlainEditor value={body} onChange={() => {}} editable={false} notes={notes} />
           ) : (
             <div className="space-y-4">
               <PlainEditor
                 value={body}
                 onChange={onBodyChange}
                 placeholder={t('editor.placeholder')}
+                onRecord={() => setVoiceState('recording')}
+                onImage={() => setImagePanelOpen(true)}
+                notes={notes}
               />
               {!isNew && (
                 <div className="mt-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 flex items-start gap-2.5">
@@ -702,8 +696,18 @@ function EditorShell({
         </div>
 
         <div className="hidden lg:block lg:col-span-5 space-y-4">
-          <EnginePanel t={t} isNew={isNew} dirty={dirty} />
-          <LeavesPanel t={t} />
+          <LiveEnginePanel
+            noteId={noteId}
+            documentType={documentType}
+            isNew={isNew}
+            dirty={dirty}
+          />
+          <LiveLeavesPanel
+            noteId={noteId}
+            documentType={documentType}
+            isNew={isNew}
+            dirty={dirty}
+          />
           {!isNew && <InsightsPanel t={t} />}
         </div>
       </div>
@@ -714,103 +718,19 @@ function EditorShell({
         t={t}
         isNew={isNew}
         dirty={dirty}
+        noteId={noteId}
+        documentType={documentType}
       />
     </div>
   )
 }
 
-function ReadBody({ body, t }: { body: string; t: (key: string) => string }) {
-  const paragraphs = body.split(/\n\s*\n/)
-  return (
-    <div className="font-serif text-[16px] leading-[1.85] text-zinc-800 dark:text-zinc-200">
-      {paragraphs.map((p, i) => (
-        <p key={i} className="mb-5 whitespace-pre-wrap">
-          {p}
-        </p>
-      ))}
-      {!body && <p className="text-zinc-400 italic">{t('editor.noContent')}</p>}
-    </div>
-  )
-}
-
-function EnginePanel({
-  t,
-  isNew,
-  dirty,
-}: {
-  t: any
-  isNew: boolean
-  dirty: boolean
-}) {
-  return (
-    <div className="card-surface p-4 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 border-emerald-500/20">
-      <div className="flex items-center gap-2">
-        <div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center shrink-0">
-          <Layers className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-300" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-[13px] font-medium text-zinc-800 dark:text-zinc-100 flex items-center gap-2 flex-wrap">
-            {t('editor.engine.title')}
-            {isNew ? (
-              <span className="text-[10px] text-zinc-500 font-normal">
-                · {t('editor.engine.waiting')}
-              </span>
-            ) : dirty ? (
-              <span className="text-[10px] text-amber-500 font-normal">
-                · {t('editor.engine.willRerun')}
-              </span>
-            ) : (
-              <span className="text-[10px] text-emerald-500 font-normal">
-                · {t('editor.engine.synced')}
-              </span>
-            )}
-          </div>
-          <div className="text-[11px] text-zinc-500 mt-0.5">
-            {isNew
-              ? t('editor.engine.descriptionNew')
-              : t('editor.engine.descriptionDone', {
-                  newCount: 0,
-                  matchCount: 0,
-                  linkedCount: 0,
-                })}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function LeavesPanel({ t }: { t: any }) {
-  return (
-    <div className="card-surface p-4">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2 flex-wrap text-zinc-500">
-          <Layers className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-          <h3 className="text-[11px] uppercase tracking-wider font-medium">
-            {t('editor.leaves.title', { count: 0 })}
-          </h3>
-          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
-            {t('editor.leaves.aiReview')}
-          </span>
-        </div>
-      </div>
-      <div className="text-center py-6">
-        <div className="text-[13px] text-zinc-600 dark:text-zinc-300 mb-1">
-          {t('editor.leaves.emptyTitle')}
-        </div>
-        <div className="text-[11px] text-zinc-500 leading-relaxed max-w-[280px] mx-auto">
-          {t('editor.leaves.emptyDescription')}
-        </div>
-      </div>
-    </div>
-  )
-}
 
 function LegendRow({
   t,
   mode,
 }: {
-  t: any
+  t: TFn
   mode: 'read' | 'edit'
 }) {
   return (
@@ -835,7 +755,7 @@ function LegendSwatch({ color, label }: { color: string; label: string }) {
   )
 }
 
-function InsightsPanel({ t }: { t: any }) {
+function InsightsPanel({ t }: { t: TFn }) {
   return (
     <div className="card-surface p-4">
       <div className="flex items-center gap-2 mb-3">

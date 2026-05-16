@@ -21,6 +21,7 @@ def _serialize(note: Note) -> dict[str, Any]:
         "body": note.body,
         "tag_ids": [t.id for t in note.tags],
         "excerpt": note.body[:EXCERPT_LEN],
+        "document_type": note.document_type,
         "created_at": note.created_at,
         "updated_at": note.updated_at,
     }
@@ -70,6 +71,7 @@ async def create_note(
         title=data.title,
         body=data.body,
         plain_text=data.body,
+        document_type=data.document_type,
         tags=tags,
     )
     db.add(note)
@@ -93,6 +95,8 @@ async def update_note(
         note.plain_text = payload["body"]
     if "tag_ids" in payload and payload["tag_ids"] is not None:
         note.tags = await _load_tags(db, user_id, payload["tag_ids"])
+    if "document_type" in payload and payload["document_type"] is not None:
+        note.document_type = payload["document_type"]
 
     await db.commit()
     await db.refresh(note, attribute_names=["tags"])

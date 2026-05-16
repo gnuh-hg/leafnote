@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { X, Layers, Sparkles } from 'lucide-react'
+import { X, Sparkles } from 'lucide-react'
+import { LiveEnginePanel, LiveLeavesPanel } from './LeavesPanelLive'
+import type { DocumentType } from '../services/notes'
 
 interface MobileInsightSheetProps {
   isOpen: boolean
@@ -7,9 +9,19 @@ interface MobileInsightSheetProps {
   t: (key: string, opts?: Record<string, unknown>) => string
   isNew: boolean
   dirty: boolean
+  noteId: string | undefined
+  documentType: DocumentType
 }
 
-export default function MobileInsightSheet({ isOpen, onClose, t, isNew, dirty }: MobileInsightSheetProps) {
+export default function MobileInsightSheet({
+  isOpen,
+  onClose,
+  t,
+  isNew,
+  dirty,
+  noteId,
+  documentType,
+}: MobileInsightSheetProps) {
   const [activeTab, setActiveTab] = useState<'engine' | 'leaves' | 'insights'>('leaves')
 
   return (
@@ -56,73 +68,31 @@ export default function MobileInsightSheet({ isOpen, onClose, t, isNew, dirty }:
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}>
-            {activeTab === 'engine' && <EngineContent t={t} isNew={isNew} dirty={dirty} />}
-            {activeTab === 'leaves' && <LeavesContent t={t} />}
+          <div
+            className="flex-1 overflow-y-auto p-4"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}
+          >
+            {activeTab === 'engine' && (
+              <LiveEnginePanel
+                noteId={noteId}
+                documentType={documentType}
+                isNew={isNew}
+                dirty={dirty}
+              />
+            )}
+            {activeTab === 'leaves' && (
+              <LiveLeavesPanel
+                noteId={noteId}
+                documentType={documentType}
+                isNew={isNew}
+                dirty={dirty}
+              />
+            )}
             {activeTab === 'insights' && <InsightsContent t={t} isNew={isNew} />}
           </div>
         </div>
       </div>
     </>
-  )
-}
-
-function EngineContent({
-  t,
-  isNew,
-  dirty,
-}: {
-  t: (key: string, opts?: Record<string, unknown>) => string
-  isNew: boolean
-  dirty: boolean
-}) {
-  return (
-    <div className="rounded-xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 p-4">
-      <div className="flex items-center gap-2">
-        <div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center shrink-0">
-          <Layers className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-300" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-[13px] font-medium text-zinc-800 dark:text-zinc-100 flex items-center gap-2 flex-wrap">
-            {t('editor.engine.title')}
-            {isNew ? (
-              <span className="text-[10px] text-zinc-500 font-normal">
-                · {t('editor.engine.waiting')}
-              </span>
-            ) : dirty ? (
-              <span className="text-[10px] text-amber-500 font-normal">
-                · {t('editor.engine.willRerun')}
-              </span>
-            ) : (
-              <span className="text-[10px] text-emerald-500 font-normal">
-                · {t('editor.engine.synced')}
-              </span>
-            )}
-          </div>
-          <div className="text-[11px] text-zinc-500 mt-0.5">
-            {isNew
-              ? t('editor.engine.descriptionNew')
-              : t('editor.engine.descriptionDone', { newCount: 0, matchCount: 0, linkedCount: 0 })}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function LeavesContent({ t }: { t: (key: string, opts?: Record<string, unknown>) => string }) {
-  return (
-    <div className="text-center py-10">
-      <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
-        <Layers className="w-6 h-6 text-emerald-500/60" />
-      </div>
-      <div className="text-[13px] text-zinc-600 dark:text-zinc-300 mb-1.5">
-        {t('editor.leaves.emptyTitle')}
-      </div>
-      <div className="text-[11px] text-zinc-500 leading-relaxed max-w-[260px] mx-auto">
-        {t('editor.leaves.emptyDescription')}
-      </div>
-    </div>
   )
 }
 

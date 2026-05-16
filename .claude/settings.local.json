@@ -116,7 +116,17 @@
       "PowerShell(git show 33cc57a:frontend/src/pages/NoteEditor.tsx > C:\\\\Users\\\\admin\\\\AppData\\\\Local\\\\Temp\\\\old_NoteEditor.tsx; \\(Get-Item C:\\\\Users\\\\admin\\\\AppData\\\\Local\\\\Temp\\\\old_NoteEditor.tsx\\).Length)",
       "Bash(gh api *)",
       "PowerShell(gh api *)",
-      "Bash(Select-Object -Property Name, Length)"
+      "Bash(Select-Object -Property Name, Length)",
+      "Bash(python -c \"import json; json.load\\(open\\('src/locales/vi.json', encoding='utf-8'\\)\\); print\\('vi.json OK'\\)\")",
+      "Bash(python -c \"import json; json.load\\(open\\('src/locales/en.json', encoding='utf-8'\\)\\); print\\('en.json OK'\\)\")",
+      "Bash(python -m py_compile app/models/leaf.py app/models/leaf_feedback.py app/models/note.py app/models/__init__.py app/schemas/leaf.py app/schemas/note.py app/services/leaf_engine.py app/services/leaf_quality.py app/services/leaves.py app/services/notes.py app/api/v1/routes/leaves.py app/api/v1/router.py app/core/config.py scripts/check_env.py scripts/eval_engine.py alembic/versions/m005_add_note_document_type.py alembic/versions/m006_create_leaves_table.py)",
+      "Bash(python *)",
+      "Bash(DATABASE_URL=postgresql+asyncpg://x:x@localhost:6543/x DATABASE_DIRECT_URL=postgresql+asyncpg://x:x@localhost:5432/x SUPABASE_URL=https://x.supabase.co SUPABASE_SERVICE_ROLE_KEY=x SUPABASE_JWT_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx venv/Scripts/python.exe -c ' *)",
+      "Bash(git fetch *)",
+      "Bash(mkdir -p data)",
+      "Bash(head -n 10 tests/fixtures/seed_all_doctypes.jsonl)",
+      "PowerShell(vssadmin list *)",
+      "PowerShell(Get-WmiObject *)"
     ]
   }
 }

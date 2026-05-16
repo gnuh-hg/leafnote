@@ -2,11 +2,29 @@ import { api } from './api'
 
 export type NoteBlock = Record<string, unknown>
 
+export type DocumentType =
+  | 'theory'
+  | 'narrative'
+  | 'procedure'
+  | 'reference'
+  | 'meeting'
+  | 'freeform'
+
+export const DOCUMENT_TYPES: DocumentType[] = [
+  'theory',
+  'narrative',
+  'procedure',
+  'reference',
+  'meeting',
+  'freeform',
+]
+
 export interface NoteListItem {
   id: string
   title: string
   excerpt: string
   tag_ids: string[]
+  document_type: DocumentType
   updated_at: string
 }
 
@@ -19,12 +37,14 @@ export interface NoteCreate {
   title?: string
   body?: string
   tag_ids?: string[]
+  document_type?: DocumentType
 }
 
 export interface NoteUpdate {
   title?: string
   body?: string
   tag_ids?: string[]
+  document_type?: DocumentType
 }
 
 const buildListParams = (tagIds?: string[]) => {

@@ -131,6 +131,26 @@ Toàn bộ UI từ `leafnote-demo/` đã được chuyển sang `leafnote/fronte
 
 ---
 
+## 2026-05-15 — Leaf Engine integration patterns
+
+**Quyết định chính** (chi tiết: HISTORY.md cùng ngày):
+
+- **Engine gateway agnostic provider**: backend đọc 3 env (`LEAF_ENGINE_URL/API_KEY/MODEL`), gọi OpenAI-compatible chat. Không bind Together/Claude/Qwen — user lo deploy + n8n + train. Khi swap model, không sửa code.
+- **Replace-all + bảo toàn `user_edited`** khi regenerate leaves: xoá leaves `user_edited=False`, insert mới từ engine. Leaves user đã sửa được giữ nguyên. Đơn giản hơn diff/merge, không mất công sức user.
+- **Quality gate runtime, retry 1 lần, threshold 0.75**: chấm Jaccard 5 metric (coverage/atomicity/no_duplicate/type_valid/granularity_floor). Fail → retry với `retry_hint(report)`. Lần 2 vẫn fail → 422 + `raw_leaves` cho FE quyết định, không commit. Tránh leaf rác vào DB.
+- **Jaccard thay sentence-transformers**: tránh +200MB dep cho Render free tier. Có thể swap sang embedder sau nếu cần precision cao hơn.
+- **`document_type = freeform` short-circuit**: backend không gọi engine, trả `[]`. UI ẩn nút "Tách lá", hiện hint.
+- **Confidence < 0.6 → badge "AI uncertain"**: visible warning, không hide. User tự review.
+- **Trigger manual button**, không auto sau save. Tránh tốn token + cho user chủ động chọn thời điểm note "chín".
+- **OpenAI-compatible response tolerant**: parser nhận cả JSON array thuần và `{leaves: [...]}` / `{items}` / `{data}` / `{result}` — provider khác nhau wrap khác nhau.
+
+**Pattern cho FE mutation engine call**:
+- `networkMode: 'online'` (không offlineFirst — engine cần gọi thật, không queue offline).
+- Toast riêng cho 502 (`engine.unavailable`) vs 422 (`engine.lowQuality`) vs other (`error.generic`).
+- `regen.data?.quality.total` hiển thị % cho user thấy độ chắc — minh bạch không hộp đen.
+
+---
+
 ## 2026-05-14 — Tách kết nối DB: Transaction Pooler (app) + Session Pooler (migration)
 
 **Quyết định:** Backend dùng **hai connection string** thay vì một.

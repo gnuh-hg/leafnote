@@ -81,6 +81,22 @@ async def probe_db(url: str, label: str) -> None:
         check(False, f"{label}: connection failed ({type(e).__name__}: {str(e)[:120]})")
 
 
+async def probe_leaf_engine() -> None:
+    if not settings.LEAF_ENGINE_URL:
+        check(False, "LEAF_ENGINE_URL not set (engine features disabled)")
+        return
+    check(bool(settings.LEAF_ENGINE_API_KEY), "LEAF_ENGINE_API_KEY present")
+    check(bool(settings.LEAF_ENGINE_MODEL), "LEAF_ENGINE_MODEL present")
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            # Reachability ping — không gọi chat completions thật vì tốn token.
+            resp = await client.get(settings.LEAF_ENGINE_URL.rsplit("/", 1)[0])
+        check(resp.status_code < 500,
+              f"LEAF_ENGINE_URL host reachable (HTTP {resp.status_code})")
+    except Exception as e:
+        check(False, f"LEAF_ENGINE_URL probe failed ({type(e).__name__}: {str(e)[:120]})")
+
+
 async def probe_jwks() -> None:
     try:
         async with httpx.AsyncClient() as client:
@@ -144,6 +160,7 @@ async def main() -> int:
 
     # Live probes
     await probe_jwks()
+    await probe_leaf_engine()
     await probe_db(db_url, "DATABASE_URL")
     await probe_db(direct_url, "DATABASE_DIRECT_URL")
 

@@ -195,6 +195,170 @@ html.dark .bn-suggestion-menu {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
+/* ─── Tiptap WYSIWYG prose styles ─────────────────────────────────────────── */
+.leafnote-plain-editor .ProseMirror {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 16px;
+  line-height: 1.85;
+  outline: none;
+  min-height: 300px;
+  color: inherit;
+}
+
+.leafnote-plain-editor .ProseMirror > * + * {
+  margin-top: 0.6em;
+}
+
+.leafnote-plain-editor .ProseMirror h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-top: 1.2em;
+  margin-bottom: 0.4em;
+  color: inherit;
+}
+.leafnote-plain-editor .ProseMirror h2 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-top: 1em;
+  margin-bottom: 0.35em;
+  color: inherit;
+}
+.leafnote-plain-editor .ProseMirror h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 0.8em;
+  margin-bottom: 0.3em;
+  color: inherit;
+}
+
+.leafnote-plain-editor .ProseMirror ul {
+  list-style: disc;
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+.leafnote-plain-editor .ProseMirror ol {
+  list-style: decimal;
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+.leafnote-plain-editor .ProseMirror li + li {
+  margin-top: 0.2em;
+}
+
+.leafnote-plain-editor .ProseMirror blockquote {
+  border-left: 3px solid #a8c0a8;
+  padding-left: 1em;
+  margin: 0.75em 0;
+  color: #638f63;
+  font-style: italic;
+}
+html.dark .leafnote-plain-editor .ProseMirror blockquote {
+  border-color: #3d3d4f;
+  color: #71717a;
+}
+
+.leafnote-plain-editor .ProseMirror strong {
+  font-weight: 700;
+}
+.leafnote-plain-editor .ProseMirror em {
+  font-style: italic;
+}
+
+.leafnote-plain-editor .ProseMirror code {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.85em;
+  background: rgba(168, 192, 168, 0.2);
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+}
+html.dark .leafnote-plain-editor .ProseMirror code {
+  background: rgba(46, 46, 61, 0.7);
+}
+
+.leafnote-plain-editor .ProseMirror hr {
+  border: none;
+  border-top: 1px solid rgba(168, 154, 122, 0.35);
+  margin: 1.5em 0;
+}
+html.dark .leafnote-plain-editor .ProseMirror hr {
+  border-color: rgba(63, 63, 75, 0.5);
+}
+
+/* Placeholder */
+.leafnote-plain-editor .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: #a1a1aa;
+  float: left;
+  pointer-events: none;
+  height: 0;
+}
+html.dark .leafnote-plain-editor .ProseMirror p.is-editor-empty:first-child::before {
+  color: #3d3d4f;
+}
+
+/* ─── Note link chip (inline link to another note) ────────────────────────── */
+.leafnote-plain-editor .ProseMirror a[href^="/note/"],
+.leafnote-plain-editor .ProseMirror a[href^="/note/"]:visited {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 6px;
+  margin: 0 1px;
+  border-radius: 5px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #059669;
+  font-size: 0.9em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  font-family: inherit;
+}
+.leafnote-plain-editor .ProseMirror a[href^="/note/"]:hover {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.5);
+}
+html.dark .leafnote-plain-editor .ProseMirror a[href^="/note/"] {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.25);
+  color: #34d399;
+}
+html.dark .leafnote-plain-editor .ProseMirror a[href^="/note/"]:hover {
+  background: rgba(16, 185, 129, 0.22);
+  border-color: rgba(16, 185, 129, 0.45);
+}
+
+/* ─── Note link autocomplete dropdown (tippy.js) ──────────────────────────── */
+.note-link-dropdown {
+  background: rgb(245, 241, 232);
+  border: 1px solid rgba(168, 154, 122, 0.35);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 20px rgba(20, 20, 30, 0.12);
+  overflow: hidden;
+  min-width: 220px;
+  max-width: 320px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 4px;
+}
+html.dark .note-link-dropdown {
+  background: rgb(25, 25, 35);
+  border-color: rgba(63, 63, 75, 0.6);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+.tippy-box[data-theme~='note-link'] {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+.tippy-box[data-theme~='note-link'] > .tippy-content {
+  padding: 0;
+}
+
 /* Hover / keyboard-selected item — emerald highlight */
 .bn-suggestion-menu-item[aria-selected="true"],
 .bn-suggestion-menu-item:hover {

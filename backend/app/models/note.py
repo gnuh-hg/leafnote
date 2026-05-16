@@ -1,9 +1,7 @@
 from datetime import datetime, timezone
-from typing import Any
 from uuid import UUID, uuid4
 
-from sqlalchemy import Column, DateTime, ForeignKey, Table, Text
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import Column, DateTime, ForeignKey, String, Table, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -26,6 +24,9 @@ class Note(Base):
     title: Mapped[str] = mapped_column(Text, nullable=False, default="")
     body: Mapped[str] = mapped_column(Text, nullable=False, default="")
     plain_text: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    document_type: Mapped[str] = mapped_column(
+        String(32), nullable=False, default="theory", server_default="theory"
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )

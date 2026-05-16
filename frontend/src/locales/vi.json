@@ -3,7 +3,11 @@
     "loading": "Đang tải...",
     "comingSoon": "Sắp ra mắt",
     "close": "Đóng",
-    "dismiss": "Đóng"
+    "dismiss": "Đóng",
+    "save": "Lưu",
+    "cancel": "Huỷ",
+    "edit": "Sửa",
+    "delete": "Xoá"
   },
   "bottomNav": {
     "more": "Thêm"
@@ -209,10 +213,16 @@
     "engine": {
       "title": "Leaf Knowledge Engine",
       "waiting": "chờ note có nội dung",
-      "willRerun": "sẽ chạy lại khi lưu",
+      "willRerun": "lưu trước khi tách lại",
       "synced": "đồng bộ",
-      "descriptionNew": "Sau khi bạn lưu, AI sẽ phân rã, sinh tiêu đề, gắn embedding",
-      "descriptionDone": "Phân rã xong · {{newCount}} lá mới · {{matchCount}} lá khớp · {{linkedCount}} lá liên kết"
+      "running": "đang phân tách...",
+      "freeform": "Note tự do — không phân tách lá",
+      "split": "Tách lá",
+      "resplit": "Tách lại",
+      "quality": "Chất lượng",
+      "wasRetried": "đã retry",
+      "descriptionNew": "Sau khi bạn lưu note, bấm \"Tách lá\" để AI phân tách thành các đơn vị tri thức",
+      "descriptionDone": "Đã tách {{count}} lá"
     },
     "leaves": {
       "title": "Lá được tách ({{count}})",
@@ -220,7 +230,12 @@
       "showAll": "Tất cả ↓",
       "addManual": "Thêm lá thủ công",
       "emptyTitle": "Chưa có lá nào",
-      "emptyDescription": "Cứ gõ tự nhiên — sau khi bạn bấm Lưu & phân rã, AI sẽ tách lá và hiện tại đây để bạn duyệt."
+      "emptyDescription": "Cứ gõ tự nhiên — sau khi lưu, bấm \"Tách lá\" để AI phân rã.",
+      "notSplitTitle": "Note này chưa được phân tách",
+      "notSplitDescription": "Bấm \"Tách lá\" trong panel Engine để AI tách note thành các leaf nguyên tử.",
+      "freeformTitle": "Note tự do",
+      "freeformDescription": "Note kiểu freeform không chạy qua engine. Đổi document type nếu muốn phân tách.",
+      "loadError": "Không tải được leaves"
     },
     "insights": {
       "title": "AI phát hiện",
@@ -238,7 +253,17 @@
       "record": "Ghi âm",
       "image": "Ảnh / OCR",
       "aiTitle": "AI sinh tiêu đề",
-      "autosave": "Auto-save 2s · offline → đồng bộ khi online"
+      "autosave": "Auto-save 2s · offline → đồng bộ khi online",
+      "noteLink": "Liên kết ghi chú (@)",
+      "noteLinkPrompt": "Nhập URL",
+      "heading1": "Tiêu đề lớn",
+      "heading2": "Tiêu đề vừa",
+      "heading3": "Tiêu đề nhỏ",
+      "bold": "In đậm",
+      "italic": "In nghiêng",
+      "bulletList": "Danh sách",
+      "orderedList": "Danh sách số",
+      "blockquote": "Trích dẫn"
     },
     "voice": {
       "recording": "đang thu — chạm để dừng",
@@ -276,7 +301,38 @@
     "tag": {
       "ai": "AI",
       "manual": "Bạn"
+    },
+    "documentType": {
+      "label": "Loại tài liệu",
+      "theory": "Lý thuyết",
+      "narrative": "Nhật ký",
+      "procedure": "Quy trình",
+      "reference": "Tra cứu",
+      "meeting": "Cuộc họp",
+      "freeform": "Tự do"
     }
+  },
+  "leafType": {
+    "definition": "Định nghĩa",
+    "fact": "Dữ kiện",
+    "example": "Ví dụ",
+    "question": "Câu hỏi",
+    "note": "Ghi chú"
+  },
+  "leafCard": {
+    "edited": "Đã sửa",
+    "uncertain": "AI chưa chắc",
+    "uncertainTooltip": "Confidence {{value}} — nên review",
+    "term": "Thuật ngữ",
+    "step": "Bước {{n}}",
+    "source": "Nguồn",
+    "deleteConfirm": "Xoá leaf này?"
+  },
+  "leafEdit": {
+    "title": "Sửa leaf",
+    "type": "Loại",
+    "content": "Nội dung",
+    "contentPlaceholder": "Nội dung leaf..."
   },
   "graph": {
     "subheading": "Cập nhật theo hành vi · cụm nóng nổi rõ, lá ngủ đông mờ dần",
@@ -478,6 +534,11 @@
     },
     "warning": {
       "offline": "Bạn đang ngoại tuyến"
+    },
+    "engine": {
+      "retried": "Engine đã retry — chất lượng leaf cuối đạt ngưỡng",
+      "lowQuality": "Chất lượng tách lá thấp — note có thể quá ngắn hoặc không cấu trúc",
+      "unavailable": "Leaf engine tạm thời không khả dụng"
     }
   },
   "tagPicker": {

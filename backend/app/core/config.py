@@ -22,6 +22,12 @@ class Settings(BaseSettings):
 
     CORS_ORIGINS: list[str] = ["http://localhost:5173"]
 
+    LEAF_ENGINE_URL: str = ""
+    LEAF_ENGINE_API_KEY: str = ""
+    LEAF_ENGINE_MODEL: str = ""
+    LEAF_ENGINE_TIMEOUT_S: float = 60.0
+    LEAF_QUALITY_MIN_SCORE: float = 0.75
+
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def parse_cors_origins(cls, v: object) -> list[str]:

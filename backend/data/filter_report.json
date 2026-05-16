@@ -1,0 +1,51 @@
+{
+  "threshold": 0.75,
+  "kept": 9,
+  "dropped": 1,
+  "rate": 0.9,
+  "by_doc_type": {
+    "theory": {
+      "total": 3,
+      "kept": 3,
+      "dropped_schema": 0,
+      "dropped_score": 0,
+      "dropped_empty": 0
+    },
+    "procedure": {
+      "total": 2,
+      "kept": 2,
+      "dropped_schema": 0,
+      "dropped_score": 0,
+      "dropped_empty": 0
+    },
+    "narrative": {
+      "total": 1,
+      "kept": 1,
+      "dropped_schema": 0,
+      "dropped_score": 0,
+      "dropped_empty": 0
+    },
+    "reference": {
+      "total": 2,
+      "kept": 2,
+      "dropped_schema": 0,
+      "dropped_score": 0,
+      "dropped_empty": 0
+    },
+    "meeting": {
+      "total": 1,
+      "kept": 1,
+      "dropped_schema": 0,
+      "dropped_score": 0,
+      "dropped_empty": 0
+    },
+    "freeform": {
+      "total": 1,
+      "kept": 0,
+      "dropped_schema": 0,
+      "dropped_score": 0,
+      "dropped_empty": 1
+    }
+  },
+  "dropped_examples": []
+}

@@ -79,11 +79,54 @@
 ### NoteListItem schema
 
 ```json
-{ "id": "uuid", "title": "string", "excerpt": "string (max 200 chars)", "tag_ids": ["uuid"], "updated_at": "iso8601" }
+{ "id": "uuid", "title": "string", "excerpt": "string (max 200 chars)", "tag_ids": ["uuid"], "document_type": "theory", "updated_at": "iso8601" }
 ```
 
 ### NoteOut schema (chi tiết)
 
 ```json
-{ "id": "uuid", "title": "string", "body": "string", "tag_ids": ["uuid"], "excerpt": "string", "created_at": "iso8601", "updated_at": "iso8601" }
+{ "id": "uuid", "title": "string", "body": "string", "tag_ids": ["uuid"], "excerpt": "string", "document_type": "theory", "created_at": "iso8601", "updated_at": "iso8601" }
 ```
+
+`document_type` enum đóng: `theory | narrative | procedure | reference | meeting | freeform`. Default `theory`. Route prompt cho leaf engine.
+
+---
+
+## Leaves
+
+| Method | Path | Auth | Mô tả |
+|---|---|---|---|
+| `GET` | `/api/v1/notes/{note_id}/leaves` | Required | List leaves của note (ordered by created_at) |
+| `POST` | `/api/v1/notes/{note_id}/leaves/regenerate` | Required | Trigger leaf engine: tách note thành leaves. Replace-all + bảo toàn `user_edited`. `freeform` → trả `[]` không gọi engine |
+| `PATCH` | `/api/v1/leaves/{leaf_id}` | Required | Sửa `type` / `content` / `metadata`. Set `user_edited=true` |
+| `DELETE` | `/api/v1/leaves/{leaf_id}` | Required | Xoá leaf → 204 |
+| `POST` | `/api/v1/leaves/{leaf_id}/feedback` | Required | Thumbs up/down, body `{rating: "up"\|"down"}` → 204 |
+
+### LeafOut schema
+
+```json
+{
+  "id": "uuid", "note_id": "uuid",
+  "type": "definition|fact|example|question|note",
+  "content": "string",
+  "metadata": { "term": "...", "ordinal": 1, "source": "...", "format": "code|math|text", "polarity": "positive|negative" },
+  "confidence": 0.85, "user_edited": false,
+  "created_at": "iso8601", "updated_at": "iso8601"
+}
+```
+
+### RegenerateResponse schema
+
+```json
+{
+  "leaves": [LeafOut, ...],
+  "quality": { "coverage": 0.8, "atomicity": 1.0, "no_duplicate": 0.95, "type_valid": 1.0, "granularity_floor": 1.0, "total": 0.85, "issues": [] },
+  "retried": false
+}
+```
+
+### Error codes (Leaves)
+
+- `502 Bad Gateway` — engine timeout/HTTP error/parse fail; body `{detail: "Leaf engine unavailable: ..."}`
+- `422 Unprocessable Entity` — quality < `LEAF_QUALITY_MIN_SCORE` sau retry; body `{detail: {message, quality, raw_leaves}}` để FE quyết định
+- `404 Not Found` — note hoặc leaf không thuộc user

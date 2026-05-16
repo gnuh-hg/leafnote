@@ -84,6 +84,7 @@ Backend đọc từ `backend/.env`. Các key bắt buộc: `DATABASE_URL`, `SUPA
 | `information/user-stories.md` | `ready` | Pre-project đã chốt |
 | `information/database-schema.md` | `draft` | High-level |
 | `information/api-spec.md` | `draft` | High-level |
+| `information/leaf-engine-training.md` | `ready` | Fine-tune Qwen2.5-7B cho Leaf Engine — synthetic data pipeline |
 | `information/product-principles.md` | `ready` | 7 định hướng sản phẩm cross-cutting |
 | `information/design-system.md` | `ready` | Màu sắc, typography, component pattern — nguồn chân lý UI |
 | `information/runbooks/` | `chưa cần` | Sau khi deploy |
@@ -97,7 +98,7 @@ Backend đọc từ `backend/.env`. Các key bắt buộc: `DATABASE_URL`, `SUPA
 | `.claude/workflows/fix-bug.md` | `ready` | Workflow debug có hệ thống |
 | `.claude/workflows/ship-product.md` | `ready` | Checklist trước khi deploy lên production |
 | `.claude/workflows/build-feature.md` | `ready` | Workflow build feature fullstack |
-| `backend/` | `phase2-notes` | FastAPI + auth + Tag CRUD + Note CRUD |
+| `backend/` | `phase2-leaves` | FastAPI + auth + Tag/Note CRUD + Leaf engine + quality gate |
 | `backend/app/models/note.py` | `ready` | Note model + bảng nối `note_tags` |
 | `backend/app/schemas/note.py` | `ready` | NoteCreate/Update/ListItem/Out |
 | `backend/app/services/notes.py` | `ready` | Note CRUD + filter tag + flatten plain_text |
@@ -118,8 +119,22 @@ Backend đọc từ `backend/.env`. Các key bắt buộc: `DATABASE_URL`, `SUPA
 | `backend/scripts/check_env.py` | `ready` | Verify env vars + live probe DB/JWKS, không in secret |
 | `backend/app/api/v1/routes/auth.py` | `ready` | GET/PATCH /auth/me |
 | `backend/app/api/v1/routes/tags.py` | `ready` | 5 endpoints: list/create/update/delete/access |
-| `backend/app/api/v1/router.py` | `ready` | API router aggregator |
-| `frontend/` | `phase2-tags` | UI đầy đủ + auth + Tag CRUD |
+| `backend/app/api/v1/router.py` | `ready` | API router aggregator (notes + tags + leaves) |
+| `backend/app/models/leaf.py` | `ready` | Leaf model: type/content/metadata/confidence/user_edited |
+| `backend/app/models/leaf_feedback.py` | `ready` | LeafFeedback model (rating up/down) |
+| `backend/app/schemas/leaf.py` | `ready` | LeafEngineItem/Out/Update + QualityReport + RegenerateResponse |
+| `backend/app/services/leaf_engine.py` | `ready` | Gateway gọi LLM endpoint OpenAI-compatible, 6 prompt theo doc_type |
+| `backend/app/services/leaf_quality.py` | `ready` | Jaccard scorer (coverage/atomicity/duplicate/type/granularity) + retry hint |
+| `backend/app/services/leaves.py` | `ready` | CRUD leaves + regenerate orchestrator (replace-all + bảo toàn user_edited) |
+| `backend/app/api/v1/routes/leaves.py` | `ready` | 5 endpoints: list/regenerate/update/delete/feedback |
+| `backend/alembic/versions/m005_add_note_document_type.py` | `ready` | Add cột Note.document_type với CHECK constraint |
+| `backend/alembic/versions/m006_create_leaves_table.py` | `ready` | Tạo bảng `leaves` + `leaf_feedback` |
+| `backend/scripts/eval_engine.py` | `ready` | Regression test engine trên fixture set, so vs baseline |
+| `backend/tests/fixtures/seed_all_doctypes.jsonl` | `ready` | 10 example seed (Vi/En/mix, 6 doc types) |
+| `information/leaf-engine-contract.md` | `ready` | Contract giữa backend và LLM endpoint (OpenAI-compatible) |
+| `frontend/eslint.config.js` | `ready` | ESLint v9 flat config — TS parser + react-hooks |
+| `gnuh_task.md` | `ready` | Checklist user phải làm tay: account/key, sinh data n8n, train Qwen, deploy Together, eval |
+| `frontend/` | `phase2-leaves` | UI đầy đủ + auth + Tag/Note/Leaf CRUD + engine integration |
 | `frontend/src/pages/Auth.tsx` | `ready` | Auth page (login/signup tabs) |
 | `frontend/src/stores/authStore.ts` | `ready` | Zustand auth store |
 | `frontend/src/stores/toastStore.ts` | `ready` | Toast store (auto-dismiss, max 3) |
@@ -141,7 +156,13 @@ Backend đọc từ `backend/.env`. Các key bắt buộc: `DATABASE_URL`, `SUPA
 | `frontend/src/components/TagDeleteConfirm.tsx` | `ready` | Confirm xóa tag |
 | `frontend/src/components/BottomNav.tsx` | `ready` | Bottom navigation bar (mobile-only, md:hidden) — 5 NavLink + nút `...` |
 | `frontend/src/components/MobileMoreSheet.tsx` | `ready` | Bottom sheet từ nút `...`: Tags list, tạo tag, logout |
-| `frontend/src/components/MobileInsightSheet.tsx` | `ready` | Bottom sheet mobile cho NoteEditor: tab Engine/Leaves/Insights |
+| `frontend/src/components/MobileInsightSheet.tsx` | `ready` | Bottom sheet mobile cho NoteEditor — tab Engine/Leaves/Insights, dùng live components |
+| `frontend/src/services/leaves.ts` | `ready` | 5 API calls leaves + types |
+| `frontend/src/hooks/useLeaves.ts` | `ready` | TanStack Query: useLeaves/Regenerate/Update/Delete/Feedback |
+| `frontend/src/components/DocumentTypePicker.tsx` | `ready` | Dropdown chọn document_type cho note |
+| `frontend/src/components/LeafItem.tsx` | `ready` | Card 1 leaf với type badge + uncertain warning + edit/delete |
+| `frontend/src/components/LeafEditModal.tsx` | `ready` | Modal sửa type + content của leaf (createPortal) |
+| `frontend/src/components/LeavesPanelLive.tsx` | `ready` | LiveEnginePanel + LiveLeavesPanel — kết nối API thật |
 | `frontend/src/pages/Dashboard.tsx` | `scaffold` | Mock data |
 | `frontend/src/pages/NotesList.tsx` | `ready` | Real notes qua useNotes, filter tag qua URL |
 | `frontend/src/pages/NoteEditor.tsx` | `ready` | BlockNote editor + autosave 600ms + tag picker thật |

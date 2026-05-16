@@ -530,3 +530,103 @@ Mỗi entry tương ứng một phase hoặc một task lớn đã hoàn thành.
 - `HISTORY.md` — thêm entry này
 
 **Không làm trong scope này**: chưa code (Leaf engine thuộc Phase 2+), chưa migration DB, chưa sửa prompt AI. Spec này là input cho phase sau.
+
+---
+
+## 2026-05-15 — Leaf Engine integration (full stack)
+
+**Mục tiêu**: Triển khai feature "phân tách note" — kết nối taxonomy đã chốt (mục 9 features.md) với code thật. Backend gọi LLM endpoint agnostic provider (user lo data + n8n + train Qwen), frontend wire UI thật vào EnginePanel/LeavesPanel.
+
+**Quyết định chính**:
+- **Engine gateway agnostic provider**: backend chỉ biết OpenAI-compatible chat schema qua `LEAF_ENGINE_URL` + `LEAF_ENGINE_API_KEY` + `LEAF_ENGINE_MODEL`. Together AI / vLLM / Claude proxy / n8n webhook đều cắm được. Không hard-code provider.
+- **Replace-all + bảo toàn `user_edited`**: khi regenerate, xóa leaves chưa user sửa, insert mới. Leaves đã sửa tay không bị overwrite.
+- **Quality gate runtime**: chấm điểm Jaccard (coverage/atomicity/no_duplicate/type_valid/granularity_floor) với threshold 0.75. Fail → retry 1 lần với hint cụ thể. Lần 2 vẫn fail → 422 + raw_leaves cho FE quyết định (không commit DB).
+- **Jaccard thay sentence-transformers**: tránh +200MB dependency cho Render free tier. Đủ tốt cho duplicate detection ở MVP.
+- **`document_type = freeform` short-circuit**: trả `[]`, không gọi engine — note brainstorm không bị ép tách.
+- **Confidence threshold 0.6 → badge "AI uncertain"**: hiển thị warning chứ không hide; user tự review.
+
+**Đã làm**:
+
+Backend:
+- `Note.document_type` (default `theory`) + migration `m005` với CHECK constraint
+- `Leaf` model + `LeafFeedback` model + Pydantic schemas (LeafEngineItem/Out/Update + QualityReport + RegenerateResponse)
+- Migration `m006` tạo bảng `leaves` + `leaf_feedback` + indexes
+- `services/leaf_engine.py` — gateway httpx async, 6 prompts theo doc_type, parse + Pydantic strict validation, drop leaf invalid
+- `services/leaf_quality.py` — 5 metric scorer + retry hint generator
+- `services/leaves.py` — CRUD + regenerate orchestrator
+- `routes/leaves.py` — 5 endpoints (list/regenerate/update/delete/feedback) + register router
+- Env vars `LEAF_ENGINE_*` + `LEAF_QUALITY_MIN_SCORE` trong `core/config.py` + `.env.example`
+- `scripts/check_env.py` — thêm probe LEAF_ENGINE_URL
+- `scripts/eval_engine.py` — regression script chạy fixture set, so vs baseline
+- `tests/fixtures/raw_seed.jsonl` — 10 example seed (Vi/En/mix, 6 doc types) cho training data + eval
+
+Frontend:
+- `services/notes.ts` — thêm `DocumentType` + `DOCUMENT_TYPES` + field trong tất cả schemas
+- `services/leaves.ts` — 5 API calls + types
+- `hooks/useLeaves.ts` — TanStack Query: useLeaves/Regenerate/Update/Delete/Feedback (offlineFirst, optimistic update theo pattern Tag)
+- `components/DocumentTypePicker.tsx` — dropdown chọn doc_type
+- `components/LeafItem.tsx` — card 1 leaf với type badge + uncertain warning + edit/delete hover menu
+- `components/LeafEditModal.tsx` — modal sửa type + content (createPortal)
+- `components/LeavesPanelLive.tsx` — `LiveEnginePanel` (nút "Tách lá" + status + quality score) + `LiveLeavesPanel` (list + 4 empty state)
+- `pages/NoteEditor.tsx` — wire DocumentTypePicker + LiveEnginePanel + LiveLeavesPanel, prop drilling `documentType` qua EditorShell
+- `components/MobileInsightSheet.tsx` — rewrite dùng live components
+- i18n: thêm `editor.documentType.*`, `editor.engine.*` (rewrite), `editor.leaves.*` (mở rộng), `leafType.*`, `leafCard.*`, `leafEdit.*`, `toast.engine.*`, `common.save/cancel/edit/delete` — đồng bộ vi.json + en.json
+
+Docs:
+- `information/leaf-engine-contract.md` mới — hợp đồng kỹ thuật cho data pipeline (n8n) + training pipeline (Qwen)
+- `information/database-schema.md` — thêm bảng `leaves` + `leaf_feedback` + cột `notes.document_type`
+- `information/api-spec.md` — 5 endpoint mới + LeafOut/RegenerateResponse schemas + error codes
+- `CLAUDE.md` — bảng trạng thái: thêm 18 file mới
+- `CHECKPOINT.md` mới — snapshot tiến độ giữa session (không commit, chỉ làm việc nội bộ)
+
+**Files đã can thiệp** (32):
+
+Backend (13):
+- `backend/app/models/note.py` — sửa: thêm `document_type` column
+- `backend/app/models/leaf.py` — tạo mới
+- `backend/app/models/leaf_feedback.py` — tạo mới
+- `backend/app/models/__init__.py` — sửa: export Leaf, LeafFeedback
+- `backend/app/schemas/note.py` — sửa: thêm DocumentType + field
+- `backend/app/schemas/leaf.py` — tạo mới
+- `backend/app/services/notes.py` — sửa: serialize document_type, accept ở create/update
+- `backend/app/services/leaf_engine.py` — tạo mới
+- `backend/app/services/leaf_quality.py` — tạo mới
+- `backend/app/services/leaves.py` — tạo mới
+- `backend/app/api/v1/routes/leaves.py` — tạo mới
+- `backend/app/api/v1/router.py` — sửa: register leaf routes
+- `backend/app/core/config.py` — sửa: thêm LEAF_ENGINE_* + LEAF_QUALITY_MIN_SCORE
+- `backend/.env.example` — sửa: document env mới
+- `backend/scripts/check_env.py` — sửa: probe leaf engine
+- `backend/scripts/eval_engine.py` — tạo mới
+- `backend/alembic/versions/m005_add_note_document_type.py` — tạo mới
+- `backend/alembic/versions/m006_create_leaves_table.py` — tạo mới
+- `backend/tests/fixtures/raw_seed.jsonl` — tạo mới (10 example)
+
+Frontend (8):
+- `frontend/src/services/notes.ts` — sửa: DocumentType + field
+- `frontend/src/services/leaves.ts` — tạo mới
+- `frontend/src/hooks/useLeaves.ts` — tạo mới
+- `frontend/src/components/DocumentTypePicker.tsx` — tạo mới
+- `frontend/src/components/LeafItem.tsx` — tạo mới
+- `frontend/src/components/LeafEditModal.tsx` — tạo mới
+- `frontend/src/components/LeavesPanelLive.tsx` — tạo mới
+- `frontend/src/pages/NoteEditor.tsx` — sửa: wire live components + DocumentTypePicker
+- `frontend/src/components/MobileInsightSheet.tsx` — sửa: rewrite dùng live
+- `frontend/src/locales/vi.json` — sửa: ~30 i18n key mới
+- `frontend/src/locales/en.json` — sửa: đồng bộ ~30 key
+
+Docs (5):
+- `CLAUDE.md` — sửa: bảng trạng thái file
+- `CHECKPOINT.md` — tạo mới
+- `information/database-schema.md` — sửa: leaves + leaf_feedback + document_type
+- `information/api-spec.md` — sửa: 5 endpoint + schemas
+- `information/leaf-engine-contract.md` — tạo mới
+- `HISTORY.md` — entry này
+
+**Còn lại / WIP**:
+- Chưa chạy `alembic upgrade head` thật trên Supabase — cần verify migration syntax (CHECK constraint với tuple repr).
+- Chưa chạy `npm run build` / `tsc --noEmit` để verify FE — risk type lỗi prop drilling.
+- Eval script cần `LEAF_ENGINE_URL` thật để test — chờ user deploy Qwen lên Together.
+- Chưa update `.claude/memory/context.md` với các pattern mới.
+
+**Ranh giới**: User tự build training data + n8n workflow + train Qwen + deploy Together. Backend chỉ cần biết URL/API key/model.
