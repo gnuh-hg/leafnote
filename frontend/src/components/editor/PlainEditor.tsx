@@ -4,6 +4,7 @@ import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
 import Link from '@tiptap/extension-link'
 import Mention from '@tiptap/extension-mention'
+import { Mathematics } from '@tiptap/extension-mathematics'
 import { Markdown } from 'tiptap-markdown'
 import { useTranslation } from 'react-i18next'
 import tippy, { type Instance } from 'tippy.js'
@@ -19,6 +20,7 @@ import {
   Mic,
   Image as ImageIcon,
   Link2,
+  Sigma,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import NoteLinkList, { type NoteLinkListRef, type NoteItem } from './NoteLinkList'
@@ -165,6 +167,11 @@ export default function PlainEditor({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     suggestion: buildSuggestion() as any,
       }),
+      Mathematics.configure({
+        katexOptions: {
+          throwOnError: false,
+        },
+      }),
       Markdown.configure({
         html: false,
         transformPastedText: true,
@@ -309,6 +316,22 @@ export default function PlainEditor({
             title={t('editor.toolbar.noteLink')}
           >
             <Link2 className="w-4 h-4" />
+          </ToolbarButton>
+
+          <ToolbarButton
+            onClick={() => {
+              if (!editor) return
+              const { from, to } = editor.state.selection
+              if (from === to) {
+                editor.chain().focus().insertContent('$ $').setTextSelection(from + 1).run()
+              } else {
+                const content = editor.state.doc.textBetween(from, to)
+                editor.chain().focus().insertContent(`$${content}$`).run()
+              }
+            }}
+            title={t('editor.toolbar.latex')}
+          >
+            <Sigma className="w-4 h-4" />
           </ToolbarButton>
 
           {(onRecord || onImage) && <ToolbarSeparator />}

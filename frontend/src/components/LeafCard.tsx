@@ -9,6 +9,7 @@ import {
   Link2,
   Snowflake,
 } from 'lucide-react'
+import MarkdownRenderer from './ui/MarkdownRenderer'
 import type { Leaf, LeafType, SurfacingType } from '../data/mockData'
 
 export const TYPE_STYLES: Record<LeafType, {
@@ -94,9 +95,9 @@ export default function LeafCard({ leaf, onClick, compact = false }: LeafCardPro
         )}
       </div>
 
-      <p className="text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-100 mb-3 font-serif">
-        {leaf.content}
-      </p>
+      <div className="text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-100 mb-3 font-serif">
+        <MarkdownRenderer content={leaf.content} />
+      </div>
 
       {leaf.surfacingReason && !compact && (
         <div className="text-[11px] text-zinc-500 mb-4 italic border-l-2 border-paper-300 dark:border-ink-700 pl-2.5">

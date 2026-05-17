@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Network, Eye, Flame, Snowflake } from 'lucide-react'
+import MarkdownRenderer from '../components/ui/MarkdownRenderer'
 import { graphNodes, graphEdges, projects, leaves } from '../data/mockData'
 import { TYPE_STYLES } from '../components/LeafCard'
 import type { Leaf as LeafType } from '../data/mockData'
@@ -346,9 +347,9 @@ function NodeDetail({ leaf, onClear }: NodeDetailProps) {
           {t('graph.nodeDetail.deselect')}
         </button>
       </div>
-      <p className="text-[14px] text-zinc-800 dark:text-zinc-100 font-serif leading-relaxed mb-4">
-        {leaf.content}
-      </p>
+      <div className="text-[14px] text-zinc-800 dark:text-zinc-100 font-serif leading-relaxed mb-4">
+        <MarkdownRenderer content={leaf.content} />
+      </div>
       <div className="space-y-2 text-[11px]">
         <Row label={t('graph.nodeDetail.retentionLabel')} value={`${Math.round(leaf.retention * 100)}%`} />
         <Row label={t('graph.nodeDetail.relevanceLabel')} value={`${Math.round(leaf.relevance * 100)}%`} />

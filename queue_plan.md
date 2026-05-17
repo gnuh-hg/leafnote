@@ -142,3 +142,30 @@ A4 + B11 có thể làm song song với chuỗi train ở dưới.
 - Sinh `raw_leaves.jsonl` (user đang chạy `/datagen-leaves`).
 - Tinh chỉnh `_BASE_PROMPT` / `_DOC_TYPE_HINT` — chỉ làm nếu eval B12 fail và xác định prompt là root cause.
 - Phase 6 continuous improvement (re-train với data thật, promote `freeform`, swap provider).
+
+---
+
+# Research & Implementation Record: LaTeX Support (Added 2026-05-17)
+
+## 1. Research Summary
+- **Current State**: 
+    - Frontend uses **Tiptap** (`PlainEditor.tsx`) for note editing but lacks math extensions.
+    - Leaves are rendered as plain text in `LeafCard.tsx`, `LeafDetailModal.tsx`, etc.
+- **Restricted Files Context**:
+    - `PLAN.md` & `CHECKPOINT.md`: Need updates to track this new feature.
+    - `skill/datagen-leaves`: May need instructions to ensure AI knows it *can* use LaTeX delimiters in the `content` field.
+    - `raw_leaves.jsonl`: Should eventually include examples with LaTeX for testing the "separation" logic.
+
+## 2. Proposed Implementation Steps
+1.  **Install Dependencies**: `katex`, `react-markdown`, `remark-math`, `rehype-katex`.
+2.  **Global Styles**: Import KaTeX CSS in `frontend/src/main.tsx`.
+3.  **New Component**: Create `MarkdownRenderer.tsx` using `react-markdown` + `rehype-katex`.
+4.  **Editor Update**: Add `tiptap-extension-katex` to `PlainEditor.tsx`.
+5.  **View Update**: Replace direct text rendering with `MarkdownRenderer` in `LeafCard.tsx`, `LeafDetailModal.tsx`, `LeafItem.tsx`, and `KnowledgeGraph.tsx`.
+6.  **Locales**: Add translation keys for the LaTeX toolbar button.
+
+## 3. Instructions for updating restricted files (For User)
+- **PLAN.md**: Add "LaTeX math support" to the active/upcoming features list.
+- **CHECKPOINT.md**: Log the completion of LaTeX integration.
+- **skill/datagen-leaves**: Update the prompt template to suggest LaTeX for mathematical expressions.
+- **raw_leaves.jsonl**: Add 2-3 samples of leaves containing math formulas.

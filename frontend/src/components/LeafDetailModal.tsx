@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { X, Brain, Link2, Edit2, GitMerge, Calendar, Eye, Snowflake, Sun } from 'lucide-react'
+import MarkdownRenderer from './ui/MarkdownRenderer'
 import { TYPE_STYLES, RetentionRow } from './LeafCard'
 import { leaves as allLeaves } from '../data/mockData'
 import type { Leaf } from '../data/mockData'
@@ -58,9 +59,9 @@ export default function LeafDetailModal({ leaf, onClose }: LeafDetailModalProps)
 
         <div className="p-6 space-y-6">
           {/* Leaf content */}
-          <p className="text-2xl leading-snug font-serif text-zinc-900 dark:text-zinc-50">
-            {leaf.content}
-          </p>
+          <div className="text-2xl leading-snug font-serif text-zinc-900 dark:text-zinc-50">
+            <MarkdownRenderer content={leaf.content} />
+          </div>
 
           {/* Why surfacing */}
           {leaf.surfacingReason && (

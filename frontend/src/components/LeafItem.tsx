@@ -9,6 +9,7 @@ import {
   Trash2,
   AlertTriangle,
 } from 'lucide-react'
+import MarkdownRenderer from './ui/MarkdownRenderer'
 import type { LeafOut, LeafType } from '../services/leaves'
 
 const TYPE_STYLES: Record<LeafType, {
@@ -99,9 +100,9 @@ export default function LeafItem({ leaf, onEdit, onDelete }: Props) {
         </div>
       </div>
 
-      <p className="text-[12.5px] leading-relaxed text-zinc-800 dark:text-zinc-100 whitespace-pre-wrap">
-        {leaf.content}
-      </p>
+      <div className="text-[12.5px] leading-relaxed text-zinc-800 dark:text-zinc-100 whitespace-pre-wrap">
+        <MarkdownRenderer content={leaf.content} />
+      </div>
 
       {leaf.type === 'definition' && Boolean(leaf.metadata.term) && (
         <div className="mt-2 text-[10.5px] text-zinc-500">
