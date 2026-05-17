@@ -12,6 +12,8 @@ from app.schemas.leaf import LEAF_TYPES, LeafEngineItem, QualityReport
 
 
 _WORD_RE = re.compile(r"[\w']+", re.UNICODE)
+_MATH_BLOCK_RE = re.compile(r"\$\$(.+?)\$\$", re.DOTALL)
+_MATH_INLINE_RE = re.compile(r"\$([^$\n]+?)\$")
 ATOMICITY_MAX_WORDS = 80
 GRANULARITY_MIN_WORDS = 15
 
@@ -29,6 +31,14 @@ WEIGHTS = {
 
 
 def _tokens(text: str) -> set[str]:
+    # Strip LaTeX trước khi tokenize: mỗi math block/inline thành 1 placeholder
+    # token (hash của nội dung công thức), giúp coverage match được giữa note
+    # và leaf chứa cùng công thức — tokenizer mặc định bỏ qua $, \, {, }.
+    def _replace_math(match: re.Match[str]) -> str:
+        return f" __math_{hash(match.group(1)) & 0xFFFF:04x}__ "
+
+    text = _MATH_BLOCK_RE.sub(_replace_math, text)
+    text = _MATH_INLINE_RE.sub(_replace_math, text)
     return {m.group(0).lower() for m in _WORD_RE.finditer(text)}
 
 

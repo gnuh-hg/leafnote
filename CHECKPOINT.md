@@ -8,8 +8,8 @@
 
 | Hạng mục | Mục tiêu | Hiện tại | % |
 |---|---|---|---|
-| Sessions sinh data | 40 | **12** | 30% |
-| Raw examples | 2 000 | **600** | 30% |
+| Sessions sinh data | 40 | **15** | 37.5% |
+| Raw examples | 2 000 | **750** | 37.5% |
 | Sau filter (dự kiến 80%) | ~1 600 | chưa chạy | — |
 | Train/test split | 1 440 / 160 | chưa | — |
 | Golden eval set | 25 | 10 (seed) | 40% |
@@ -25,8 +25,8 @@
 |---|---|---|---|---|
 | 1 | theory | lập trình (Py/JS/TS/algo) | ✅ done | 50 examples, validate 0 lỗi |
 | 2 | theory | khoa học tự nhiên (lý/hoá/sinh) | ✅ done | 50 examples, validate 0 lỗi |
-| 3 | theory | toán học (xác suất/ĐSTT/giải tích) | ✅ done | 50 examples, validate 0 lỗi |
-| 4 | theory | ML/AI (NN/transformer/RAG) | ✅ done | 50 examples, validate 0 lỗi |
+| 3 | theory | toán học (xác suất/ĐSTT/giải tích) | ✅ done | Redo với LaTeX 2026-05-17, 96% example có LaTeX (48/50), avg score 0.857 |
+| 4 | theory | ML/AI (NN/transformer/RAG) | ✅ done | Redo với LaTeX 2026-05-17, 66% example có LaTeX (33/50), avg score 0.868 |
 | 5 | theory | web/system (HTTP/REST/SQL/OS) | ✅ done | 50 examples, validate 0 lỗi |
 
 **Phase 1 gate (sau session 5)**:
@@ -53,7 +53,10 @@
 | 10 | procedure — nấu ăn Á (sushi, kimchi, dim sum) | ✅ done |
 | 11 | procedure — bánh & dessert (macaron, tiramisu, flan) | ✅ done |
 | 12 | procedure — tech setup (Docker, Git flow, Linux, PostgreSQL) | ✅ done |
-| 13–16 | procedure (dev workflow, thể dục, đời sống, DIY...) | ⏳ |
+| 13 | procedure — dev workflow (CI/CD, code review, deploy) | ✅ done |
+| 14 | procedure — thể dục & sức khoẻ (gym, yoga, chạy bộ) | ✅ done |
+| 15 | procedure — đời sống (du lịch packing, chăm sóc cây, dọn dẹp) | ✅ done |
+| 16 | procedure (DIY & craft) | ⏳ |
 | 17–20 | narrative (nhật ký, kỷ niệm...) | ⏳ |
 
 **Phase 2 gate (sau session 15)**:
@@ -115,23 +118,17 @@
 - **Validate**: 50/50 OK, không có lỗi JSON, không leaf >100 từ; mọi `definition` có term+meaning; mọi `example` có polarity
 - **File**: `backend/data/raw_leaves.jsonl` lines 51–100
 
-### Session 3 — 2026-05-16
+### Session 3 — 2026-05-16 (DEPRECATED, đã strip — xem Session 3 redo bên dưới)
 
 - **Doc type**: theory
-- **Topic**: toán học — xác suất & thống kê (s03-001..017), đại số tuyến tính (s03-018..034), giải tích (s03-035..050)
-- **Ngôn ngữ**: ~60% Vi, ~30% En, ~10% mix
-- **Leaves/note**: 3–5
-- **Validate**: 50/50 OK, không có lỗi JSON, không leaf >100 từ; mọi `definition` có term+meaning; mọi `example` có polarity
-- **File**: `backend/data/raw_leaves.jsonl` lines 101–150
+- **Topic**: toán học — xác suất & thống kê, đại số tuyến tính, giải tích
+- **Lý do strip**: sinh khi skill còn cấm LaTeX, không có công thức — đã thay bằng version mới (xem entry s03-redo)
 
-### Session 4 — 2026-05-16
+### Session 4 — 2026-05-16 (DEPRECATED, đã strip — xem Session 4 redo bên dưới)
 
 - **Doc type**: theory
-- **Topic**: ML/AI — NN fundamentals (s04-001..010), Attention & Transformer (s04-011..019), Embeddings & retrieval (s04-020..029), RAG & hallucination (s04-025..030), Training & efficiency (s04-031..034), Reasoning & evaluation (s04-035..045), Misc (s04-046..050)
-- **Ngôn ngữ**: ~70% Vi, ~20% En (s04-031..035, s04-046), ~10% mix
-- **Leaves/note**: 3–4
-- **Validate**: 50/50 OK, không có lỗi JSON, không có leaf >100 từ; mọi `definition` có term+meaning; mọi `example` có polarity
-- **File**: `backend/data/raw_leaves.jsonl` lines 151–200
+- **Topic**: ML/AI — NN, Transformer, Embeddings, RAG
+- **Lý do strip**: sinh khi skill còn cấm LaTeX, không có công thức — đã thay bằng version mới (xem entry s04-redo)
 
 ### Session 5 — 2026-05-16
 
@@ -203,6 +200,14 @@ Ban đầu sinh leaves kèm `user_edited: false` → 404 leaves bị thừa key.
 
 Skill ban đầu nói "không trùng", "cover hết ý" định tính → Claude không biết khi nào leaf bị reject. Đã thêm section "Threshold filter sẽ chấm" với 3 con số (coverage 0.75, jaccard 0.85, granularity 15) + sửa ngưỡng atomicity 100 → 80 (khớp filter thật `leaf_quality.py:15`).
 
+### 4. LaTeX bị cấm khi sinh data sớm (2026-05-17)
+
+Session 1–12 sinh khi skill còn cấm LaTeX → session 3 (toán) và session 4 (ML/AI) không có công thức nào dù topic rất phù hợp. Đã mở khoá LaTeX trong skill + PLAN.md + contract sau khi tích hợp `@tiptap/extension-mathematics` ở frontend và `leaf_quality._tokens()` strip math block. **Action**: strip lines 101–200 trong `raw_leaves.jsonl` và sinh lại 2 session đó với LaTeX. Các session khác (1, 2, 5–12) không bắt buộc redo vì topic không có công thức rõ ràng. **✅ DONE 2026-05-17**: s3 redo 96% LaTeX (avg 0.857), s4 redo 66% LaTeX (avg 0.868), validate 0 hard errors cả hai.
+
+### 5. Field `metadata.format: "math"` dư thừa (2026-05-17)
+
+Khi mở khoá LaTeX, rule yêu cầu mọi leaf chứa `$...$` phải gắn `metadata.format: "math"`. Sau khi sinh xong nhận ra field này dư thừa: downstream (filter `leaf_quality._tokens()`, frontend KaTeX, scorer) detect delimiter `$` trực tiếp từ content, không đọc metadata.format; rule chỉ thêm gánh nặng cho model fine-tune mà không mang signal mới. **Action**: bỏ rule khỏi SKILL + PLAN + contract, chạy script strip 93 field đã sinh ở s03/s04 (lines 501–600). Validate sau strip: 100% pass, avg score 0.862. Giữ `format: "code"` vì code không có delimiter chuẩn trong content.
+
 ## Quy ước mới (áp dụng từ session 7)
 
 Sau mỗi session sinh data, **trước khi cập nhật CHECKPOINT**:
@@ -235,6 +240,53 @@ Baseline hiện tại (sau 300 example): **98% pass rate**, avg score 0.857.
 - **Leaves/note**: 6–9 (procedure step-heavy + intro definition + outro tip)
 - **Validate**: 50/50 OK, 0 hard errors, 49 soft warnings (intro/outro fact không có ordinal — skill cho phép), 100% pass ≥0.75, avg score **0.889**
 - **File**: `backend/data/raw_leaves.jsonl` lines 551–600
+
+### Session 3 redo — 2026-05-17 (LaTeX)
+
+- **Doc type**: theory
+- **Topic**: toán học — xác suất & thống kê (s03-001..017), đại số tuyến tính (s03-018..034), giải tích (s03-035..050)
+- **Ngôn ngữ**: ~70% Vi, ~22% En, ~8% mix
+- **Leaves/note**: 3
+- **LaTeX**: **48/50 example (96%)** chứa công thức `$...$`/`$$...$$`; mọi leaf chứa LaTeX có `metadata.format: "math"`
+- **Validate**: 50/50 OK, 0 hard errors, 0 soft warnings, 100% pass ≥0.75, avg score **0.857**
+- **File**: `backend/data/raw_leaves.jsonl` lines 501–550 (vị trí mới sau strip+append)
+
+### Session 13 — 2026-05-17
+
+- **Doc type**: procedure
+- **Topic**: dev workflow — CI/CD (s13-001..018: GitHub Actions workflow cơ bản, matrix Node, cache deps, secrets, artifact, schedule cron, reusable workflow, required status checks, self-hosted runner, lint job, test sharding, Codecov, Docker build/push, release on tag, Slack notify, pin action SHA, Playwright E2E, GitLab CI), code review (s13-019..030: PR template, CODEOWNERS, Conventional Commits, squash merge, review checklist, self-review, stacked PRs, draft PR, resolve conversation, comment etiquette, auto-merge, pair review), deploy (s13-031..044: blue-green, canary, K8s rolling update, feature flag, Vercel, Fly.io, DB migration, smoke test, K8s probes, rollback, Lambda Serverless, ArgoCD GitOps, preview env per PR, maintenance mode), release (s13-045..050: semver, release-please CHANGELOG, Git tag, release notes, hotfix branch, Grafana deploy monitor)
+- **Ngôn ngữ**: ~60% Vi, ~30% En (s13-002, 005, 009, 011, 017, 023, 025), ~10% mix
+- **Leaves/note**: 6–8 (procedure step-heavy + intro/outro)
+- **Validate**: 50/50 OK, 0 hard errors, 24 soft warnings (intro fact không có ordinal — skill cho phép), 100% pass ≥0.75, avg score **0.901**
+- **File**: `backend/data/raw_leaves.jsonl` lines 601–650
+
+### Session 14 — 2026-05-17
+
+- **Doc type**: procedure
+- **Topic**: thể dục & sức khoẻ — gym (s14-001..017: squat, deadlift, bench, OHP, pull-up, barbell row, lunge, plank, push-up, warm-up, progressive overload, rest periods, cool-down, mobility, foam rolling, gym etiquette, máy vs tạ tự do), yoga (s14-018..034: Surya Namaskar A, downward dog, Warrior I/II/III, tree pose, child's pose, pranayama, vinyasa flow sáng, restorative tối, yin 60 phút, hatha 30 phút, mindfulness meditation, savasana, hot yoga prep, chăm sóc thảm, hip openers, backbend, balance tối), chạy bộ (s14-035..050: C25K tuần 1, running form, thở 3:2, interval 400m, long run, tempo, recovery run, chọn giày, hydration, fueling, heat acclimation, hill repeats, treadmill, race morning, phòng knee injury, stretch sau chạy)
+- **Ngôn ngữ**: ~62% Vi, ~28% En (s14-002, 005, 008, 012, 015, 019, 022, 026, 029, 032, 036, 038, 041, 045, 048), ~10% mix (s14-010, 024, 044)
+- **Leaves/note**: 5–6 (procedure step-heavy + intro definition + outro note/example)
+- **Validate**: 50/50 OK, 0 hard errors, 0 soft warnings, 100% pass ≥0.75, avg score **0.891**
+- **File**: `backend/data/raw_leaves.jsonl` lines 651–700
+
+### Session 4 redo — 2026-05-17 (LaTeX)
+
+- **Doc type**: theory
+- **Topic**: ML/AI — NN fundamentals (s04-001..010), Transformer & attention (s04-011..020), Embeddings & RAG (s04-021..030), Training & efficiency (s04-031..040), Evaluation & misc (s04-041..050)
+- **Ngôn ngữ**: ~52% Vi, ~38% En, ~10% mix
+- **Leaves/note**: 3
+- **LaTeX**: **33/50 example (66%)** chứa công thức (attention scaling, softmax, RoPE, LoRA, distillation, perplexity, BLEU, MoE...); mọi leaf chứa LaTeX có `metadata.format: "math"`
+- **Validate**: 50/50 OK, 0 hard errors, 0 soft warnings, 100% pass ≥0.75, avg score **0.868**
+- **File**: `backend/data/raw_leaves.jsonl` lines 551–600 (vị trí mới sau strip+append)
+
+### Session 15 — 2026-05-17
+
+- **Doc type**: procedure
+- **Topic**: đời sống — du lịch packing (s15-001..017: công tác 3 ngày, carry-on quốc tế, cuộn quần áo, packing cubes, đồ điện tử, TSA 3-1-1, trekking 5 ngày, beach trip, gia đình có em bé, winter layering, camping cuối tuần, backpacking Europe, vali ký gửi, travel laundry, túi y tế, documents wallet, bleisure), chăm sóc cây (s15-018..034: sen đá, monstera, trầu bà, fiddle leaf fig, húng quế, snake plant, rệp sáp, basil pinching, phát lộc thuỷ canh, orchid fertilizing, xương rồng mùa đông, succulent propagation, cà chua, pothos, phục hồi úng nước, Kratky hydroponic, mai chiếu thuỷ), dọn dẹp (s15-035..050: KonMari 6 bước, weekly schedule, bếp gas, bathroom deep clean, drap giường, carpet stain, cửa kính, stainless sink, tủ quần áo theo mùa, paperwork 3-pass, máy giặt cửa trước, microwave steam, sàn gỗ, pantry tier, mùi tủ lạnh, digital declutter)
+- **Ngôn ngữ**: ~58% Vi, ~32% En (s15-002, 004, 006, 008, 010, 012, 014, 016, 019, 021, 023, 025, 027, 029, 031, 036, 038, 040, 042, 044, 046, 050), ~10% mix (s15-017, 033, 048)
+- **Leaves/note**: 6–8 (procedure step-heavy + intro definition + outro note)
+- **Validate**: 50/50 OK, 0 hard errors, 0 soft warnings, 100% pass ≥0.75, avg score **0.906**
+- **File**: `backend/data/raw_leaves.jsonl` lines 701–750
 
 ## Quy ước cập nhật CHECKPOINT
 

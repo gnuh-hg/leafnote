@@ -166,8 +166,9 @@ Backend đọc từ `backend/.env`. Các key bắt buộc: `DATABASE_URL`, `SUPA
 | `frontend/src/components/LeavesPanelLive.tsx` | `ready` | LiveEnginePanel + LiveLeavesPanel — kết nối API thật |
 | `frontend/src/pages/Dashboard.tsx` | `scaffold` | Mock data |
 | `frontend/src/pages/NotesList.tsx` | `ready` | Real notes qua useNotes, filter tag qua URL |
-| `frontend/src/pages/NoteEditor.tsx` | `ready` | BlockNote editor + autosave 600ms + tag picker thật |
-| `frontend/src/components/editor/BlockEditor.tsx` | `ready` | Wrapper BlockNote: schema không media, dark/light theme |
+| `frontend/src/pages/NoteEditor.tsx` | `ready` | Tiptap editor + autosave 600ms + tag picker thật |
+| `frontend/src/components/editor/PlainEditor.tsx` | `ready` | Wrapper Tiptap + tiptap-markdown + Mathematics (LaTeX `$...$` / `$$...$$`), toolbar, dark/light theme |
+| `frontend/src/components/editor/MathEditPopover.tsx` | `ready` | Popover sửa công thức LaTeX (KaTeX preview, xoá, xong) |
 | `frontend/src/services/notes.ts` | `ready` | Axios wrapper 5 endpoint Notes |
 | `frontend/src/hooks/useNotes.ts` | `ready` | TanStack Query hooks cho Note CRUD |
 | `frontend/src/pages/KnowledgeGraph.tsx` | `scaffold` | Mock data |

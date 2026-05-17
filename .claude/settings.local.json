@@ -136,7 +136,15 @@
       "Bash(awk 'NR==4' backend/tests/fixtures/seed_all_doctypes.jsonl)",
       "PowerShell(python -m scripts.validate_session --input tests/fixtures/seed_all_doctypes.jsonl 2>&1 | Select-Object -Last 20)",
       "PowerShell(python -m scripts.validate_session --input data/raw_leaves.jsonl --last 50 2>&1 | Select-Object -Last 15)",
-      "PowerShell(Remove-Item *)"
+      "PowerShell(Remove-Item *)",
+      "PowerShell(Set-Content *)",
+      "PowerShell(\\(Get-Content backend/data/temp_s03.jsonl | Measure-Object -Line\\).Lines)",
+      "PowerShell(Set-Location C:\\\\Users\\\\admin\\\\all\\\\project\\\\leafnote; $s3 = Get-Content backend/data/temp_s03.jsonl; $s4 = Get-Content backend/data/temp_s04.jsonl; $s3Latex = \\($s3 | Where-Object { $_ -match '\\\\$' }\\).Count; $s4Latex = \\($s4 | Where-Object { $_ -match '\\\\$' }\\).Count; Write-Host \"s03 examples with LaTeX: $s3Latex / 50\"; Write-Host \"s04 examples with LaTeX: $s4Latex / 50\")",
+      "Bash(cat data/_s13_temp.jsonl)",
+      "Bash(rm data/_s13_temp.jsonl)",
+      "Bash(.\\\\venv\\\\Scripts\\\\python.exe -m scripts.validate_session --last 50)",
+      "Bash(cat data/session15_temp.jsonl)",
+      "Bash(rm data/session15_temp.jsonl)"
     ]
   }
 }

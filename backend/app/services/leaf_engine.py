@@ -41,9 +41,14 @@ QUY TẮC CHUNG (luôn áp dụng):
 METADATA mỗi leaf:
 - definition: phải có {term, meaning}
 - fact: tùy chọn {ordinal} (cho procedure), {source} (cho meeting/quote), {format: text|math|code}, {polarity: positive|negative}
+- fact BẮT BUỘC có {format: "math"} khi content chứa LaTeX ($...$ inline hoặc $$...$$ block).
 - example: phải có {polarity: positive|negative}, tùy chọn {parent_leaf_id}
 - question: không bắt buộc metadata
 - note: không bắt buộc metadata
+
+LaTeX trong note:
+- Giữ NGUYÊN cú pháp $...$ (inline) hoặc $$...$$ (block) trong content của leaf — không escape, không đổi delimiter.
+- Mỗi công thức quan trọng nên tách thành 1 leaf type "fact" riêng với metadata.format = "math".
 
 CONFIDENCE:
 - 0.9–1.0 cho leaf rõ ràng, có chứng cứ trực tiếp trong note.

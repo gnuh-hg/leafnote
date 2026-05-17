@@ -263,7 +263,13 @@
       "italic": "In nghiêng",
       "bulletList": "Danh sách",
       "orderedList": "Danh sách số",
-      "blockquote": "Trích dẫn"
+      "blockquote": "Trích dẫn",
+      "mathInline": "Chèn công thức"
+    },
+    "math": {
+      "placeholder": "Nhập LaTeX, ví dụ: x^2 + y^2 = z^2",
+      "edit": "Xong",
+      "delete": "Xoá"
     },
     "voice": {
       "recording": "đang thu — chạm để dừng",

@@ -149,7 +149,7 @@ Mỗi tương tác (review answer, mở leaf, copy leaf, dismiss surfacing) ghi 
 | Core | React 18 + Vite + TypeScript |
 | UI | TailwindCSS + shadcn/ui |
 | Server state | TanStack Query |
-| Editor | Tiptap (ProseMirror) |
+| Editor | Tiptap (ProseMirror) + tiptap-markdown + `@tiptap/extension-mathematics` + `katex` (LaTeX `$...$` inline / `$$...$$` block) |
 | Graph view | Cytoscape.js hoặc react-force-graph |
 | Auth client | @supabase/supabase-js |
 

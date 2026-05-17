@@ -195,6 +195,32 @@ html.dark .bn-suggestion-menu {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
+/* ─── Tiptap math (KaTeX) ─────────────────────────────────────────────────── */
+.leafnote-plain-editor .Tiptap-mathematics-render,
+.leafnote-plain-editor [data-type="inlineMath"],
+.leafnote-plain-editor [data-type="blockMath"] {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 1px 3px;
+  transition: background 0.15s;
+}
+.leafnote-plain-editor .Tiptap-mathematics-render:hover,
+.leafnote-plain-editor [data-type="inlineMath"]:hover,
+.leafnote-plain-editor [data-type="blockMath"]:hover {
+  background: rgba(16, 185, 129, 0.10);
+}
+.leafnote-plain-editor [data-type="blockMath"] {
+  display: block;
+  text-align: center;
+  margin: 0.75em 0;
+  padding: 0.5em 0.75em;
+}
+.leafnote-plain-editor .ProseMirror-selectednode[data-type="inlineMath"],
+.leafnote-plain-editor .ProseMirror-selectednode[data-type="blockMath"] {
+  background: rgba(16, 185, 129, 0.18);
+  outline: 1px solid rgba(16, 185, 129, 0.5);
+}
+
 /* ─── Tiptap WYSIWYG prose styles ─────────────────────────────────────────── */
 .leafnote-plain-editor .ProseMirror {
   font-family: 'Times New Roman', Times, serif;

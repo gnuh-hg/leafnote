@@ -74,6 +74,13 @@
 - **Ví dụ trong codebase**: `frontend/src/hooks/useTags.ts`
 - **Caveats**: Xem "tmp ID lock" trong `mistakes.md` — không cho edit/delete item có id `tmp-*`
 
+### Tiptap node + tiptap-markdown round-trip
+
+- **Vấn đề giải quyết**: Thêm custom node (math, ảnh, embed...) vào Tiptap mà vẫn giữ Markdown thuần khi lưu DB
+- **Implementation**: `Extension.extend({ addStorage() { return { markdown: { serialize(state, node) { ... }, parse: {} } } } })` — tiptap-markdown đọc storage này khi `getMarkdown()`. Với content load từ Markdown, dùng migration helper của extension (vd `migrateMathStrings(editor)`) gọi sau `setContent()` để convert raw text → node.
+- **Ví dụ trong codebase**: `frontend/src/components/editor/PlainEditor.tsx` (InlineMathMd, BlockMathMd)
+- **Caveats**: Serializer phải `state.closeBlock(node)` cho block node, không thì paragraph kế bị merge cùng dòng. Migration cần chạy sau khi `isExternalUpdate` flag set false để không trigger onChange loop.
+
 ### Supabase client fallback
 
 - **Vấn đề giải quyết**: App không crash khi env vars chưa được set (local dev chưa có `.env`)

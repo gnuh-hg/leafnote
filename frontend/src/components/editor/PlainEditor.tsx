@@ -1,9 +1,15 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useEditor, EditorContent, ReactRenderer } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
 import Link from '@tiptap/extension-link'
 import Mention from '@tiptap/extension-mention'
+import {
+  Mathematics,
+  InlineMath,
+  BlockMath,
+  migrateMathStrings,
+} from '@tiptap/extension-mathematics'
 import { Markdown } from 'tiptap-markdown'
 import { useTranslation } from 'react-i18next'
 import tippy, { type Instance } from 'tippy.js'
@@ -19,9 +25,43 @@ import {
   Mic,
   Image as ImageIcon,
   Link2,
+  Sigma,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import NoteLinkList, { type NoteLinkListRef, type NoteItem } from './NoteLinkList'
+import MathEditPopover, { type MathEditTarget } from './MathEditPopover'
+import 'katex/dist/katex.min.css'
+
+// Tiptap-markdown round-trip: serialize node math về `$..$` / `$$..$$` để DB
+// và Leaf Engine luôn thấy markdown chuẩn KaTeX, không phải HTML.
+const InlineMathMd = InlineMath.extend({
+  addStorage() {
+    return {
+      markdown: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        serialize(state: any, node: any) {
+          state.write('$' + (node.attrs.latex ?? '') + '$')
+        },
+        parse: {},
+      },
+    }
+  },
+})
+
+const BlockMathMd = BlockMath.extend({
+  addStorage() {
+    return {
+      markdown: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        serialize(state: any, node: any) {
+          state.write('$$' + (node.attrs.latex ?? '') + '$$')
+          state.closeBlock(node)
+        },
+        parse: {},
+      },
+    }
+  },
+})
 
 interface Props {
   value: string
@@ -78,6 +118,9 @@ export default function PlainEditor({
   const isExternalUpdate = useRef(false)
   const notesRef = useRef<NoteItem[]>(notes)
   const insertAtLocked = useRef(false)
+  const [mathTarget, setMathTarget] = useState<MathEditTarget | null>(null)
+  // editorRef cho phép callback của math node (định nghĩa trước useEditor) truy cập editor mới nhất
+  const editorRef = useRef<ReturnType<typeof useEditor> | null>(null)
 
   // Keep notesRef in sync so the suggestion closure always sees fresh data
   useEffect(() => {
@@ -149,6 +192,26 @@ export default function PlainEditor({
     },
   }), [])
 
+  const openMathPopover = useCallback((kind: 'inline' | 'block', pos: number, latex: string, isNew = false) => {
+    // Editor có thể chưa khởi tạo khi callback được tạo — dùng setTimeout để truy cập sau.
+    setTimeout(() => {
+      const view = editorRef.current?.view
+      if (!view) return
+      try {
+        const coords = view.coordsAtPos(pos)
+        setMathTarget({
+          kind,
+          pos,
+          latex,
+          isNew,
+          rect: { left: coords.left, top: coords.top, bottom: coords.bottom },
+        })
+      } catch {
+        // pos không hợp lệ — bỏ qua
+      }
+    }, 0)
+  }, [])
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ codeBlock: false }),
@@ -164,6 +227,15 @@ export default function PlainEditor({
         HTMLAttributes: { class: 'note-link-chip' },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     suggestion: buildSuggestion() as any,
+      }),
+      Mathematics,
+      InlineMathMd.configure({
+        katexOptions: { throwOnError: false, errorColor: '#dc2626' },
+        onClick: (node, pos) => openMathPopover('inline', pos, node.attrs.latex ?? ''),
+      }),
+      BlockMathMd.configure({
+        katexOptions: { throwOnError: false, errorColor: '#dc2626' },
+        onClick: (node, pos) => openMathPopover('block', pos, node.attrs.latex ?? ''),
       }),
       Markdown.configure({
         html: false,
@@ -183,6 +255,16 @@ export default function PlainEditor({
     },
   })
 
+  // Keep editorRef in sync — callbacks tạo trước khi editor sẵn sàng cần lookup hiện tại
+  useEffect(() => {
+    editorRef.current = editor
+    // Initial mount: useEditor({ content }) đã load value rồi nên useEffect [value] bên dưới skip.
+    // Phải gọi migrate ở đây để `$x^2$` từ DB convert thành node math ngay lần đầu render.
+    if (editor) {
+      migrateMathStrings(editor)
+    }
+  }, [editor])
+
   // Sync external value changes (note hydration) without triggering onChange loop
   useEffect(() => {
     if (!editor) return
@@ -190,6 +272,8 @@ export default function PlainEditor({
     isExternalUpdate.current = true
     lastMarkdown.current = value
     editor.commands.setContent(value)
+    // Sau khi load markdown, convert raw `$...$` / `$$...$$` thành node math
+    migrateMathStrings(editor)
     isExternalUpdate.current = false
   }, [value, editor])
 
@@ -213,6 +297,78 @@ export default function PlainEditor({
     },
     [navigate],
   )
+
+  // Tìm vị trí thật của node math tại/sau `hintPos` — pos có thể lệch nếu doc đổi
+  // giữa lúc mở popover và lúc submit (vd user nhập tiếp ở vị trí khác).
+  const resolveMathPos = useCallback((hintPos: number, kind: 'inline' | 'block'): number | null => {
+    if (!editor) return null
+    const typeName = kind === 'inline' ? 'inlineMath' : 'blockMath'
+    // Thử pos hint trước
+    const node = editor.state.doc.nodeAt(hintPos)
+    if (node?.type.name === typeName) return hintPos
+    // Quét toàn doc tìm node gần hint nhất
+    let bestPos: number | null = null
+    let bestDist = Infinity
+    editor.state.doc.descendants((n, p) => {
+      if (n.type.name === typeName) {
+        const d = Math.abs(p - hintPos)
+        if (d < bestDist) {
+          bestDist = d
+          bestPos = p
+        }
+      }
+    })
+    return bestPos
+  }, [editor])
+
+  const handleMathSave = useCallback((latex: string) => {
+    if (!editor || !mathTarget) return
+    if (!latex.trim()) {
+      setMathTarget(null)
+      return
+    }
+    if (mathTarget.isNew) {
+      // Insert mới tại vị trí cursor lúc mở popover
+      const chain = editor.chain().focus().setTextSelection(mathTarget.pos)
+      if (mathTarget.kind === 'inline') {
+        chain.insertInlineMath({ latex }).run()
+      } else {
+        chain.insertBlockMath({ latex }).run()
+      }
+    } else {
+      // Sửa node đã tồn tại — resolve pos lại phòng khi doc đổi
+      const pos = resolveMathPos(mathTarget.pos, mathTarget.kind)
+      if (pos != null) {
+        if (mathTarget.kind === 'inline') {
+          editor.chain().focus().updateInlineMath({ latex, pos }).run()
+        } else {
+          editor.chain().focus().updateBlockMath({ latex, pos }).run()
+        }
+      }
+    }
+    setMathTarget(null)
+  }, [editor, mathTarget, resolveMathPos])
+
+  const handleMathDelete = useCallback(() => {
+    if (!editor || !mathTarget) {
+      setMathTarget(null)
+      return
+    }
+    // Nếu chưa insert (isNew) thì chỉ cần đóng popover
+    if (mathTarget.isNew) {
+      setMathTarget(null)
+      return
+    }
+    const pos = resolveMathPos(mathTarget.pos, mathTarget.kind)
+    if (pos != null) {
+      if (mathTarget.kind === 'inline') {
+        editor.chain().focus().deleteInlineMath({ pos }).run()
+      } else {
+        editor.chain().focus().deleteBlockMath({ pos }).run()
+      }
+    }
+    setMathTarget(null)
+  }, [editor, mathTarget, resolveMathPos])
 
   if (!editor) return null
 
@@ -264,6 +420,18 @@ export default function PlainEditor({
             title={t('editor.toolbar.blockquote')}
           >
             <Quote className="w-4 h-4" />
+          </ToolbarButton>
+
+          <ToolbarSeparator />
+
+          <ToolbarButton
+            onClick={() => {
+              const { from } = editor.state.selection
+              openMathPopover('inline', from, '', true)
+            }}
+            title={t('editor.toolbar.mathInline')}
+          >
+            <Sigma className="w-4 h-4" />
           </ToolbarButton>
 
           <ToolbarSeparator />
@@ -326,6 +494,12 @@ export default function PlainEditor({
         </div>
       )}
       <EditorContent editor={editor} />
+      <MathEditPopover
+        target={mathTarget}
+        onSave={handleMathSave}
+        onDelete={handleMathDelete}
+        onClose={() => setMathTarget(null)}
+      />
     </div>
   )
 }

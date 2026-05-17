@@ -80,7 +80,8 @@ Sinh trực tiếp trong response. Format JSONL — mỗi dòng 1 object:
 ### Quy tắc note
 
 - Viết bằng Markdown: `##` heading, `**bold**`, `_italic_`, danh sách `- / 1.`, `> blockquote`, `` `code inline` ``
-- **Không dùng**: fenced code block (``` ``` ```), HTML tags, LaTeX
+- **Không dùng**: fenced code block (``` ``` ```), HTML tags
+- **CHO PHÉP LaTeX**: `$công thức$` inline, `$$công thức$$` block. Chỉ dùng khi nội dung thật sự cần công thức (theory toán/lý/ML, reference cheatsheet công thức). Session 3/4 và reference công thức nên có ≥30% example chứa LaTeX.
 - Độ dài: 5–15 câu / 80–250 từ
 - Ngôn ngữ: 60% tiếng Việt, 30% tiếng Anh, 10% mix Việt-Anh
 - Nội dung đa dạng trong topic batch của session
@@ -105,7 +106,8 @@ Metadata bắt buộc theo `(type, document_type)`:
 - `question` / `note` (mọi doc type) → `{}`
 
 Metadata **tùy chọn** (theo contract `leaf-engine-contract.md:66-67`, dùng khi phù hợp để training data đa dạng):
-- `fact` có thể thêm `"format": "code"` hoặc `"format": "math"` khi nội dung là snippet code hoặc công thức toán.
+- `fact` có thể thêm `"format": "code"` khi nội dung là snippet code (giữ vì code không có delimiter chuẩn trong content như `$` của math).
+- **KHÔNG cần** gắn `"format": "math"` khi content chứa LaTeX — downstream (filter, frontend KaTeX, scorer) detect `$...$`/`$$...$$` trực tiếp từ content. Trước 2026-05-17 có rule bắt buộc, đã bỏ vì dư thừa và thêm gánh nặng cho model.
 - `example` có thể thêm `"parent_leaf_id": null` (giữ `null` vì training data không có ID thực) khi example minh hoạ cho một leaf khác trong cùng note.
 
 ### Threshold filter sẽ chấm (phải biết trước khi sinh)
@@ -142,6 +144,7 @@ Trước khi in JSONL ra, kiểm tra nhanh:
 - `fact` trong `procedure` thiếu `metadata.ordinal`
 - `fact` trong `theory` / `narrative` / `reference` lại có `metadata.ordinal` (sai doc type)
 - `example` thiếu `metadata.polarity`
+- Note chứa `$` lẻ không khớp cặp (orphan dollar — sẽ gãy parser KaTeX)
 
 **Dấu hiệu tốt**:
 - Note có ít nhất 1 heading + 1 list hoặc blockquote

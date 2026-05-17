@@ -630,3 +630,73 @@ Docs (5):
 - Chưa update `.claude/memory/context.md` với các pattern mới.
 
 **Ranh giới**: User tự build training data + n8n workflow + train Qwen + deploy Together. Backend chỉ cần biết URL/API key/model.
+
+---
+
+## 2026-05-17 — LaTeX support trong note (frontend + backend + datagen)
+
+**Mục tiêu**: Cho phép user viết công thức LaTeX trong note với cú pháp `$...$` (inline) và `$$...$$` (block), render KaTeX trực tiếp trong editor (không lộ `$$` thô). Đồng bộ pipeline: filter chất lượng, leaf engine prompt, datagen skill, và backfill 2 session toán/ML.
+
+**Đã làm**:
+
+Frontend:
+- Cài `@tiptap/extension-mathematics@3.23.4` + `katex@0.16.47`.
+- Tích hợp `Mathematics + InlineMath + BlockMath` vào `PlainEditor.tsx`, extend node với `addStorage().markdown.serialize` để round-trip Markdown thuần (`$...$` / `$$...$$`).
+- Sau `setContent()` gọi `migrateMathStrings(editor)` để convert raw `$...$` từ DB thành node KaTeX.
+- Tạo `MathEditPopover.tsx` — click vào node math mở popover (KaTeX live preview + textarea + nút Xoá/Xong).
+- Thêm 2 toolbar button (Sigma cho inline, SquareFunction cho block) + 5 i18n key cả vi/en.
+- Import `katex/dist/katex.min.css` + CSS riêng cho `.Tiptap-mathematics-render` (hover/selected highlight).
+
+Backend:
+- `leaf_quality._tokens()` strip `$...$` / `$$...$$` thành placeholder `__math_<hash>__` trước khi tokenize → coverage match giữa note có math và leaf chứa cùng công thức; 2 leaf cùng công thức bị flag duplicate đúng ý đồ. Validate trên 50 example cuối → score giữ nguyên 0.889 (không regress).
+- `leaf_engine._BASE_PROMPT` thêm rule LaTeX: giữ nguyên delimiter `$`, mỗi công thức quan trọng là 1 leaf `fact` với `metadata.format: "math"`.
+
+Datagen pipeline:
+- Skill `/datagen-leaves` mở khoá LaTeX: bỏ khỏi danh sách cấm, yêu cầu ≥30% example có LaTeX cho session theory toán/lý/ML. `format: "math"` BẮT BUỘC cho leaf chứa LaTeX.
+- `PLAN.md` thêm note cho phép LaTeX.
+- `CHECKPOINT.md`: mark session 3 (toán) và session 4 (ML/AI) thành `🔄 redo` — user phải strip lines 101–200 trong `raw_leaves.jsonl` và sinh lại với LaTeX.
+- `information/leaf-engine-contract.md`: format math BẮT BUỘC + granularity rules thêm guideline LaTeX.
+
+Docs / memory:
+- `CLAUDE.md` sửa `BlockEditor.tsx` → `PlainEditor.tsx`, thêm row `MathEditPopover.tsx`.
+- `information/architecture.md` thêm `@tiptap/extension-mathematics` + `katex` vào tech stack.
+- `.claude/memory/context.md` ghi quyết định cú pháp `$...$` + `$$...$$`, tại sao chọn KaTeX, files chính.
+- `.claude/memory/patterns.md` thêm pattern "Tiptap node + tiptap-markdown round-trip" (reuse cho image/embed sau này).
+
+**Files đã can thiệp**:
+
+Frontend (5):
+- `frontend/package.json` — sửa: cài 2 deps mới
+- `frontend/src/components/editor/PlainEditor.tsx` — sửa: thêm Mathematics ext + toolbar + popover state + migrate sau setContent
+- `frontend/src/components/editor/MathEditPopover.tsx` — tạo mới
+- `frontend/src/index.css` — sửa: import katex CSS + style math node
+- `frontend/src/locales/vi.json` + `en.json` — sửa: 5 key mới (mathInline/mathBlock + math.placeholder/edit/delete)
+
+Backend (2):
+- `backend/app/services/leaf_quality.py` — sửa: `_tokens()` strip math block
+- `backend/app/services/leaf_engine.py` — sửa: prompt thêm rule LaTeX + format:math required
+
+Docs (7):
+- `CLAUDE.md` — sửa: row PlainEditor + thêm row MathEditPopover
+- `PLAN.md` — sửa: cho phép LaTeX
+- `CHECKPOINT.md` — sửa: session 3/4 redo + log bài học #4 + giảm tiến độ
+- `.claude/skills/datagen-leaves/SKILL.md` — sửa: bỏ cấm LaTeX, format:math required, self-validate rules
+- `information/leaf-engine-contract.md` — sửa: format:math required + granularity LaTeX
+- `information/architecture.md` — sửa: tech stack thêm deps
+- `.claude/memory/context.md` + `patterns.md` — thêm entry mới
+- `HISTORY.md` — entry này
+
+**Verification**:
+- `npx tsc --noEmit` — 0 error
+- `npm run lint` — 0 warning
+- `npm run build` — OK, KaTeX fonts được copy vào dist/assets/
+- `python -m scripts.validate_session --last 50` — 0 hard error, score 0.889 không regress
+
+**Còn lại / WIP**:
+- User chưa backfill session 3 và 4. Bước cần làm tay:
+  1. Strip lines 101–200 trong `backend/data/raw_leaves.jsonl`.
+  2. Gọi `/datagen-leaves` 2 lần (đếm sẽ cho session 11, 12 nhưng nội dung theo plan là 3 và 4 redo — note rõ trong CHECKPOINT khi append).
+  3. Validate + cập nhật CHECKPOINT.
+- Browser QA chưa chạy — cần verify: nhập `$x^2$` → node KaTeX hiện ngay; click → popover mở; save → reload → công thức render lại; tag picker + autosave không vỡ.
+
+**Ranh giới**: Plan này chỉ implement infrastructure LaTeX. Backfill session 3/4 và browser QA thuộc về user.

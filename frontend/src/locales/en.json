@@ -263,7 +263,13 @@
       "italic": "Italic",
       "bulletList": "Bullet list",
       "orderedList": "Numbered list",
-      "blockquote": "Quote"
+      "blockquote": "Quote",
+      "mathInline": "Insert formula"
+    },
+    "math": {
+      "placeholder": "Enter LaTeX, e.g.: x^2 + y^2 = z^2",
+      "edit": "Done",
+      "delete": "Delete"
     },
     "voice": {
       "recording": "recording — tap to stop",

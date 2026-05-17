@@ -179,3 +179,17 @@ Tên unique mỗi câu lệnh → không bao giờ collision dù pgbouncer reuse
 **Tooling:** `backend/scripts/check_env.py` verify env vars không in secret. Chạy `python -m scripts.check_env` từ `backend/`.
 
 **Files chính:** `backend/app/core/{config,database,auth}.py`, `backend/app/main.py`, `backend/alembic/env.py`, `backend/.env.example`, `backend/scripts/check_env.py`.
+
+---
+
+## 2026-05-17 — LaTeX trong note: cú pháp `$...$` + `$$...$$` (KaTeX)
+
+**Quyết định**: hỗ trợ công thức LaTeX trong note với chuẩn KaTeX — `$inline$` và `$$block$$`.
+
+- **Frontend**: dùng `@tiptap/extension-mathematics` + `katex`. Editor convert `$...$` → node math (KaTeX render) ngay khi user nhập đầy đủ cặp delimiter — user KHÔNG bao giờ thấy `$$` thô. Click node math mở popover sửa (`MathEditPopover.tsx`).
+- **Storage**: DB lưu Markdown `$...$` / `$$...$$` thuần — round-trip qua `tiptap-markdown` storage serializer. Leaf Engine prompt giữ nguyên markdown này.
+- **Backend filter**: `leaf_quality._tokens()` strip math block thành placeholder `__math_<hash>__` trước khi tokenize → coverage không bị drop khi note có math; 2 leaf chứa cùng công thức bị flag duplicate đúng ý đồ.
+- **Datagen**: skill `/datagen-leaves` mở khoá LaTeX cho session theory toán/lý/ML và reference công thức. Leaf chứa công thức BẮT BUỘC có `metadata.format: "math"`.
+- **Tại sao chọn `$` thay vì `\\(`**: chuẩn KaTeX/MathJax phổ biến, quen thuộc với user Vi/En, training data dễ kiếm. Tiptap input rule chỉ trigger khi cặp `$` đóng đủ → không xung đột với giá tiền dạng "50$".
+
+**Files chính**: `frontend/src/components/editor/{PlainEditor,MathEditPopover}.tsx`, `backend/app/services/leaf_quality.py`, `backend/app/services/leaf_engine.py` (prompt), `information/leaf-engine-contract.md`, `.claude/skills/datagen-leaves/SKILL.md`.
