@@ -256,6 +256,7 @@
       "autosave": "Auto-save 2s · offline → đồng bộ khi online",
       "noteLink": "Liên kết ghi chú (@)",
       "noteLinkPrompt": "Nhập URL",
+      "latex": "Chèn công thức toán (LaTeX)",
       "heading1": "Tiêu đề lớn",
       "heading2": "Tiêu đề vừa",
       "heading3": "Tiêu đề nhỏ",
