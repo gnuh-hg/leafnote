@@ -126,7 +126,17 @@
       "Bash(mkdir -p data)",
       "Bash(head -n 10 tests/fixtures/seed_all_doctypes.jsonl)",
       "PowerShell(vssadmin list *)",
-      "PowerShell(Get-WmiObject *)"
+      "PowerShell(Get-WmiObject *)",
+      "Bash(powershell *)",
+      "Bash(cat data/_session05.jsonl)",
+      "Bash(rm data/_session05.jsonl)",
+      "PowerShell(\\(Get-Content backend/data/raw_leaves.jsonl -ErrorAction SilentlyContinue | Measure-Object -Line\\).Lines)",
+      "PowerShell(Add-Content *)",
+      "PowerShell(python -m scripts.validate_session --input tests/fixtures/seed_all_doctypes.jsonl 2>&1 | Select-Object -Last 30)",
+      "Bash(awk 'NR==4' backend/tests/fixtures/seed_all_doctypes.jsonl)",
+      "PowerShell(python -m scripts.validate_session --input tests/fixtures/seed_all_doctypes.jsonl 2>&1 | Select-Object -Last 20)",
+      "PowerShell(python -m scripts.validate_session --input data/raw_leaves.jsonl --last 50 2>&1 | Select-Object -Last 15)",
+      "PowerShell(Remove-Item *)"
     ]
   }
 }

@@ -130,6 +130,7 @@ Backend đọc từ `backend/.env`. Các key bắt buộc: `DATABASE_URL`, `SUPA
 | `backend/alembic/versions/m005_add_note_document_type.py` | `ready` | Add cột Note.document_type với CHECK constraint |
 | `backend/alembic/versions/m006_create_leaves_table.py` | `ready` | Tạo bảng `leaves` + `leaf_feedback` |
 | `backend/scripts/eval_engine.py` | `ready` | Regression test engine trên fixture set, so vs baseline |
+| `backend/scripts/validate_session.py` | `ready` | Pre-filter validator sau mỗi session datagen — schema hard check + quality soft warn |
 | `backend/tests/fixtures/seed_all_doctypes.jsonl` | `ready` | 10 example seed (Vi/En/mix, 6 doc types) |
 | `information/leaf-engine-contract.md` | `ready` | Contract giữa backend và LLM endpoint (OpenAI-compatible) |
 | `frontend/eslint.config.js` | `ready` | ESLint v9 flat config — TS parser + react-hooks |

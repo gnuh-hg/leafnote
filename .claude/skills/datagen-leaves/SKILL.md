@@ -87,20 +87,35 @@ Sinh trực tiếp trong response. Format JSONL — mỗi dòng 1 object:
 
 ### Quy tắc leaf (bắt buộc)
 
-Mỗi leaf:
+Mỗi leaf chỉ có đúng **4 keys**: `type`, `content`, `metadata`, `confidence`. **Không** thêm `user_edited`, `id`, `created_at`, hay bất kỳ field nào khác — đó là field của DB schema (`LeafOut`), không phải training data.
+
 - `type` ∈ `{definition, fact, example, question, note}`
-- `content`: 15–80 từ (definition ngắn hơn được, miễn không dưới 10 từ)
+- `content`: **15 ≤ words ≤ 80** (cứng). Chỉ `definition` có `metadata.term` mới được dưới 15 từ (filter `leaf_quality.py:82` miễn rule sàn cho nhánh này). KHÔNG có ngoại lệ trên ngưỡng 80.
 - Độc lập: đọc leaf không cần context từ leaf khác
 - Không trùng nội dung với leaf khác trong cùng note
 - Cover hết ý chính của note (không bỏ sót)
 - `confidence`: 0.85–0.95 cho ý rõ ràng, 0.65–0.79 cho ý mơ hồ/tranh cãi
 
-Metadata bắt buộc theo type:
-- `definition` → `{"term": "...", "meaning": "..."}`
-- `fact` trong procedure → `{"ordinal": N}`
-- `fact` trong meeting → `{"source": "tên-cuộc-họp"}`
-- `example` → `{"polarity": "positive" | "negative"}`
-- `question` / `note` → `{}`
+Metadata bắt buộc theo `(type, document_type)`:
+- `definition` (mọi doc type) → `{"term": "...", "meaning": "..."}`
+- `fact` trong `procedure` → `{"ordinal": N}` cho các bước (N tăng dần). Leaf intro/outro không phải step có thể là `{}` — không bắt buộc.
+- `fact` trong `meeting` → `{"source": "tên-cuộc-họp"}`
+- `fact` trong `theory` / `narrative` / `reference` → `{}` (KHÔNG có `ordinal`)
+- `example` (mọi doc type) → `{"polarity": "positive" | "negative"}`
+- `question` / `note` (mọi doc type) → `{}`
+
+Metadata **tùy chọn** (theo contract `leaf-engine-contract.md:66-67`, dùng khi phù hợp để training data đa dạng):
+- `fact` có thể thêm `"format": "code"` hoặc `"format": "math"` khi nội dung là snippet code hoặc công thức toán.
+- `example` có thể thêm `"parent_leaf_id": null` (giữ `null` vì training data không có ID thực) khi example minh hoạ cho một leaf khác trong cùng note.
+
+### Threshold filter sẽ chấm (phải biết trước khi sinh)
+
+Filter `leaf_quality.py` chấm điểm weighted, pass nếu `total ≥ 0.75`. Để giảm rủi ro reject:
+- **Coverage** (trọng số 0.35): tập hợp token của các leaf cộng lại phải chứa **≥75% unique tokens** của note. Bỏ ý chính nào là mất ngay.
+- **Atomicity** (0.20): không leaf nào vượt **80 từ**. Vượt 80 → tách thành 2 leaf.
+- **No-duplicate** (0.15): 2 leaf bất kỳ trong cùng note phải có **Jaccard token < 0.85**. Paraphrase nhẹ vẫn fail — phải thực sự khác ý.
+- **Type-valid** (0.15): mọi `type` ∈ 5 giá trị hợp lệ. Sai 1 leaf = mất hết 0.15.
+- **Granularity floor** (0.15): không leaf nào dưới **15 từ** (trừ `definition` có `term`).
 
 ### Phân bố trong 50 examples
 
@@ -117,12 +132,16 @@ Trước khi in JSONL ra, kiểm tra nhanh:
 
 **Loại bỏ example nếu**:
 - Note là prose thuần — không có element Markdown nào (không heading, không list, không bold, không blockquote)
-- Có leaf nào >100 từ
-- Hai leaf liên tiếp nói cùng một điều (paraphrase nhau)
+- Có leaf nào **>80 từ** (filter ngưỡng cứng — `leaf_quality.py:15`)
+- Có leaf nào **<15 từ**, trừ `definition` có `metadata.term`
+- Hai leaf trong cùng note có Jaccard token **≥0.85** (paraphrase quá gần)
+- Leaf có key thừa ngoài `{type, content, metadata, confidence}` (vd `user_edited`, `id`)
 - `expected_leaves` rỗng dù note có nội dung
 - Tất cả `confidence` đều là 1.0 — không thực tế
 - `definition` thiếu `metadata.term` hoặc `metadata.meaning`
-- `fact` trong procedure thiếu `metadata.ordinal`
+- `fact` trong `procedure` thiếu `metadata.ordinal`
+- `fact` trong `theory` / `narrative` / `reference` lại có `metadata.ordinal` (sai doc type)
+- `example` thiếu `metadata.polarity`
 
 **Dấu hiệu tốt**:
 - Note có ít nhất 1 heading + 1 list hoặc blockquote
@@ -145,8 +164,13 @@ Tổng cộng sau session này: ~N×50 examples.
 Lưu output trên vào file tạm rồi append:
   cat temp.jsonl >> backend/data/raw_leaves.jsonl
 
-Kiểm tra nhanh:
-  python -c "import json; errors=[i+1 for i,l in enumerate(open('backend/data/raw_leaves.jsonl').readlines()) if not (lambda: True if json.loads(l) else True)()]; print('OK')"
+Validate session vừa sinh (BẮT BUỘC trước khi tiếp session sau):
+  cd backend
+  python -m scripts.validate_session --last 50
+
+Script in 2 phần:
+- HARD ERRORS: sai schema/metadata/key thừa → phải sửa hoặc strip trước khi tiếp
+- SOFT WARNINGS: quality score <0.75 → sẽ bị filter reject ở phase gate
 
 Phase hiện tại: <PHASE 1/2/3> — còn <N> session nữa đến hết phase.
 ```
