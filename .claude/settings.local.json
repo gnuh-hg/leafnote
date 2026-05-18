@@ -144,7 +144,13 @@
       "Bash(rm data/_s13_temp.jsonl)",
       "Bash(.\\\\venv\\\\Scripts\\\\python.exe -m scripts.validate_session --last 50)",
       "Bash(cat data/session15_temp.jsonl)",
-      "Bash(rm data/session15_temp.jsonl)"
+      "Bash(rm data/session15_temp.jsonl)",
+      "PowerShell(\\(Get-Content backend/data/raw_leaves.jsonl | Measure-Object -Line\\).Lines)",
+      "PowerShell(\\(Get-Content backend/data/_s19_batch.jsonl | Measure-Object -Line\\).Lines)",
+      "PowerShell(cd backend; \\(Get-Content data/raw_leaves.jsonl -ErrorAction SilentlyContinue | Measure-Object -Line\\).Lines)",
+      "Bash(./venv/Scripts/python.exe *)",
+      "Bash(cat backend/data/_s29_batch.jsonl)",
+      "Read(//c/c/Users/admin/all/project/leafnote/backend/data/**)"
     ]
   }
 }
